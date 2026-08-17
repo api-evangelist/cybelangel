@@ -1,0 +1,120 @@
+generated: '2026-08-17'
+method: searched
+source: >-
+  openapi/cybelangel-adm-inventory-openapi.yml, openapi/cybelangel-alerts-openapi.yml,
+  openapi/cybelangel-audit-logs-openapi.yml, openapi/cybelangel-keywords-openapi.yml,
+  openapi/cybelangel-partner-openapi.yml, openapi/cybelangel-platform-reports-openapi.yml,
+  openapi/cybelangel-threat-intelligence-openapi.yml
+docs:
+  - https://developers.cybelangel.com/docs/cybelangel-platform-api/b6b6c2d4906e9-authentication
+  - https://developers.cybelangel.com/docs/cybelangel-platform-api/05d245301ecc5-get-your-api-credentials
+  - https://developers.cybelangel.com/docs/cybelangel-platform-api/8ba3b4bfd2344-make-authenticated-requests
+  - https://developers.cybelangel.com/docs/audit-logs-api/b87d37ae48a0d-authentication
+  - https://developers.cybelangel.com/docs/alerts-api/fbe89213b575d-api-calls
+probed:
+  - {url: 'https://auth.cybelangel.com/.well-known/openid-configuration', status: 200, file: well-known/cybelangel-openid-configuration.json}
+  - {url: 'https://auth.cybelangel.com/.well-known/oauth-authorization-server', status: 200, file: well-known/cybelangel-oauth-authorization-server.json}
+  - {url: 'https://auth.cybelangel.com/.well-known/jwks.json', status: 200, file: well-known/cybelangel-jwks.json}
+summary:
+  types: [oauth2, http]
+  oauth2_flows: [clientCredentials]
+  api_key_in: []
+  single_credential: true
+  note: >-
+    One credential pair covers all seven APIs. The specs declare the mechanism inconsistently
+    but describe the same thing: the Reports API declares a full oauth2 clientCredentials
+    scheme with a tokenUrl and 10 named scopes, while the six api.cybelangel.com specs declare
+    only a bare `jwt` http-bearer scheme with no token endpoint and no scopes. The bearer they
+    accept is the same Auth0-issued token, so the http-bearer declarations are an
+    under-specification of the oauth2 flow rather than a second auth model. This artifact is
+    marked `searched` because the token endpoint, audience, credential provisioning and quota
+    come from the docs, not from those six specs.
+authorization_server:
+  issuer: https://auth.cybelangel.com/
+  vendor: Auth0
+  token_endpoint: https://auth.cybelangel.com/oauth/token
+  authorization_endpoint: https://auth.cybelangel.com/authorize
+  jwks_uri: https://auth.cybelangel.com/.well-known/jwks.json
+  revocation_endpoint: https://auth.cybelangel.com/oauth/revoke
+  userinfo_endpoint: https://auth.cybelangel.com/userinfo
+  registration_endpoint: https://auth.cybelangel.com/oidc/register
+  grant_types_supported: [client_credentials, authorization_code, refresh_token, password, implicit, 'urn:ietf:params:oauth:grant-type:device_code', 'urn:ietf:params:oauth:grant-type:token-exchange', 'urn:ietf:params:oauth:grant-type:jwt-bearer']
+  token_endpoint_auth_methods_supported: [client_secret_basic, client_secret_post, private_key_jwt, none]
+  id_token_signing_alg_values_supported: [HS256, RS256, PS256]
+  code_challenge_methods_supported: [S256, plain]
+  dpop_supported: true
+  note: >-
+    Most of the advertised grants belong to the platform's interactive login, not to the API.
+    The only grant the API documentation uses is client_credentials.
+token_request:
+  method: POST
+  url: https://auth.cybelangel.com/oauth/token
+  content_type: application/json
+  body_fields:
+    client_id: 'public identifier for your application'
+    client_secret: 'private secret used to generate tokens'
+    audience: 'https://platform.cybelangel.com/  — the same value for EVERY API, including api.cybelangel.com'
+    grant_type: client_credentials
+  response_fields: [access_token, scope, expires_in, token_type]
+  token_format: RS256 JWT
+  usage: 'Authorization: Bearer <access_token>'
+  note: >-
+    JSON body, not form-encoded — unusual for an OAuth token endpoint, and the shape the docs
+    publish in every curl example.
+credential_provisioning:
+  location: 'CybelAngel Platform > Settings > CybelAngel API'
+  role_required: 'CybelAngel Platform admin'
+  self_serve: true
+  actions: ['Enable API access (plan includes the API)', 'Start 30-day trial (plan does not)']
+  values_issued: [organization_id, client_id, client_secret]
+  organization_id_note: >-
+    Required in the path of the Audit Logs and Partner APIs, and NOT self-serve — the provider's
+    guide says "To retrieve your organization ID, please contact your Customer Success Manager."
+  alerts_stream_id_note: >-
+    The Alerts API additionally requires a stream_id, also issued by a CSM (or via
+    support@cybelangel.com). Not obtainable from any API.
+  rotation: 'not documented — no key-rotation endpoint or policy published'
+token_lifetime:
+  assume_seconds: 3600
+  conflict: >-
+    The docs contradict themselves: 1 hour on the Reports and Audit Logs authentication pages,
+    24 hours on the Alerts "API calls" page, and expires_in 86400 in the Reports OpenAPI
+    description. Assume 3600 and refresh on 401.
+  sliding: 'the Alerts limitations page says validity "is renewed whenever it is used in a successfully authenticated request"'
+  minting_quota: '2000 tokens/month per client_id — caching is mandatory, not optional'
+schemes:
+  - name: bearer_token
+    type: oauth2
+    flows:
+      - flow: clientCredentials
+        tokenUrl: https://auth.cybelangel.com/oauth/token
+        scopes: 10
+    applied: 'root-level security requirement — every operation'
+    sources:
+      - openapi/cybelangel-platform-reports-openapi.yml
+    see: scopes/cybelangel-scopes.yml
+  - name: jwt
+    type: http
+    scheme: bearer
+    bearerFormat: JWT
+    applied: 'declared in components.securitySchemes; no root-level security requirement in these six specs'
+    scopes: 0
+    sources:
+      - openapi/cybelangel-adm-inventory-openapi.yml
+      - openapi/cybelangel-alerts-openapi.yml
+      - openapi/cybelangel-audit-logs-openapi.yml
+      - openapi/cybelangel-keywords-openapi.yml
+      - openapi/cybelangel-partner-openapi.yml
+      - openapi/cybelangel-threat-intelligence-openapi.yml
+    gap: >-
+      None of these six specs declares a root-level `security:` requirement or applies the scheme
+      per operation, so a code generator reading them alone produces an unauthenticated client
+      even though every endpoint returns 401 without a bearer. They also omit the token endpoint
+      and any scope names.
+errors:
+  401: 'Missing or invalid token — verify the Authorization header format and regenerate a token'
+  403: 'Valid token, insufficient rights/scope — check that your API plan includes the required scope'
+  source: https://developers.cybelangel.com/docs/audit-logs-api/b87d37ae48a0d-authentication
+mtls: false
+openid_connect_for_api: false
+api_keys: false

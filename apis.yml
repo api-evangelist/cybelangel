@@ -1,24 +1,299 @@
 aid: cybelangel
 name: CybelAngel
-description: 'CybelAngel is a company surfaced as a portfolio company of serena and added to the API Evangelist
-  network as a stub for enrichment. Sector: ai-data. This profile is a lead awaiting the enrichment pipeline.'
+description: >-
+  CybelAngel is a Paris- and Boston-based external risk protection company that scans the
+  public internet, the deep and dark web, connected devices, cloud storage, code-sharing
+  and paste sites for a customer's exposed data and unmanaged assets. Its platform covers
+  external attack surface (ADM) inventory, data-breach prevention, credential intelligence,
+  brand protection and domain/social-media impersonation, cyber threat intelligence, and
+  analyst-led remediation. For developers it publishes seven documented REST APIs on a
+  Stoplight developer portal — Reports (incident reports, credential and domain watchlists,
+  assets, remediation requests), Alerts in Feed (real-time alerts, also served in OASIS STIX
+  format), ADM Inventory, Keywords, Threat Intelligence claimed-attacks, Audit Logs and a
+  Partner API for MSSPs managing client organizations — all authenticated with OAuth 2.0
+  client-credentials bearer tokens minted by an Auth0 tenant, plus CybelAngel Connect, a
+  no-code automation studio for ServiceNow, Jira, Splunk, Slack, Cortex XSOAR, IBM Security
+  SOAR and Azure Sentinel.
+image: https://cybelangel.com/wp-content/uploads/2026/08/langEN-1-90764-1280x460.avif
 url: https://raw.githubusercontent.com/api-evangelist/cybelangel/refs/heads/main/apis.yml
 x-type: company
 x-source: serena-portfolio
-x-tier: stub
-x-tier-reason: portfolio-lead
-specificationVersion: '0.20'
+specificationVersion: '0.21'
 created: '2026-08-17'
 modified: '2026-08-17'
 tags:
-- Company
-- Ai Data
-apis: []
+  - Company
+  - cybersecurity
+  - threat-intelligence
+  - external-attack-surface-management
+  - data-breach-prevention
+  - credential-intelligence
+  - brand-protection
+  - dark-web-monitoring
+  - digital-risk-protection
+  - stix
+  - security-alerts
+  - asset-inventory
+  - audit-logs
+apis:
+  - name: CybelAngel Reports API
+    description: >-
+      The original CybelAngel Platform API. Retrieves incident reports (v2 search plus
+      per-report detail, mirror listings in JSON/CSV/archive, PDF export, attachments and
+      comments), the leaked-credential watchlist and its CSV export, the malicious-domain
+      watchlist, report assets, report volume statistics, and the caller's report
+      permissions. Also moves report and credential statuses and files analyst remediation
+      requests. OAuth 2.0 client-credentials with a documented scope set.
+    humanURL: https://developers.cybelangel.com/docs/cybelangel-platform-api/39d4926befc14-what-can-i-do-with-this-api
+    baseURL: https://platform.cybelangel.com/api
+    tags:
+      - incident-reports
+      - credential-intelligence
+      - domain-monitoring
+      - remediation
+      - cybersecurity
+    properties:
+      - type: OpenAPI
+        url: openapi/cybelangel-platform-reports-openapi.yml
+      - type: Documentation
+        url: https://developers.cybelangel.com/docs/cybelangel-platform-api/39d4926befc14-what-can-i-do-with-this-api
+      - type: APIReference
+        url: https://developers.cybelangel.com/docs/cybelangel-platform-api/68a341c676710-references
+      - type: GettingStarted
+        url: https://developers.cybelangel.com/docs/cybelangel-platform-api/05d245301ecc5-get-your-api-credentials
+      - type: Authentication
+        url: https://developers.cybelangel.com/docs/cybelangel-platform-api/b6b6c2d4906e9-authentication
+      - type: OAuthScopes
+        url: scopes/cybelangel-scopes.yml
+      - type: Sandbox
+        url: https://stoplight.io/mocks/cybelangel/cybelangel-platform-api/84330
+      - type: Overlay
+        url: overlays/cybelangel-platform-reports-overlay.yaml
+  - name: CybelAngel Alerts API
+    description: >-
+      "Alerts in Feed" — real-time machine-readable access to the alerts CybelAngel's
+      collection and ML pipeline generates across ADM, Board, Cloud Drive, DNS, Database,
+      Docshare, Codeshare, Fileserver, Leak, Paste and RSS categories. Search by keyword,
+      IP, hostname and detection date; fetch a single alert; fetch leaked credentials and
+      codeshare findings attached to an alert; fetch a DNS screenshot; PATCH a customer
+      assessment status; and retrieve the same alerts as OASIS STIX bundles.
+    humanURL: https://developers.cybelangel.com/docs/alerts-api/72b66de24898e-cybel-angel-alerts-api-real-time-threat-intelligence
+    baseURL: https://api.cybelangel.com
+    tags:
+      - security-alerts
+      - threat-intelligence
+      - stix
+      - dark-web-monitoring
+      - credential-intelligence
+    properties:
+      - type: OpenAPI
+        url: openapi/cybelangel-alerts-openapi.yml
+      - type: Documentation
+        url: https://developers.cybelangel.com/docs/alerts-api/72b66de24898e-cybel-angel-alerts-api-real-time-threat-intelligence
+      - type: APIReference
+        url: https://developers.cybelangel.com/docs/alerts-api/a3ab024122156-search-alerts
+      - type: GettingStarted
+        url: https://developers.cybelangel.com/docs/alerts-api/c53add3c8b16f-getting-started
+      - type: RateLimits
+        url: https://developers.cybelangel.com/docs/alerts-api/304dab003eb13-limitations
+      - type: Sandbox
+        url: https://stoplight.io/mocks/cybelangel/alerts-api/133714
+      - type: Overlay
+        url: overlays/cybelangel-alerts-overlay.yaml
+  - name: CybelAngel ADM Inventory API
+    description: >-
+      Attack surface (Asset Discovery & Monitoring) inventory. Lists discovered assets and
+      their hostnames, lists threats joined with the owning asset record, and writes back
+      asset and asset-threat statuses so an external system can triage shadow IT and
+      exposed services programmatically.
+    humanURL: https://developers.cybelangel.com/docs/adm-inventory-api/7e88d945427a4-fetch-assets-details-from-adm-inventory
+    baseURL: https://api.cybelangel.com
+    tags:
+      - external-attack-surface-management
+      - asset-inventory
+      - vulnerability-management
+      - cybersecurity
+    properties:
+      - type: OpenAPI
+        url: openapi/cybelangel-adm-inventory-openapi.yml
+      - type: Documentation
+        url: https://developers.cybelangel.com/docs/adm-inventory-api/7e88d945427a4-fetch-assets-details-from-adm-inventory
+      - type: Sandbox
+        url: https://stoplight.io/mocks/cybelangel/adm-inventory-api/133714
+      - type: Overlay
+        url: overlays/cybelangel-adm-inventory-overlay.yaml
+  - name: CybelAngel Keywords API
+    description: >-
+      Manages the keyword set that drives CybelAngel detection: list, create, update and
+      change the status of monitored keywords, and list the workspaces those keywords
+      belong to. Shipped on the Q3 2026 roadmap as "Keywords API — programmatic keyword
+      management".
+    humanURL: https://developers.cybelangel.com/docs/keywords-api/c812fc6b544b0-manipulate-your-keywords
+    baseURL: https://api.cybelangel.com
+    tags:
+      - keyword-monitoring
+      - configuration
+      - cybersecurity
+    properties:
+      - type: OpenAPI
+        url: openapi/cybelangel-keywords-openapi.yml
+      - type: Documentation
+        url: https://developers.cybelangel.com/docs/keywords-api/c812fc6b544b0-manipulate-your-keywords
+      - type: Sandbox
+        url: https://stoplight.io/mocks/cybelangel/keywords-api/133714
+      - type: Overlay
+        url: overlays/cybelangel-keywords-overlay.yaml
+  - name: CybelAngel Threat Intelligence API
+    description: >-
+      Returns claimed attacks observed by CybelAngel's threat-intelligence collection —
+      ransomware and extortion claims attributed to threat actors — for ingestion into a
+      SIEM, TIP or internal risk dashboard.
+    humanURL: https://developers.cybelangel.com/docs/threat-intelligence-api/38e63ab3d5c42-fetch-threat-intelligence-claimed-attacks
+    baseURL: https://api.cybelangel.com
+    tags:
+      - threat-intelligence
+      - ransomware
+      - threat-actors
+      - cybersecurity
+    properties:
+      - type: OpenAPI
+        url: openapi/cybelangel-threat-intelligence-openapi.yml
+      - type: Documentation
+        url: https://developers.cybelangel.com/docs/threat-intelligence-api/38e63ab3d5c42-fetch-threat-intelligence-claimed-attacks
+      - type: Sandbox
+        url: https://stoplight.io/mocks/cybelangel/threat-intelligence-api/133714
+      - type: Overlay
+        url: overlays/cybelangel-threat-intelligence-overlay.yaml
+  - name: CybelAngel Audit Logs API
+    description: >-
+      Searches the audit trail for an organization — who did what in the CybelAngel
+      platform — scoped by organization_id in the path, for export into a SIEM or a
+      compliance evidence store. Shipped Q2 2026 as "Audit Log Accessibility".
+    humanURL: https://developers.cybelangel.com/docs/audit-logs-api/72b66de24898e-cybel-angel-audit-logs-api
+    baseURL: https://api.cybelangel.com
+    tags:
+      - audit-logs
+      - compliance
+      - observability
+      - cybersecurity
+    properties:
+      - type: OpenAPI
+        url: openapi/cybelangel-audit-logs-openapi.yml
+      - type: Documentation
+        url: https://developers.cybelangel.com/docs/audit-logs-api/72b66de24898e-cybel-angel-audit-logs-api
+      - type: GettingStarted
+        url: https://developers.cybelangel.com/docs/audit-logs-api/f9723159f94ff-getting-started-guide-audit-logs-api
+      - type: Authentication
+        url: https://developers.cybelangel.com/docs/audit-logs-api/b87d37ae48a0d-authentication
+      - type: Sandbox
+        url: https://stoplight.io/mocks/cybelangel/audit-logs-api/182542
+      - type: Overlay
+        url: overlays/cybelangel-audit-logs-overlay.yaml
+  - name: CybelAngel Partner API
+    description: >-
+      The MSSP/reseller surface. Mirrors the ADM Inventory, Keywords and Workspaces
+      operations but scoped to a client organization via an {organization_id} path
+      parameter, so a partner can manage assets, threats and keywords across the client
+      organizations it administers.
+    humanURL: https://developers.cybelangel.com/docs/partner-api/72b66de24898e-cybel-angel-partners-api
+    baseURL: https://api.cybelangel.com
+    tags:
+      - partner-api
+      - mssp
+      - asset-inventory
+      - keyword-monitoring
+      - multi-tenant
+    properties:
+      - type: OpenAPI
+        url: openapi/cybelangel-partner-openapi.yml
+      - type: Documentation
+        url: https://developers.cybelangel.com/docs/partner-api/72b66de24898e-cybel-angel-partners-api
+      - type: Sandbox
+        url: https://stoplight.io/mocks/cybelangel/partner-api/133714
+      - type: Overlay
+        url: overlays/cybelangel-partner-overlay.yaml
 maintainers:
-- FN: Kin Lane
-  email: kin@apievangelist.com
-- FN: APIs.json
-  email: info@apis.io
+  - FN: Kin Lane
+    email: kin@apievangelist.com
+  - FN: APIs.json
+    email: info@apis.io
 common:
-- type: Website
-  url: https://www.cybelangel.com/
+  - type: Website
+    url: https://www.cybelangel.com/
+  - type: DeveloperPortal
+    url: https://developers.cybelangel.com/
+  - type: Documentation
+    url: https://developers.cybelangel.com/docs/cybelangel-platform-api/39d4926befc14-what-can-i-do-with-this-api
+  - type: APIReference
+    url: https://developers.cybelangel.com/docs/cybelangel-platform-api/68a341c676710-references
+  - type: GettingStarted
+    url: https://developers.cybelangel.com/docs/cybelangel-platform-api/05d245301ecc5-get-your-api-credentials
+  - type: Support
+    url: https://cybelangel.com/contact/
+  - type: Blog
+    url: https://cybelangel.com/blog/
+  - type: BlogRSS
+    url: https://cybelangel.com/feed/
+  - type: GitHubOrganization
+    url: https://github.com/CybelAngel
+  - type: ChangeLog
+    url: https://cybelangel.com/changelog/
+  - type: Roadmap
+    url: https://cybelangel.com/changelog/
+  - type: SignUp
+    url: https://cybelangel.com/request-a-demo/
+  - type: Login
+    url: https://platform.cybelangel.com/
+  - type: TermsOfService
+    url: https://cybelangel.com/terms-conditions/
+  - type: PrivacyPolicy
+    url: https://cybelangel.com/privacy-policy/
+  - type: Compliance
+    url: https://cybelangel.com/solutions/compliance-cybelangel/
+  - type: Security
+    url: https://cybelangel.com/security.txt
+  - type: SecurityTxt
+    url: well-known/cybelangel-security.txt
+  - type: WellKnown
+    url: well-known/cybelangel-well-known.yml
+  - type: OpenIDConnect
+    url: https://auth.cybelangel.com/.well-known/openid-configuration
+  - type: Authentication
+    url: authentication/cybelangel-authentication.yml
+  - type: OAuthScopes
+    url: scopes/cybelangel-scopes.yml
+  - type: Conventions
+    url: conventions/cybelangel-conventions.yml
+  - type: RateLimits
+    url: rate-limits/cybelangel-rate-limits.yml
+  - type: Plans
+    url: plans/cybelangel-plans-pricing.yml
+  - type: Lifecycle
+    url: lifecycle/cybelangel-lifecycle.yml
+  - type: ChangeLog
+    url: changelog/cybelangel-changelog.yml
+  - type: ErrorCatalog
+    url: errors/cybelangel-problem-types.yml
+  - type: DataModel
+    url: data-model/cybelangel-data-model.yml
+  - type: Conformance
+    url: conformance/cybelangel-conformance.yml
+  - type: Packages
+    url: packages/cybelangel-packages.yml
+  - type: Sandbox
+    url: sandbox/cybelangel-sandbox.yml
+  - type: AgentSkill
+    url: skills/_index.yml
+  - type: LLMsTxt
+    url: llms/cybelangel-llms.txt
+  - type: DomainSecurity
+    url: security/cybelangel-domain-security.yml
+  - type: VulnerabilityDisclosure
+    url: security/cybelangel-vulnerability-disclosure.yml
+  - type: Integrations
+    url: https://developers.cybelangel.com/docs/connectors-apps/141b1fbcacfd2-welcome-to-cybel-angel-connect-docs
+x-enrichment:
+  date: '2026-08-17'
+  status: enriched
+  artifacts_added: 43
+  pass: local-v1

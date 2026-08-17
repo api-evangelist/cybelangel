@@ -1,0 +1,174 @@
+generated: '2026-08-17'
+method: searched
+source: >-
+  https://developers.cybelangel.com/docs/alerts-api/fbe89213b575d-api-calls,
+  https://developers.cybelangel.com/docs/alerts-api/304dab003eb13-limitations,
+  https://developers.cybelangel.com/docs/cybelangel-platform-api/b6b6c2d4906e9-authentication,
+  https://developers.cybelangel.com/docs/audit-logs-api/b87d37ae48a0d-authentication,
+  https://developers.cybelangel.com/docs/partner-api/72b66de24898e-cybel-angel-partners-api
+  + derived from the seven OpenAPI 3.1.0 documents in openapi/
+style:
+  protocol: REST over HTTPS
+  media_type: application/json
+  extra_media_types:
+    - text/csv (credential watchlist export, report mirror CSV)
+    - application/pdf (report PDF)
+    - application/zip (report mirror archive)
+  resource_urls: 'predictable, resource-oriented — /v1/<resource>, /v2/<resource>'
+  docs_quote: >-
+    "CybelAngel Alerts API is organized around REST. Our API has predictable
+    resource-oriented URLs and returns JSON-encoded responses, uses standard HTTP response
+    codes, authentication, and verbs."
+authentication:
+  style: OAuth 2.0 client-credentials bearer token
+  token_endpoint: https://auth.cybelangel.com/oauth/token
+  audience: https://platform.cybelangel.com/
+  request_shape: 'POST JSON body {client_id, client_secret, audience, grant_type: client_credentials}'
+  header: 'Authorization: Bearer <access_token>'
+  token_format: RS256 JWT (verify against https://auth.cybelangel.com/.well-known/jwks.json)
+  provider: Auth0 tenant at auth.cybelangel.com
+  ttl_conflict: >-
+    The docs contradict themselves on token lifetime, and an agent must handle the shortest
+    claim. The Reports API authentication page and the Audit Logs authentication page both
+    say "A token has validity period of 1 hour"; the Alerts API "API calls" page says "The
+    bearer token has an expiration time of 24h"; and the OpenAPI info block of
+    cybelangel-platform-reports-openapi.yml says "These tokens expire 24 hours" while the
+    example token response carries expires_in: 86400. Treat 3600s as the ceiling and
+    re-authenticate on any 401.
+  token_reuse: >-
+    Required, not optional — token minting is itself rate-limited to 2,000 tokens/month per
+    client_id, so a token must be cached and reused for its whole lifetime. The Audit Logs
+    guide states it explicitly: "Implement a token caching strategy to avoid regenerating a
+    token on every request."
+  renewal_on_use: >-
+    The Alerts limitations page says the 1-hour validity "is renewed whenever it is used in
+    a successfully authenticated request" — a sliding expiry, undocumented elsewhere.
+  see: authentication/cybelangel-authentication.yml, scopes/cybelangel-scopes.yml
+idempotency:
+  supported: false
+  header: null
+  evidence: >-
+    No idempotency contract exists. Not one of the 52 operations across the seven specs
+    declares an Idempotency-Key (or equivalent) header or parameter, and no docs page
+    mentions idempotency, retry-safety or request deduplication. The write surface is
+    small and mostly status-setting (PUT /v1/inventory/assets/status,
+    PUT /v1/reports/{report-id}/status, POST /v1/reports/status,
+    POST /v1/credentials/status, PUT /v1/keywords/status,
+    PATCH /v1/alerts/{alert_id}/customer) which is naturally idempotent by shape, but two
+    operations are NOT — POST /v1/reports/{report-id}/comments and
+    POST /v1/reports/remediation-request will duplicate on retry with no key to suppress it.
+    This is why apis.yml carries no `Idempotency` pointer.
+  gap_for_provider: >-
+    Adding an Idempotency-Key header to POST /v1/reports/{report-id}/comments and
+    POST /v1/reports/remediation-request is the single cheapest agent-readiness improvement
+    available here.
+pagination:
+  consistent: false
+  note: >-
+    Two incompatible pagination styles ship side by side, split by which API generation an
+    operation belongs to. An agent cannot assume one.
+  styles:
+    - style: cursor
+      params: [cursor, limit]
+      response_fields: [cursor]
+      apis: [Alerts, ADM Inventory, Keywords, Audit Logs, Partner]
+      operations:
+        - alerts_search_alerts_alerts_get
+        - stix_search_stix_alerts_stix_alerts_get
+        - get-inventory-assets
+        - get-inventory-assets-hostnames
+        - get-inventory-threats-with-asset-info
+        - get-keywords
+        - get-organization-inventory-assets
+        - get-organization-inventory-assets-hostnames
+        - get-organization-inventory-threats-with-asset-info
+        - get-organization-keywords
+        - audit_logs_search_audit_logs__organization_id__audit_logs_get
+      note: >-
+        The STIX variant names its page-size parameter alerts_limit rather than limit.
+    - style: offset
+      params: [skip, limit]
+      apis: [Reports, Threat Intelligence]
+      operations:
+        - get-credential-watchlist
+        - get-domain-watchlist
+        - get-threat-intelligence-claimed-attacks
+  hard_response_cap:
+    alerts: 1000
+    docs_quote: 'We never send more than 1000 alerts in a single request response.'
+    note: >-
+      The documented Python toolbox script exists mainly to page past this cap; the docs
+      article "How to fetch 1000 alerts" is the canonical worked example.
+filtering_and_sorting:
+  date_windows: >-
+    Every list operation is date-windowed, but the parameter names are not harmonized:
+    start-date/end-date (Reports v2), start_date/end_date, date_from/date_to,
+    min-date/max-date, creation_start_date/creation_end_date,
+    first_seen_start_date/first_seen_end_date, last_modification_start_date/
+    last_modification_end_date, first_seen_at_start_date/last_seen_at_end_date, start/end.
+    A client must read each operation's parameter list; there is no global convention.
+  sorting: 'order / order_by (Reports), sort_by / sort_order (newer APIs) — also unharmonized'
+  free_text: 'query / search_query / keyword / match, plus a documented freetext-search guide for Alerts'
+  ml_score_filter: 'min_ml_score on the Alerts search — filter to high-confidence detections'
+  streams: 'stream_id scopes an Alerts query to a provisioned alert stream (issued by the CSM, not self-serve)'
+field_expansion:
+  supported: false
+  note: No expand / fields / sparse-fieldset parameter in any spec.
+metadata:
+  supported: false
+  note: No customer-writable metadata bag. The only customer-owned write on an alert is the customer_assessment status.
+request_tracing:
+  request_id_header: null
+  note: >-
+    No request-id / correlation-id header is documented or declared in any spec response,
+    and none was observed on the live 404 from api.cybelangel.com (which returns only
+    content-type, x-content-type-options, content-length and date). Nothing to quote to
+    support when a call fails.
+versioning:
+  scheme: uri-path
+  versions_in_use: [v1, v2]
+  note: >-
+    Mixed within one API rather than across APIs: the Reports API serves /v2/reports and
+    /v2/stats/reports alongside /v1/reports/{id}/mirror, /v1/credentials and /v1/domains.
+    No version header, no date-pinning, no version-negotiation. See lifecycle/.
+error_envelope:
+  format: proprietary
+  rfc9457: false
+  shape: '{"error": {"message": "<string>"}}'
+  validation_shape: '{"error": {"message": "<string>", "fields": [{"name", "msg", "input", "valid_input"}]}}'
+  content_type: application/json
+  note: >-
+    Consistent across all seven specs as APIErrorResponse[<ErrorName>] wrapping a single
+    `error` object — never application/problem+json, no `type` URI, no `status` member.
+    The Reports API is the weak one: its 4xx/5xx responses are declared with a description
+    only and NO content schema at all, so a client of platform.cybelangel.com/api cannot
+    know the failure shape from the spec.
+  see: errors/cybelangel-problem-types.yml
+rate_limit_signaling:
+  documented_limits: true
+  response_headers: none
+  note: >-
+    Limits are published in prose (15 req/s, 20 concurrent, 2,000 tokens/month) but NO
+    rate-limit response headers are documented and none are declared in any spec — no
+    X-RateLimit-*, no RateLimit-*, no Retry-After. The docs say only that excess requests
+    "may be automatically rejected", without naming the status code. An agent has no
+    runtime signal to back off on; it must self-throttle.
+  see: rate-limits/cybelangel-rate-limits.yml
+data_retention:
+  alerts: 12 months rolling; nothing available before 2026-01-01
+  note: >-
+    A convention with teeth for agents: a query outside the window returns an empty result
+    rather than an error. Quoted from the Alerts limitations page: "Alerts are available,
+    via API, for a maximum period of 12 months from the date of day. Please note that no
+    data is available before January 1, 2024."
+  ordering_caveat: >-
+    "Due to the asynchronous nature of our detection and ingestion process, it is possible
+    that the alerts from the last minutes are not made available in the correct sequence" —
+    so a tail-polling agent must overlap its windows rather than advance a strict watermark.
+alternative_formats:
+  stix:
+    endpoint: GET /v1/stix/alerts
+    standard: OASIS STIX (Structured Threat Information Expression)
+    note: >-
+      Every alert category except RSS has a published STIX schema mapping. This is the one
+      place CybelAngel speaks an industry data standard rather than a proprietary shape.

@@ -1,0 +1,96 @@
+generated: '2026-08-17'
+method: searched
+source: >-
+  https://cybelangel.com/changelog/,
+  https://developers.cybelangel.com/ (Stoplight table-of-contents for all eight projects),
+  https://developers.cybelangel.com/docs/alerts-api/304dab003eb13-limitations,
+  https://cybelangel.com/terms-conditions/
+  + derived from the seven OpenAPI documents in openapi/
+versioning:
+  scheme: uri-path
+  versions_in_use: [v1, v2]
+  current: 'v2 for reports and report stats; v1 everywhere else'
+  header_negotiation: false
+  date_pinning: false
+  docs: https://developers.cybelangel.com/docs/cybelangel-platform-api/68a341c676710-references
+  note: >-
+    There is no published versioning POLICY — only observable version segments in the paths.
+    v1 and v2 coexist inside a single API: the Reports API serves /v2/reports and
+    /v2/stats/reports beside /v1/reports/{id}/mirror, /v1/credentials, /v1/domains and
+    /v1/assets/{type}/{name}. The six api.cybelangel.com APIs are all v1. The Stoplight
+    projects also differ in default branch — six publish from `production`, audit-logs-api
+    publishes from `main` — which is an internal-release detail leaking into the public
+    portal.
+  spec_versions:
+    - {spec: openapi/cybelangel-platform-reports-openapi.yml, info_version: 0.1.0}
+    - {spec: openapi/cybelangel-alerts-openapi.yml, info_version: 1.0.0}
+    - {spec: openapi/cybelangel-adm-inventory-openapi.yml, info_version: 1.0.0}
+    - {spec: openapi/cybelangel-keywords-openapi.yml, info_version: 1.0.0}
+    - {spec: openapi/cybelangel-partner-openapi.yml, info_version: 1.0.0}
+    - {spec: openapi/cybelangel-threat-intelligence-openapi.yml, info_version: 1.0.0}
+    - {spec: openapi/cybelangel-audit-logs-openapi.yml, info_version: 1.0.0}
+    - note: >-
+        The oldest and largest API still declares info.version 0.1.0 while the newer ones
+        declare 1.0.0 — the version field is not maintained as a release signal.
+deprecation:
+  policy_url: null
+  policy_published: false
+  sunset_header: false
+  deprecation_header: false
+  rfc8594: false
+  evidence_of_practice: >-
+    CybelAngel DOES deprecate in the contract even though it publishes no policy: the Alerts
+    API marks GET /v1/alerts/{alert_id}/credentials with `deprecated: true` in the OpenAPI and
+    supersedes it with GET /v1/alerts/{alert_id}/leak-credentials, and three Alerts operations
+    declare a 410 Gone response. That is a real deprecation signal delivered in-band. What is
+    missing is the human contract around it — no sunset date, no notice period, no RFC 8594
+    Sunset/Deprecation response headers, and no page that says how much warning a customer
+    gets. The Q2 2026 changelog entry "[Coming Q3] Reinforced API Access" is the closest thing
+    to a stated intention.
+  deprecated_operations:
+    - spec: openapi/cybelangel-alerts-openapi.yml
+      operationId: alerts_get_alert_credentials_deprecated_alerts__alert_id__credentials_get
+      path: GET /v1/alerts/{alert_id}/credentials
+      superseded_by: GET /v1/alerts/{alert_id}/leak-credentials
+      deprecated_flag: true
+  operations_returning_410:
+    - GET /v1/alerts/{alert_id}/credentials
+    - GET /v1/alerts/{alert_id}/dns-screenshot
+    - GET /v1/leak-credentials
+status_page: null
+status_page_note: >-
+  No status page. status.cybelangel.com does not resolve (DNS failure, curl exit 6), and no
+  status/uptime/incident-history URL appears anywhere in the 258-URL page sitemap, the
+  developer portal, or the platform footer. This is the single largest operational-transparency
+  gap on the profile, which is why apis.yml carries no `StatusPage` pointer.
+sla:
+  url: null
+  uptime_target: null
+  note: >-
+    No public SLA or uptime commitment. https://cybelangel.com/terms-conditions/ is a website
+    terms page; the service-level terms live in the customer contract, which is not published.
+release_cadence:
+  scheme: quarterly
+  surface: https://cybelangel.com/changelog/
+  labels: [GA, Beta, Research, 'Coming Q<n>']
+  policy_quote: >-
+    "The changelog is updated continuously as features ship. Each quarter we publish a
+    structured recap covering everything that moved to Generally Available, entered Beta,
+    started Research, or is planned for the next quarter."
+  roadmap_commitment_quote: >-
+    "The next-quarter roadmap is committed, but priorities can shift based on emerging threats,
+    customer demand, or technical findings during development. We will always communicate scope
+    changes via the changelog and through your Customer Success Manager."
+  see: changelog/cybelangel-changelog.yml
+data_lifecycle:
+  alerts_retention_months: 12
+  alerts_earliest_date: '2026-01-01'
+  note: >-
+    A data-lifecycle boundary an integration must encode, not just a limit: alerts age out of
+    the API after 12 months and nothing exists before 2026-01-01. Queries outside the window
+    return empty rather than erroring.
+  source: https://developers.cybelangel.com/docs/alerts-api/304dab003eb13-limitations
+beta_access:
+  mechanism: 'opt-in via Customer Success Manager'
+  quote: 'Beta: available to opt-in customers. Contact your Customer Success Manager to join.'
+  note: 'No public beta/preview flag, header or environment — beta features are enabled per account.'

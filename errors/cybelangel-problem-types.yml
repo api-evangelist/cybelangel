@@ -1,0 +1,127 @@
+generated: '2026-08-17'
+method: derived
+source: >-
+  derived from the 4xx/5xx responses and components.schemas of all seven OpenAPI documents in
+  openapi/; enriched from
+  https://developers.cybelangel.com/docs/audit-logs-api/b87d37ae48a0d-authentication and
+  https://developers.cybelangel.com/docs/alerts-api/fbe89213b575d-api-calls
+format: proprietary
+rfc9457: false
+envelope:
+  content_type: application/json
+  shape: '{"error": {"message": "<string>"}}'
+  wrapper_schema_pattern: 'APIErrorResponse[<ErrorName>] — object with a single required `error` property'
+  validation_shape: '{"error": {"message": "<string>", "fields": [{"name": "...", "msg": "...", "input": "...", "valid_input": "..."}]}}'
+  note: >-
+    No `type` URI, no `status` member, no `instance`, and never application/problem+json —
+    so the envelope is not RFC 9457 Problem Details. Machine dispatch is on HTTP status
+    alone; the only structured detail available anywhere is the ValidationError `fields[]`
+    array on the Alerts and Audit Logs APIs.
+coverage_gap:
+  api: CybelAngel Reports API (openapi/cybelangel-platform-reports-openapi.yml)
+  finding: >-
+    Its 400/401/403/404/500 responses are declared with a human description and NO content
+    schema at all (16 of the 400s, 21 of the 401s, 21 of the 403s, 10 of the 404s and 21 of
+    the 500s across the corpus are schema-less, and all of them are on this spec). A client
+    of platform.cybelangel.com/api cannot learn the failure shape from the contract; the six
+    api.cybelangel.com specs all declare application/json error schemas.
+problems:
+  - status: 400
+    name: BadRequestError
+    title: User sent a bad request
+    schema: 'APIErrorResponse[BadRequestError] → {error: {message}}'
+    apis: [ADM Inventory, Keywords, Threat Intelligence, Partner]
+    remediation: Fix the request; the message names the offending condition.
+  - status: 400
+    name: ValidationError
+    title: Error on incorrect input fields
+    schema: 'APIErrorResponse[ValidationError] → {error: {message, fields[{name, msg, input, valid_input}]}}'
+    apis: [Alerts, Audit Logs]
+    remediation: >-
+      The richest error in the estate — iterate fields[] and correct each named parameter
+      against valid_input. Most commonly a malformed or out-of-window date.
+  - status: 400
+    name: '(undeclared)'
+    title: Bad request
+    schema: null
+    apis: [Reports]
+    note: 'Declared by description only, no content schema — see coverage_gap.'
+  - status: 401
+    name: UnauthorizedError
+    title: Missing or invalid token
+    schema: 'APIErrorResponse[UnauthorizedError] → {error: {message}}'
+    apis: [ADM Inventory, Keywords, Threat Intelligence, Partner, Reports]
+    docs_cause: Missing or invalid token
+    remediation: >-
+      Verify the Authorization header format ("Bearer <token>") and regenerate a token at
+      https://auth.cybelangel.com/oauth/token. Also returned when a token has expired —
+      remember the token-minting cap (2,000/month) and cache the new token.
+    source: https://developers.cybelangel.com/docs/audit-logs-api/b87d37ae48a0d-authentication
+  - status: 403
+    name: ForbiddenAccessError
+    title: User cannot access some resource
+    schema: 'APIErrorResponse[ForbiddenAccessError] → {error: {message}}'
+    apis: [Alerts, ADM Inventory, Keywords, Threat Intelligence, Partner, Audit Logs, Reports]
+    docs_cause: 'No rights to access audit logs on the organization.'
+    remediation: >-
+      Check that the API plan includes the required scope. On the Reports API the scope set
+      is explicit (reports.read, reports.move, credentials.read, credentials.move,
+      credentials.export, assets.download, usergroups.read, usergroups.admin,
+      reports_global_comments.read/write) — a 403 usually means the client_credentials grant
+      was not issued that scope. See scopes/cybelangel-scopes.yml.
+    source: https://developers.cybelangel.com/docs/audit-logs-api/b87d37ae48a0d-authentication
+  - status: 404
+    name: NotFoundError
+    title: Nothing matches the given URI
+    schema: 'APIErrorResponse[NotFoundError] → {error: {message}}'
+    apis: [Alerts, ADM Inventory, Threat Intelligence, Partner, Audit Logs, Reports]
+    remediation: >-
+      Check the resource id. Note that an out-of-retention alert query returns an EMPTY
+      RESULT SET, not a 404 — do not treat empty as missing.
+  - status: 409
+    name: ConflictError
+    title: Status conflict on an asset status write
+    schema: 'application/json error envelope'
+    apis: [ADM Inventory, Partner]
+    source_operations:
+      - openapi/cybelangel-adm-inventory-openapi.yml#put-inventory-assets-status
+      - openapi/cybelangel-partner-openapi.yml#put-organization-inventory-assets-status
+    remediation: >-
+      Re-read the asset before writing. With no idempotency key on the write path, a
+      concurrent status change is the likely cause.
+  - status: 410
+    name: GoneError
+    title: Resource permanently withdrawn
+    schema: 'application/json error envelope'
+    apis: [Alerts]
+    source_operations:
+      - openapi/cybelangel-alerts-openapi.yml#alerts_get_alert_credentials_deprecated_alerts__alert_id__credentials_get
+      - openapi/cybelangel-alerts-openapi.yml#alerts_get_alert_dns_screenshot_alerts__alert_id__dns_screenshot_get
+      - openapi/cybelangel-alerts-openapi.yml#alerts_get_leak_credentials_leak_credentials_get
+    note: >-
+      The only 410s in the estate, and the most agent-relevant status here: one of the three
+      operations that can return it is itself marked deprecated: true
+      (GET /v1/alerts/{alert_id}/credentials, superseded by
+      GET /v1/alerts/{alert_id}/leak-credentials). Treat 410 as "stop retrying and migrate",
+      never as a transient failure.
+  - status: 500
+    name: UnknownError
+    title: Unhandled server error
+    schema: 'APIErrorResponse[UnknownError] → {error: {message}}'
+    apis: [Alerts, ADM Inventory, Keywords, Threat Intelligence, Partner, Audit Logs, Reports]
+    remediation: >-
+      Retry with backoff. No request-id/correlation header is returned by any operation, so
+      escalation to support@cybelangel.com has to be described by time + endpoint + payload
+      rather than by an identifier.
+undocumented:
+  rate_limit_status: >-
+    The status code returned when the 15 req/s or 20-concurrent ceiling is exceeded is NOT
+    documented and not declared in any spec — the docs only say requests "may be automatically
+    rejected". 429 is the natural assumption but CybelAngel does not state it, so it is not
+    recorded as a problem type here.
+counts:
+  problem_types: 9
+  operations_covered: 52
+  specs_covered: 7
+  operations_with_a_400: 47
+  operations_with_a_500: 52

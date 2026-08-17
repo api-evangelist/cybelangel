@@ -42,6 +42,60 @@
 > Full detail: **[Where this data comes from](https://apievangelist.com/about/where-our-data-comes-from)**
 <!-- API-EVANGELIST-PROVENANCE:END -->
 
-CybelAngel is a company surfaced as a portfolio company of serena and added to the API Evangelist network as a stub for enrichment. Sector: ai-data. This profile is a lead awaiting the enrichment pipeline.
+CybelAngel is a Paris- and Boston-based external risk protection company. Its platform scans the
+public internet, the deep and dark web, unsecured file servers and databases, cloud drives, code-
+and paste-sharing sites, DNS and social platforms for a customer's exposed data and unmanaged
+assets, across external attack surface (ADM) inventory, data-breach prevention, credential
+intelligence, brand protection and impersonation, cyber threat intelligence, and analyst-led
+remediation.
+
+## What this profile covers
+
+CybelAngel publishes **seven documented REST APIs** on a Stoplight developer portal at
+[developers.cybelangel.com](https://developers.cybelangel.com/) — **52 operations across seven
+OpenAPI 3.1.0 documents**, all harvested verbatim into [`openapi/`](openapi/):
+
+| API | Ops | Base URL |
+|---|---|---|
+| [Reports](https://developers.cybelangel.com/docs/cybelangel-platform-api/39d4926befc14-what-can-i-do-with-this-api) | 21 | `https://platform.cybelangel.com/api` |
+| [Alerts (Alerts in Feed)](https://developers.cybelangel.com/docs/alerts-api/72b66de24898e-cybel-angel-alerts-api-real-time-threat-intelligence) | 9 | `https://api.cybelangel.com` |
+| [Partner](https://developers.cybelangel.com/docs/partner-api/72b66de24898e-cybel-angel-partners-api) | 10 | `https://api.cybelangel.com` |
+| [ADM Inventory](https://developers.cybelangel.com/docs/adm-inventory-api/7e88d945427a4-fetch-assets-details-from-adm-inventory) | 5 | `https://api.cybelangel.com` |
+| [Keywords](https://developers.cybelangel.com/docs/keywords-api/c812fc6b544b0-manipulate-your-keywords) | 5 | `https://api.cybelangel.com` |
+| [Threat Intelligence](https://developers.cybelangel.com/docs/threat-intelligence-api/38e63ab3d5c42-fetch-threat-intelligence-claimed-attacks) | 1 | `https://api.cybelangel.com` |
+| [Audit Logs](https://developers.cybelangel.com/docs/audit-logs-api/72b66de24898e-cybel-angel-audit-logs-api) | 1 | `https://api.cybelangel.com` |
+
+Authentication is OAuth 2.0 client-credentials against an Auth0 tenant at
+`auth.cybelangel.com`, which serves real OIDC discovery, RFC 8414 metadata and JWKS
+(all three captured in [`well-known/`](well-known/)).
+
+## Notable findings
+
+- **Token minting is the real quota.** 2,000 tokens/month per `client_id` against a token the
+  docs variously describe as lasting 1 hour or 24 hours. Caching is mandatory, not an
+  optimization — see [`rate-limits/`](rate-limits/) and [`conventions/`](conventions/).
+- **Two pagination styles in one estate**: cursor on the newer `api.cybelangel.com` APIs,
+  `skip`/`limit` on the Reports watchlists and Threat Intelligence.
+- **No idempotency key anywhere**, and two genuinely non-idempotent POSTs (report comments,
+  remediation requests).
+- **Published limits, no runtime signal**: 15 req/s and 20 concurrent requests are documented,
+  but no `X-RateLimit-*`, `RateLimit-*` or `Retry-After` header exists and the exhaustion status
+  code is never named.
+- **The Reports API declares no error schemas** — its 4xx/5xx responses carry a description only,
+  unlike the six sibling specs.
+- **STIX is a real strength**: `GET /v1/stix/alerts` returns OASIS STIX bundles, with a published
+  schema mapping per alert category.
+- **The `/security.txt` is broken three ways** — wrong path, no `Expires`, and its only `Contact`
+  is the marketing site's WordPress agency rather than CybelAngel. Detail in
+  [`security/`](security/).
+- **No SDKs, no CLI, no MCP server, no agent card, no webhooks/AsyncAPI, no status page, no
+  published prices.** Every registry and well-known path probed is recorded with the status it
+  actually returned.
+- CybelAngel does hold **ISO/IEC 27001:2022** and **SOC 2 Type I** (both A-LIGN) — see
+  [`conformance/`](conformance/).
+
+Six packaged [Agent Skills](skills/) ground the marquee flows in real `operationId`s, and each
+harvested spec has an [Overlay](overlays/) carrying API Evangelist's derived findings without
+mutating the provider's document.
 
 Source: portfolio company of [serena](https://github.com/api-evangelist/serena) — https://www.cybelangel.com/

@@ -1,0 +1,66 @@
+generated: '2026-08-17'
+method: searched
+source: >-
+  https://cybelangel.com/page-sitemap.xml (no /pricing page exists),
+  https://developers.cybelangel.com/docs/cybelangel-platform-api/05d245301ecc5-get-your-api-credentials,
+  https://developers.cybelangel.com/docs/audit-logs-api/b87d37ae48a0d-authentication,
+  https://cybelangel.com/changelog/,
+  https://cybelangel.com/request-a-demo/
+plan_count: 0
+published_pricing: false
+currency: null
+note: >-
+  CybelAngel publishes NO price and no plan table. Its 258-URL page sitemap contains no
+  /pricing path at all and /pricing returns 404; the commercial funnel is
+  https://cybelangel.com/request-a-demo/ and a Customer Success Manager. What the developer
+  docs DO publish is the packaging rule for API access itself, and the API trial, which are
+  recorded below as tiers-without-prices because they are the only real, quotable commercial
+  facts on the API surface.
+api_packaging:
+  statement: 'The CybelAngel API is part of the advanced package or can be purchased separately.'
+  source: https://developers.cybelangel.com/docs/cybelangel-platform-api/05d245301ecc5-get-your-api-credentials
+  also_included_in: 'all CybelAngel Connect offers'
+  activation: 'Platform > Settings > CybelAngel API > "Enable API access" (admin only); issues client_id + client_secret'
+tiers:
+  - name: API included in subscription
+    price: null
+    currency: null
+    period: null
+    quota: 'API access enabled; 2,000 access tokens/month per client_id, 15 req/s, 20 concurrent'
+    overage: null
+    note: >-
+      Available when the customer's plan already contains the API ("advanced package"), or
+      when it was purchased separately. Self-activated by a platform admin.
+  - name: API 30-day trial
+    price: '0'
+    currency: null
+    period: 30 days
+    quota: 'full API access for 30 days, then expires'
+    overage: null
+    docs_quote: >-
+      Your plan does not include the API: open the CybelAngel API section, click "Start
+      30-day trial", your credentials are immediately available for 30 days. Contact your CSM
+      or request an upgrade from the platform to get unlimited access after the trial period.
+    source: https://developers.cybelangel.com/docs/audit-logs-api/b87d37ae48a0d-authentication
+  - name: Alerts API (Alerts in Feed)
+    price: null
+    currency: null
+    period: null
+    quota: 'requires a provisioned stream_id'
+    note: >-
+      Separately subscribed and NOT self-serve: "You have your API credentials and your
+      stream identifier(s) (If not, please contact your CSM, or send an email to
+      support@cybelangel.com)". The stream identifier is issued by a human.
+    source: https://developers.cybelangel.com/docs/alerts-api/c53add3c8b16f-getting-started
+roadmap_items_affecting_pricing:
+  - item: CybelAngel Starter
+    status: '[Coming Q3] 2026'
+    note: 'A self-service platform entry point — the first plan CybelAngel has signalled it may sell without a demo.'
+    source: https://cybelangel.com/changelog/
+  - item: Self-Service Plan
+    status: '[Beta] shipped Q2 2026'
+    source: https://cybelangel.com/changelog/
+  - item: Credits Monitoring
+    status: '[New] shipped Q2 2026'
+    note: 'Usage tracking — implies a credit-metered commercial model, but no credit prices are published.'
+    source: https://cybelangel.com/changelog/

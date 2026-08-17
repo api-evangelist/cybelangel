@@ -1,0 +1,50 @@
+generated: '2026-08-17'
+method: probed
+source: live DNS/TLS/HTTP probes of apis.yml + OpenAPI hosts
+hosts:
+- host: www.cybelangel.com
+  https: true
+  tls_version: TLSv1.3
+  cert_expires: Nov 14 12:28:35 2026 GMT
+  hsts: true
+  hsts_max_age: 31536000
+- host: developers.cybelangel.com
+  https: true
+  tls_version: TLSv1.3
+  cert_expires: Nov 15 13:15:50 2026 GMT
+  hsts: true
+  hsts_max_age: 31536000
+- host: platform.cybelangel.com
+  https: true
+  tls_version: TLSv1.3
+  cert_expires: Oct  2 16:29:26 2026 GMT
+  hsts: true
+  hsts_max_age: 31536000
+- host: api.cybelangel.com
+  https: true
+  tls_version: TLSv1.3
+  cert_expires: Oct  2 16:29:26 2026 GMT
+  hsts: false
+  hsts_max_age: null
+  note: >-
+    The API host for six of the seven published APIs. Added by hand — the probe script
+    caps itself at three hosts. Root returns HTTP/2 404 text/plain "404 page not found"
+    with x-content-type-options nosniff and NO Strict-Transport-Security header, so this
+    host is the one gap in an otherwise HSTS-everywhere estate.
+- host: auth.cybelangel.com
+  https: true
+  tls_version: TLSv1.3
+  cert_expires: Sep 21 16:56:59 2026 GMT
+  hsts: true
+  hsts_max_age: 31536000
+  hsts_include_subdomains: true
+  note: >-
+    Auth0 tenant that mints every bearer token; serves OIDC discovery and JWKS.
+    Added by hand for the same reason as api.cybelangel.com.
+domains:
+- domain: cybelangel.com
+  dnssec: true
+  caa: []
+  spf: true
+  dmarc: true
+  dmarc_policy: reject

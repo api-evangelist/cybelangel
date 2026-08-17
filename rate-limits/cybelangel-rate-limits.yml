@@ -1,0 +1,78 @@
+generated: '2026-08-17'
+method: searched
+source: >-
+  https://developers.cybelangel.com/docs/alerts-api/304dab003eb13-limitations,
+  https://developers.cybelangel.com/docs/alerts-api/fbe89213b575d-api-calls,
+  https://developers.cybelangel.com/docs/cybelangel-platform-api/b6b6c2d4906e9-authentication,
+  https://developers.cybelangel.com/docs/audit-logs-api/b87d37ae48a0d-authentication
+limit_count: 4
+response_headers: []
+status_on_exhaustion: null
+note: >-
+  CybelAngel publishes real numeric limits in prose, on the Alerts API "Limitations" page and
+  in both authentication guides — but ships NO runtime signal. No X-RateLimit-*, no
+  RateLimit-* (RFC 9331/draft), no Retry-After header is documented anywhere, none is
+  declared in any of the seven OpenAPI documents, and the docs do not even name the status
+  code returned when a limit is hit ("Additional requests may be automatically rejected").
+  A client therefore has to enforce the published ceilings itself; it cannot discover its
+  remaining budget from a response. The token-minting cap is the one that actually bites
+  automation: 2,000 tokens/month against a 1-hour token means a naive client that fetches a
+  fresh token per request exhausts a month of budget in under three hours.
+limits:
+  - scope: per-client
+    dimension: requests-per-second
+    limit: 15
+    window: 1s
+    burst: null
+    applies_to: api.cybelangel.com (Alerts and, by the same published statement, the sibling APIs)
+    docs_quote: >-
+      In order to protect our infrastructure, we don't accept more than 15 requests/second
+      from a single client. Additional requests may be automatically rejected.
+    source: https://developers.cybelangel.com/docs/alerts-api/304dab003eb13-limitations
+  - scope: per-client
+    dimension: concurrent-pending-requests
+    limit: 20
+    window: concurrent
+    applies_to: api.cybelangel.com
+    docs_quote: >-
+      We also limit the number of pending requests to 20 simultaneous requests from a single
+      client. Additional requests may be automatically rejected.
+    source: https://developers.cybelangel.com/docs/alerts-api/304dab003eb13-limitations
+  - scope: per-client_id
+    dimension: access-tokens-per-month
+    limit: 2000
+    window: 1 month
+    applies_to: https://auth.cybelangel.com/oauth/token
+    docs_quote: 'You are limited to 2000 tokens/month for a client identifier.'
+    source: https://developers.cybelangel.com/docs/cybelangel-platform-api/b6b6c2d4906e9-authentication
+    mitigation: >-
+      Cache and reuse the token for its whole lifetime. The Audit Logs guide: "Implement a
+      token caching strategy to avoid regenerating a token on every request — reuse the same
+      token until it expires."
+  - scope: per-response
+    dimension: max-records-returned
+    limit: 1000
+    window: per request
+    applies_to: 'GET /v1/alerts, GET /v1/stix/alerts'
+    docs_quote: 'We never send more than 1000 alerts in a single request response.'
+    source: https://developers.cybelangel.com/docs/alerts-api/304dab003eb13-limitations
+    mitigation: 'Page with the cursor parameter; the docs ship a worked example ("How to fetch 1000 alerts").'
+token_lifetime:
+  documented_values:
+    - {value: 1 hour, source: 'https://developers.cybelangel.com/docs/cybelangel-platform-api/b6b6c2d4906e9-authentication'}
+    - {value: 1 hour, source: 'https://developers.cybelangel.com/docs/audit-logs-api/b87d37ae48a0d-authentication'}
+    - {value: 24 hours, source: 'https://developers.cybelangel.com/docs/alerts-api/fbe89213b575d-api-calls'}
+    - {value: '86400s (expires_in in the documented token response)', source: 'openapi/cybelangel-platform-reports-openapi.yml info.description'}
+  note: >-
+    Unresolved contradiction in the provider's own docs. Assume the shorter value (3600s) and
+    re-authenticate on 401.
+  sliding: >-
+    The Alerts limitations page adds that the 1-hour validity "is renewed whenever it is used
+    in a successfully authenticated request".
+retention_limits:
+  alerts_window_months: 12
+  alerts_earliest_date: '2026-01-01'
+  docs_quote: >-
+    Alerts are available, via API, for a maximum period of 12 months from the date of day.
+    Please note that no data is available before January 1, 2024.
+  source: https://developers.cybelangel.com/docs/alerts-api/304dab003eb13-limitations

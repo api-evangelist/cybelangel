@@ -1,0 +1,70 @@
+generated: '2026-08-17'
+method: derived
+source: openapi/cybelangel-platform-reports-openapi.yml
+schemes:
+- name: bearer_token
+  source: openapi/cybelangel-platform-reports-openapi.yml
+  flows:
+  - flow: clientCredentials
+    tokenUrl: https://auth.cybelangel.com/oauth/token
+scopes:
+- scope: assets.download
+  description: Downloading an asset
+  flows:
+  - clientCredentials
+  sources:
+  - openapi/cybelangel-platform-reports-openapi.yml
+- scope: credentials.export
+  description: Export list of credentials
+  flows:
+  - clientCredentials
+  sources:
+  - openapi/cybelangel-platform-reports-openapi.yml
+- scope: credentials.move
+  description: Resolve or reopen a credential
+  flows:
+  - clientCredentials
+  sources:
+  - openapi/cybelangel-platform-reports-openapi.yml
+- scope: credentials.read
+  description: Read list of leaked monitored credentials
+  flows:
+  - clientCredentials
+  sources:
+  - openapi/cybelangel-platform-reports-openapi.yml
+- scope: reports.move
+  description: Resolve or reopen an incident report
+  flows:
+  - clientCredentials
+  sources:
+  - openapi/cybelangel-platform-reports-openapi.yml
+- scope: reports.read
+  description: Read incident reports
+  flows:
+  - clientCredentials
+  sources:
+  - openapi/cybelangel-platform-reports-openapi.yml
+- scope: reports_global_comments.read
+  description: Read comments of a incident report
+  flows:
+  - clientCredentials
+  sources:
+  - openapi/cybelangel-platform-reports-openapi.yml
+- scope: reports_global_comments.write
+  description: Write comments on a incident report (Endpoint not accessible, yet)
+  flows:
+  - clientCredentials
+  sources:
+  - openapi/cybelangel-platform-reports-openapi.yml
+- scope: usergroups.admin
+  description: Read and manage usergroups
+  flows:
+  - clientCredentials
+  sources:
+  - openapi/cybelangel-platform-reports-openapi.yml
+- scope: usergroups.read
+  description: Read subscribed usergroups
+  flows:
+  - clientCredentials
+  sources:
+  - openapi/cybelangel-platform-reports-openapi.yml

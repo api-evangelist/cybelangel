@@ -1,0 +1,113 @@
+generated: '2026-08-17'
+method: generated
+source: >-
+  Generated from the seven OpenAPI 3.1.0 documents in openapi/ (52 operations) plus the
+  developers.cybelangel.com articles on authentication, credentials, limitations, STIX and the
+  API toolbox. Every operationId referenced in every skill was grepped out of the harvested
+  specifications — none was invented. CybelAngel publishes no AGENTS.md, skill files or agent
+  documentation of its own (searched the portal, the marketing site, the changelog and the
+  GitHub organization).
+note: >-
+  Six skills covering the marquee flows across all seven APIs. The rules each one carries are the
+  ones an agent gets wrong on this provider specifically: the 2,000-tokens-per-month cap that
+  punishes per-request auth, the two incompatible pagination styles, the 1,000-record alert cap,
+  the asynchronous ingestion order that breaks watermark polling, the HTTP 207 partial success on
+  keyword batches, the 409 on asset status writes, the absence of any idempotency key on the two
+  genuinely non-idempotent POSTs, and the fact that leaked-credential responses are live breach
+  data.
+skills:
+  - file: cybelangel-authenticate.md
+    name: Authenticate to the CybelAngel APIs
+    api: authentication/cybelangel-authentication.yml
+    operations: []
+    note: 'Prerequisite for every other skill; covers the token cache the quota forces on you.'
+  - file: cybelangel-poll-alert-feed.md
+    name: Poll the CybelAngel alert feed into a SIEM
+    api: openapi/cybelangel-alerts-openapi.yml
+    operations:
+      - alerts_search_alerts_alerts_get
+      - alerts_search_an_alert_alerts__alert_id__get
+      - stix_search_stix_alerts_stix_alerts_get
+  - file: cybelangel-triage-leaked-credentials.md
+    name: Triage leaked credentials
+    api: openapi/cybelangel-alerts-openapi.yml
+    operations:
+      - alerts_get_alert_credentials_alerts__alert_id__leak_credentials_get
+      - alerts_get_leak_credentials_leak_credentials_get
+      - alerts_patch_an_alert_alerts__alert_id__customer_patch
+      - get-credential-watchlist
+      - get-reports-credentials-count
+      - get-volume-of-credentials
+      - get-export-credential-watchlist
+      - update-status-of-credential
+  - file: cybelangel-work-incident-reports.md
+    name: Work CybelAngel incident reports end to end
+    api: openapi/cybelangel-platform-reports-openapi.yml
+    operations:
+      - getReportPermissions
+      - get-v2-reports
+      - get-v2-reports-by-id
+      - get-mirror-by-report-id
+      - get-mirror-csv-by-report-id
+      - get-mirror-archive-by-report-id
+      - get-attachments-by-report-id
+      - get-pdf-by-report-id
+      - get-report-comments
+      - post-report-comments
+      - update-report-status-by-report-id
+      - update-multiple-reports-statuses
+      - create-remediation-request
+      - get-v2-stats-reports
+      - get-report-asset
+  - file: cybelangel-triage-attack-surface.md
+    name: Triage the external attack surface
+    api: openapi/cybelangel-adm-inventory-openapi.yml
+    operations:
+      - get-inventory-assets
+      - get-inventory-assets-hostnames
+      - get-inventory-threats-with-asset-info
+      - put-inventory-assets-status
+      - put-inventory-assets-threats-status
+      - get-organization-inventory-assets
+      - get-organization-inventory-assets-hostnames
+      - get-organization-inventory-threats-with-asset-info
+      - put-organization-inventory-assets-status
+      - put-organization-inventory-assets-threats-status
+      - get-organization-workspaces
+  - file: cybelangel-manage-keywords.md
+    name: Manage monitored keywords
+    api: openapi/cybelangel-keywords-openapi.yml
+    operations:
+      - get-keywords
+      - create-keywords
+      - update-keywords
+      - update-keywords-status
+      - get-workspaces
+      - get-organization-keywords
+      - create-organization-keywords
+      - delete-organization-keywords
+      - update-organization-keywords-status
+  - file: cybelangel-export-audit-logs.md
+    name: Export CybelAngel audit logs and threat intelligence
+    api: openapi/cybelangel-audit-logs-openapi.yml
+    operations:
+      - audit_logs_search_audit_logs__organization_id__audit_logs_get
+      - get-threat-intelligence-claimed-attacks
+coverage:
+  skills: 6
+  apis_covered: 7
+  operations_referenced: 45
+  operations_total: 52
+  uncovered:
+    - get-domain-watchlist
+    - get-mirror-csv-by-report-id
+    - alerts_get_codeshare_findings_alerts__alert_id__codeshare_findings_get
+    - alerts_get_alert_dns_screenshot_alerts__alert_id__dns_screenshot_get
+    - alerts_get_alert_credentials_deprecated_alerts__alert_id__credentials_get
+    - create-organization-keywords
+    - update-keywords
+  uncovered_note: >-
+    Counts are of DISTINCT operationIds named in a skill's frontmatter; several of the
+    "uncovered" ids above are in fact discussed in a skill body (the deprecated credentials
+    operation and the DNS screenshot in the alert-feed skill, the domain watchlist in the reports
+    skill) without being listed as a primary operation.

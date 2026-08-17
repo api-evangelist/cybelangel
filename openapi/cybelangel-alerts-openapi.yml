@@ -1,0 +1,2750 @@
+openapi: 3.1.0
+info:
+  version: 1.0.0
+  title: References
+  description: |-
+    API for CybelAngel's Alerts.
+    Authentication uses standard [OAuth2 Bearer Tokens](https://tools.ietf.org/html/rfc6750).
+
+    Here is a simple example of how to fetch such a token with curl:
+
+    ```shell
+    curl -X POST https://auth.cybelangel.com/oauth/token -H 'content-type: application/json -d '{"client_id": "client_id", "client_secret": "client_secret", "audience": "https://platform.cybelangel.com/", "grant_type": "client_credentials"}
+    ```
+
+    The received access token can then be used as a Bearer token to request our API.
+  contact:
+    email: support@cybelangel.com
+  license:
+    url: 'https://cybelangel.com/'
+    name: Proprietary
+servers:
+  - url: 'https://api.cybelangel.com'
+paths:
+  /v1/alerts:
+    get:
+      tags:
+        - alerts
+      summary: Search alerts
+      description: 'Search alerts according to user filters.<br/><br/>Note: Historical data is only available starting from January 1, 2024, and is retained for a maximum of 12 months.<br/>Requests for data outside of this range will not return any results.'
+      operationId: alerts_search_alerts_alerts_get
+      parameters:
+        - name: cursor
+          in: query
+          description: |-
+            Set it to the the 'cursor' value received from previous search request to iterate on the following alerts, beyond the limit set per request.
+            Searching from a cursor does not impact the total number of results.
+            Behavior is undefined if the filters and sort are changed between successive requests.
+
+            Note: with big datasets, iterating on cursor can be much slower than iterating on 'start_date' filter.
+          required: false
+          schema:
+            title: Cursor
+            description: |-
+              Set it to the the 'cursor' value received from previous search request to iterate on the following alerts, beyond the limit set per request.
+              Searching from a cursor does not impact the total number of results.
+              Behavior is undefined if the filters and sort are changed between successive requests.
+
+              Note: with big datasets, iterating on cursor can be much slower than iterating on 'start_date' filter.
+            anyOf:
+              - type: string
+        - name: order_by
+          in: query
+          description: |-
+            Can be multiple fields with +/- for ascending/descending sort.
+            Fields can be ingestion_date, detection_date, ml_score.
+          required: false
+          schema:
+            type: array
+            title: Order By
+            description: |-
+              Can be multiple fields with +/- for ascending/descending sort.
+              Fields can be ingestion_date, detection_date, ml_score.
+            default:
+              - +ingestion_date
+              - +detection_date
+            items:
+              type: string
+              pattern: '[+-]?(ingestion_date|detection_date|ml_score)'
+              minLength: 1
+        - name: stream_id
+          in: query
+          description: |-
+            Stream id used to filter alerts belonging to some organization.
+            A client can only query alerts for its allowed streams.
+          required: true
+          schema:
+            type: string
+            title: Stream Id
+            description: |-
+              Stream id used to filter alerts belonging to some organization.
+              A client can only query alerts for its allowed streams.
+            minLength: 1
+            examples:
+              - 90b18fad-b9ca-41db-bae1-b4964c1a4e84
+          examples:
+            default:
+              value: 90b18fad-b9ca-41db-bae1-b4964c1a4e84
+        - name: start_date
+          in: query
+          description: |-
+            Minimal ingestion date. Expects a date with timezone information.
+
+            Note: Historical data is only available starting from January 1, 2024, and is retained for a maximum of 12 months.
+            Requests for data outside of this range will not return any results.
+          required: true
+          schema:
+            type: string
+            title: Start Date
+            description: |-
+              Minimal ingestion date. Expects a date with timezone information.
+
+              Note: Historical data is only available starting from January 1, 2024, and is retained for a maximum of 12 months.
+              Requests for data outside of this range will not return any results.
+            format: date-time
+            examples:
+              - '2024-09-01T10:00:00.000Z'
+          examples:
+            default:
+              value: '2024-09-01T10:00:00.000Z'
+        - name: end_date
+          in: query
+          description: |-
+            Maximal ingestion date. Expects a date with timezone information.
+
+            Note: Historical data is only available starting from January 1, 2024, and is retained for a maximum of 12 months.
+            Requests for data outside of this range will not return any results.
+          required: false
+          schema:
+            title: End Date
+            description: |-
+              Maximal ingestion date. Expects a date with timezone information.
+
+              Note: Historical data is only available starting from January 1, 2024, and is retained for a maximum of 12 months.
+              Requests for data outside of this range will not return any results.
+            anyOf:
+              - type: string
+                format: date-time
+        - name: status
+          in: query
+          description: |-
+            Select only alerts having one of the requested statuses.
+            By default selects only 'new' alerts to exclude alerts automatically discarded by our ML tools or already processed by analysts.
+          required: false
+          schema:
+            type: array
+            title: Status
+            description: |-
+              Select only alerts having one of the requested statuses.
+              By default selects only 'new' alerts to exclude alerts automatically discarded by our ML tools or already processed by analysts.
+            default:
+              - new
+            items:
+              $ref: '#/components/schemas/AlertStatus'
+        - name: category
+          in: query
+          description: 'If set, select alerts with specified categories.'
+          required: false
+          schema:
+            type: array
+            title: Category
+            description: 'If set, select alerts with specified categories.'
+            default: []
+            items:
+              $ref: '#/components/schemas/AlertCategory'
+        - name: customer_assessment
+          in: query
+          description: |-
+            If set, select only alerts having one of the requested customer assessments.
+            This is the **customer.assessment** field that may be set by clients using the API.
+          required: false
+          schema:
+            type: array
+            title: Customer Assessment
+            description: |-
+              If set, select only alerts having one of the requested customer assessments.
+              This is the **customer.assessment** field that may be set by clients using the API.
+            default: []
+            items:
+              $ref: '#/components/schemas/CustomerAssessment'
+        - name: keyword
+          in: query
+          description: 'If set, select alerts matching specified keywords aliases.'
+          required: false
+          schema:
+            type: array
+            title: Keyword
+            description: 'If set, select alerts matching specified keywords aliases.'
+            default: []
+            items:
+              type: string
+              minLength: 1
+        - name: keyword_id
+          in: query
+          description: 'If set, select alerts matching specified keyword identifiers.'
+          required: false
+          schema:
+            type: array
+            title: Keyword Id
+            description: 'If set, select alerts matching specified keyword identifiers.'
+            default: []
+            items:
+              type: string
+              minLength: 1
+        - name: min_ml_score
+          in: query
+          description: 'If set, select alerts with equal or higher ''ml.score''.'
+          required: false
+          schema:
+            type: integer
+            title: Min Ml Score
+            description: 'If set, select alerts with equal or higher ''ml.score''.'
+            minimum: 0
+            maximum: 100
+            default: 0
+        - name: hostname
+          in: query
+          description: 'If set, select alerts with any specified hostname value.'
+          required: false
+          schema:
+            type: array
+            title: Hostname
+            description: 'If set, select alerts with any specified hostname value.'
+            default: []
+            items:
+              type: string
+              minLength: 1
+        - name: ip
+          in: query
+          description: 'If set, select alerts with specified IP address among ''ip'', ''server_ip'' or ''victim_ip'' fields.'
+          required: false
+          schema:
+            type: array
+            title: Ip
+            description: 'If set, select alerts with specified IP address among ''ip'', ''server_ip'' or ''victim_ip'' fields.'
+            default: []
+            items:
+              type: string
+              minLength: 1
+        - name: search_query
+          in: query
+          description: Words to search in alerts text fields.
+          required: false
+          schema:
+            title: Search Query
+            description: Words to search in alerts text fields.
+            anyOf:
+              - type: string
+                minLength: 1
+        - name: limit
+          in: query
+          description: Max number of returned alerts. Increasing it will also increase the payload.
+          required: false
+          schema:
+            type: integer
+            title: Limit
+            description: Max number of returned alerts. Increasing it will also increase the payload.
+            minimum: 0
+            maximum: 1000
+            default: 10
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AlertList'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_ValidationError_'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_ForbiddenAccessError_'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_NotFoundError_'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_UnknownError_'
+      security:
+        - jwt: []
+      servers:
+        - url: 'https://api.cybelangel.com'
+  '/v1/alerts/{alert_id}':
+    get:
+      tags:
+        - alerts
+      summary: Get an alert
+      description: 'Get an alert by its unique id.<br/><br/>Note: Historical data is only available starting from January 1, 2024, and is retained for a maximum of 12 months.<br/>Requests for data outside of this range will not return any results.'
+      operationId: alerts_search_an_alert_alerts__alert_id__get
+      parameters:
+        - name: alert_id
+          in: path
+          description: ID of an alert.
+          required: true
+          schema:
+            type: string
+            title: Alert Id
+            description: ID of an alert.
+            minLength: 1
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PublicAlert'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_ValidationError_'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_ForbiddenAccessError_'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_NotFoundError_'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_UnknownError_'
+      security:
+        - jwt: []
+      servers:
+        - url: 'https://api.cybelangel.com'
+  '/v1/alerts/{alert_id}/customer':
+    patch:
+      tags:
+        - alerts
+      summary: Set customer fields
+      description: Allow to edit customer-maintained fields in an alert published by the API.<br/><br/>The only use now is to assess the alerts.<br/>These assessments may then be used by CybelAngel to improve the alerts automated filtering.
+      operationId: alerts_patch_an_alert_alerts__alert_id__customer_patch
+      parameters:
+        - name: alert_id
+          in: path
+          description: ID of an alert.
+          required: true
+          schema:
+            type: string
+            title: Alert Id
+            description: ID of an alert.
+            minLength: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AlertRequestCustomerFieldsPatch'
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_ValidationError_'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_ForbiddenAccessError_'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_NotFoundError_'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_UnknownError_'
+      security:
+        - jwt: []
+      servers:
+        - url: 'https://api.cybelangel.com'
+  '/v1/alerts/{alert_id}/credentials':
+    get:
+      tags:
+        - alerts
+      summary: Get leak alert credentials (deprecated)
+      description: This endpoint is deprecated and will be removed in a future release.<br/>Use /v1/alerts/<alert_id>/leak-credentials instead.
+      operationId: alerts_get_alert_credentials_deprecated_alerts__alert_id__credentials_get
+      parameters:
+        - name: alert_id
+          in: path
+          description: ID of an alert.
+          required: true
+          schema:
+            type: string
+            title: Alert Id
+            description: ID of an alert.
+            minLength: 1
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CredentialsResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_ValidationError_'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_ForbiddenAccessError_'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_NotFoundError_'
+        '410':
+          description: Gone
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_GoneError_'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_UnknownError_'
+      deprecated: true
+      security:
+        - jwt: []
+      servers:
+        - url: 'https://api.cybelangel.com'
+  '/v1/alerts/{alert_id}/leak-credentials':
+    get:
+      tags:
+        - alerts
+      summary: Get leak alert credentials
+      description: Get credentials associated with an alert.
+      operationId: alerts_get_alert_credentials_alerts__alert_id__leak_credentials_get
+      parameters:
+        - name: alert_id
+          in: path
+          description: ID of an alert.
+          required: true
+          schema:
+            type: string
+            title: Alert Id
+            description: ID of an alert.
+            minLength: 1
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CredentialsResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_ValidationError_'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_ForbiddenAccessError_'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_NotFoundError_'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_UnknownError_'
+      security:
+        - jwt: []
+      servers:
+        - url: 'https://api.cybelangel.com'
+  '/v1/alerts/{alert_id}/codeshare-findings':
+    get:
+      tags:
+        - alerts
+      summary: Get codeshare alert findings
+      description: 'Get sensitive code snippets for a codeshare alert.<br/><br/>Note: downloading hundreds of thousands of findings may take a few dozen seconds.'
+      operationId: alerts_get_codeshare_findings_alerts__alert_id__codeshare_findings_get
+      parameters:
+        - name: alert_id
+          in: path
+          description: ID of an alert.
+          required: true
+          schema:
+            type: string
+            title: Alert Id
+            description: ID of an alert.
+            minLength: 1
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FindingsResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_ValidationError_'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_ForbiddenAccessError_'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_NotFoundError_'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_UnknownError_'
+      security:
+        - jwt: []
+      servers:
+        - url: 'https://api.cybelangel.com'
+  '/v1/alerts/{alert_id}/dns-screenshot':
+    get:
+      tags:
+        - alerts
+      summary: Get DNS alert screenshot.
+      description: 'Get the website screenshot associated with a DNS alert.<br/><br/>If a screenshot is present, it is returned as a PNG file.<br/>If no screenshot was taken for the alert, a 204 NO_CONTENT is returned.<br/>If the alert is older than 180 days a GONE response is returned.'
+      operationId: alerts_get_alert_dns_screenshot_alerts__alert_id__dns_screenshot_get
+      parameters:
+        - name: alert_id
+          in: path
+          description: ID of an alert.
+          required: true
+          schema:
+            type: string
+            title: Alert Id
+            description: ID of an alert.
+            minLength: 1
+      responses:
+        '200':
+          description: OK
+          content:
+            image/png:
+              schema:
+                type: string
+                contentMediaType: application/octet-stream
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_ValidationError_'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_ForbiddenAccessError_'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_NotFoundError_'
+        '410':
+          description: Gone
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_GoneError_'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_UnknownError_'
+      security:
+        - jwt: []
+      servers:
+        - url: 'https://api.cybelangel.com'
+  /v1/leak-credentials:
+    get:
+      tags:
+        - alerts
+      summary: Get leak credentials
+      description: Get leak credentials we collected.
+      operationId: alerts_get_leak_credentials_leak_credentials_get
+      parameters:
+        - name: stream_id
+          in: query
+          description: |-
+            Stream id used to filter alerts belonging to some organization.
+            A client can only query alerts for its allowed streams.
+          required: true
+          schema:
+            type: string
+            title: Stream Id
+            description: |-
+              Stream id used to filter alerts belonging to some organization.
+              A client can only query alerts for its allowed streams.
+            minLength: 1
+            examples:
+              - 90b18fad-b9ca-41db-bae1-b4964c1a4e84
+          examples:
+            default:
+              value: 90b18fad-b9ca-41db-bae1-b4964c1a4e84
+        - name: start_date
+          in: query
+          description: Minimal ingestion date. Expects a date with timezone information.
+          required: true
+          schema:
+            type: string
+            title: Start Date
+            description: Minimal ingestion date. Expects a date with timezone information.
+            format: date-time
+            examples:
+              - '2024-09-01T10:00:00.000Z'
+          examples:
+            default:
+              value: '2024-09-01T10:00:00.000Z'
+        - name: end_date
+          in: query
+          description: Maximal ingestion date. Expects a date with timezone information.
+          required: false
+          schema:
+            title: End Date
+            description: Maximal ingestion date. Expects a date with timezone information.
+            anyOf:
+              - type: string
+                format: date-time
+        - name: match
+          in: query
+          description: Words to search in credentials logins and targets.
+          required: false
+          schema:
+            title: Match
+            description: Words to search in credentials logins and targets.
+            anyOf:
+              - type: string
+                minLength: 1
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CredentialsResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_ValidationError_'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_ForbiddenAccessError_'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_NotFoundError_'
+        '410':
+          description: Gone
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_GoneError_'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_UnknownError_'
+      security:
+        - jwt: []
+      servers:
+        - url: 'https://api.cybelangel.com'
+  /v1/stix/alerts:
+    get:
+      tags:
+        - stix
+      summary: Search alerts in STIX 2.1 format
+      description: 'Search alerts according to user filters and return them as a Bundle in STIX 2.1 format.<br/>See https://oasis-open.github.io/cti-documentation/stix/intro for more information on this format.<br/><br/>Note: Historical data is only available starting from January 1, 2024, and is retained for a maximum of 12 months.<br/>Requests for data outside of this range will not return any results.'
+      operationId: stix_search_stix_alerts_stix_alerts_get
+      parameters:
+        - name: cursor
+          in: query
+          description: |-
+            Set it to the the 'cursor' value received from previous search request to iterate on the following alerts, beyond the limit set per request.
+            Searching from a cursor does not impact the total number of results.
+            Behavior is undefined if the filters and sort are changed between successive requests.
+
+            Note: with big datasets, iterating on cursor can be much slower than iterating on 'start_date' filter.
+          required: false
+          schema:
+            title: Cursor
+            description: |-
+              Set it to the the 'cursor' value received from previous search request to iterate on the following alerts, beyond the limit set per request.
+              Searching from a cursor does not impact the total number of results.
+              Behavior is undefined if the filters and sort are changed between successive requests.
+
+              Note: with big datasets, iterating on cursor can be much slower than iterating on 'start_date' filter.
+            anyOf: []
+        - name: order_by
+          in: query
+          description: |-
+            Can be multiple fields with +/- for ascending/descending sort.
+            Fields can be ingestion_date, detection_date, ml_score.
+          required: false
+          schema:
+            type: array
+            title: Order By
+            description: |-
+              Can be multiple fields with +/- for ascending/descending sort.
+              Fields can be ingestion_date, detection_date, ml_score.
+            default:
+              - +ingestion_date
+              - +detection_date
+            items:
+              type: string
+              pattern: '[+-]?(ingestion_date|detection_date|ml_score)'
+              minLength: 1
+        - name: stream_id
+          in: query
+          description: |-
+            Stream id used to filter alerts belonging to some organization.
+            A client can only query alerts for its allowed streams.
+          required: true
+          schema:
+            type: string
+            title: Stream Id
+            description: |-
+              Stream id used to filter alerts belonging to some organization.
+              A client can only query alerts for its allowed streams.
+            minLength: 1
+            examples:
+              - 90b18fad-b9ca-41db-bae1-b4964c1a4e84
+          examples:
+            default:
+              value: 90b18fad-b9ca-41db-bae1-b4964c1a4e84
+        - name: start_date
+          in: query
+          description: |-
+            Minimal ingestion date. Expects a date with timezone information.
+
+            Note: Historical data is only available starting from January 1, 2024, and is retained for a maximum of 12 months.
+            Requests for data outside of this range will not return any results.
+          required: true
+          schema:
+            type: string
+            title: Start Date
+            description: |-
+              Minimal ingestion date. Expects a date with timezone information.
+
+              Note: Historical data is only available starting from January 1, 2024, and is retained for a maximum of 12 months.
+              Requests for data outside of this range will not return any results.
+            format: date-time
+            examples:
+              - '2024-09-01T10:00:00.000Z'
+          examples:
+            default:
+              value: '2024-09-01T10:00:00.000Z'
+        - name: end_date
+          in: query
+          description: |-
+            Maximal ingestion date. Expects a date with timezone information.
+
+            Note: Historical data is only available starting from January 1, 2024, and is retained for a maximum of 12 months.
+            Requests for data outside of this range will not return any results.
+          required: false
+          schema:
+            title: End Date
+            description: |-
+              Maximal ingestion date. Expects a date with timezone information.
+
+              Note: Historical data is only available starting from January 1, 2024, and is retained for a maximum of 12 months.
+              Requests for data outside of this range will not return any results.
+            anyOf: []
+        - name: status
+          in: query
+          description: |-
+            Select only alerts having one of the requested statuses.
+            By default selects only 'new' alerts to exclude alerts automatically discarded by our ML tools or already processed by analysts.
+          required: false
+          schema:
+            type: array
+            title: Status
+            description: |-
+              Select only alerts having one of the requested statuses.
+              By default selects only 'new' alerts to exclude alerts automatically discarded by our ML tools or already processed by analysts.
+            default:
+              - new
+            items:
+              $ref: '#/components/schemas/AlertStatus'
+        - name: category
+          in: query
+          description: 'If set, select alerts with specified categories.'
+          required: false
+          schema:
+            type: array
+            title: Category
+            description: 'If set, select alerts with specified categories.'
+            default: []
+            items:
+              $ref: '#/components/schemas/AlertCategory'
+        - name: customer_assessment
+          in: query
+          description: |-
+            If set, select only alerts having one of the requested customer assessments.
+            This is the **customer.assessment** field that may be set by clients using the API.
+          required: false
+          schema:
+            type: array
+            title: Customer Assessment
+            description: |-
+              If set, select only alerts having one of the requested customer assessments.
+              This is the **customer.assessment** field that may be set by clients using the API.
+            default: []
+            items:
+              $ref: '#/components/schemas/CustomerAssessment'
+        - name: keyword
+          in: query
+          description: 'If set, select alerts matching specified keywords aliases.'
+          required: false
+          schema:
+            type: array
+            title: Keyword
+            description: 'If set, select alerts matching specified keywords aliases.'
+            default: []
+            items:
+              type: string
+              minLength: 1
+        - name: keyword_id
+          in: query
+          description: 'If set, select alerts matching specified keyword identifiers.'
+          required: false
+          schema:
+            type: array
+            title: Keyword Id
+            description: 'If set, select alerts matching specified keyword identifiers.'
+            default: []
+            items:
+              type: string
+              minLength: 1
+        - name: min_ml_score
+          in: query
+          description: 'If set, select alerts with equal or higher ''ml.score''.'
+          required: false
+          schema:
+            type: integer
+            title: Min Ml Score
+            description: 'If set, select alerts with equal or higher ''ml.score''.'
+            minimum: 0
+            maximum: 100
+            default: 0
+        - name: hostname
+          in: query
+          description: 'If set, select alerts with any specified hostname value.'
+          required: false
+          schema:
+            type: array
+            title: Hostname
+            description: 'If set, select alerts with any specified hostname value.'
+            default: []
+            items:
+              type: string
+              minLength: 1
+        - name: ip
+          in: query
+          description: 'If set, select alerts with specified IP address among ''ip'', ''server_ip'' or ''victim_ip'' fields.'
+          required: false
+          schema:
+            type: array
+            title: Ip
+            description: 'If set, select alerts with specified IP address among ''ip'', ''server_ip'' or ''victim_ip'' fields.'
+            default: []
+            items:
+              type: string
+              minLength: 1
+        - name: search_query
+          in: query
+          description: Words to search in alerts text fields.
+          required: false
+          schema:
+            title: Search Query
+            description: Words to search in alerts text fields.
+            anyOf: []
+        - name: alerts_limit
+          in: query
+          description: |-
+            Max number of considered alerts. Increasing it will also increase the payload.
+
+            Note: it limits the number of alert considered by the query, but one alert can generate from zero to dozens of STIX objects.
+          required: false
+          schema:
+            type: integer
+            title: Alerts Limit
+            description: |-
+              Max number of considered alerts. Increasing it will also increase the payload.
+
+              Note: it limits the number of alert considered by the query, but one alert can generate from zero to dozens of STIX objects.
+            minimum: 0
+            maximum: 1000
+            default: 10
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StixAlertsResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_ValidationError_'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_ForbiddenAccessError_'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_UnknownError_'
+      security:
+        - jwt: []
+      servers:
+        - url: 'https://api.cybelangel.com'
+tags:
+  - name: alerts
+    description: Alerts
+  - name: stix
+    description: Alerts - Stix
+components:
+  securitySchemes:
+    jwt:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    AlertStatus:
+      type: string
+      enum:
+        - new
+        - autodiscarded
+        - discarded
+        - interesting
+        - forwarded
+        - report_sent
+      title: AlertStatus
+      description: 'Status of alerts, set by cybelangel automated systems and analysts.'
+    AlertCategory:
+      type: string
+      enum:
+        - adm
+        - fileserver
+        - codeshare
+        - dns
+        - database
+        - board
+        - clouddrive
+        - docshare
+        - paste
+        - leak
+        - rss
+        - social
+      title: AlertCategory
+      description: |-
+        ADM stands for Asset Discovery and Monitoring.
+        DNS stands for Domain Name System.
+    CustomerAssessment:
+      type: string
+      enum:
+        - unknown
+        - true_positive
+        - false_positive
+      title: CustomerAssessment
+      description: |-
+        Assessment of the alert quality: is it a real security threat?
+        Set by the API user to provide feedback to Cybelangel.
+
+        The default 'unknown' value is present before user assessed the alert, or when removing that assessment.
+    AlertList:
+      type: object
+      title: AlertList
+      description: List of alerts.
+      properties:
+        total:
+          type: integer
+          title: Total
+          description: Total number of alerts matching the request.
+        message:
+          title: Message
+          description: Additional information in case of non-blocking issue with the query.
+          anyOf:
+            - type: string
+        alerts:
+          type: array
+          title: Alerts
+          items:
+            $ref: '#/components/schemas/PublicAlert'
+        more:
+          type: boolean
+          title: More
+          description: Set to true when there are more alerts to retrieve with the same search request parameters and a new 'cursor'.
+          default: false
+        cursor:
+          title: Cursor
+          description: 'Set when there are more alerts to retrieve. It can be used in another search request, with the same parameters, to download the following alerts.'
+          anyOf:
+            - type: string
+      required:
+        - total
+        - alerts
+    PublicAlert:
+      type: object
+      title: PublicAlert
+      description: Represents an Alert in our raw data
+      properties:
+        id:
+          type: string
+          title: Id
+          description: Id of the incident report sent for this alert.
+          examples:
+            - '08c846af-fe9f-4bb3-9061-a3ddbebd1f11:7d14caa9-63ac-4c984-b8a3-98b9dc75f975'
+        stream_id:
+          type: string
+          title: Stream Id
+          description: |-
+            Technical stream for the keyword that generated the alert.
+            It restricts alert access to users of that stream's organization.
+          examples:
+            - 90b18fad-b9ca-41db-bae1-b4964c1a4e84
+        status:
+          $ref: '#/components/schemas/AlertStatus'
+        ingestion_date:
+          type: string
+          title: Ingestion Date
+          description: |-
+            Time at which this alert was ingested and made available to our users.
+            It can be used to get new alerts when periodically polling the API.
+
+            Note: due to the asynchronous nature of the ingestion process and various caches, the alerts ingested in the last few minutes may not yet be returned by the API.
+          format: date-time
+          examples:
+            - '2024-09-01T12:36:15.456Z'
+        detection_date:
+          type: string
+          title: Detection Date
+          description: Time of the original detection of this alert when crawling the Internet.
+          format: date-time
+          examples:
+            - '2024-08-31T06:15:54Z'
+        customer:
+          $ref: '#/components/schemas/CustomerFields'
+        report:
+          description: Fields set when publishing a report from this alert.
+          anyOf:
+            - $ref: '#/components/schemas/Report'
+        ml:
+          $ref: '#/components/schemas/MLFields'
+        matches:
+          type: array
+          title: Matches
+          description: |-
+            List of keyword matches that triggered this alert.
+            This is not an exhaustive list of matches from the data causing the alert as we limit the number of extracts we compute.
+          items:
+            $ref: '#/components/schemas/Match'
+        category:
+          $ref: '#/components/schemas/AlertCategory'
+          description: 'Category of alerts, depending on its technical source. It dictates the category-specific field that may be set.'
+        database:
+          description: Set only for Database alerts.
+          anyOf:
+            - $ref: '#/components/schemas/Database'
+        adm:
+          description: Set only for ADM alerts.
+          anyOf:
+            - $ref: '#/components/schemas/ADM'
+        dns:
+          description: Set only for DNS alerts.
+          anyOf:
+            - $ref: '#/components/schemas/DNS'
+        fileserver:
+          description: Set only for Fileserver alerts.
+          anyOf:
+            - $ref: '#/components/schemas/Fileserver'
+        clouddrive:
+          description: Set only for Clouddrive alerts.
+          anyOf:
+            - $ref: '#/components/schemas/Clouddrive'
+        docshare:
+          description: Set only for Docshare alerts.
+          anyOf:
+            - $ref: '#/components/schemas/Docshare'
+        codeshare:
+          description: Set only for Codeshare alerts.
+          anyOf:
+            - $ref: '#/components/schemas/Codeshare'
+        board:
+          description: Set only for Board alerts.
+          anyOf:
+            - $ref: '#/components/schemas/Board'
+        leak:
+          description: Set only for Leak alerts
+          anyOf:
+            - $ref: '#/components/schemas/Leak'
+        rss:
+          description: Set only for RSS alerts
+          anyOf:
+            - $ref: '#/components/schemas/RSS'
+        paste:
+          description: Set only for Paste alerts
+          anyOf:
+            - $ref: '#/components/schemas/Paste'
+        social:
+          description: Set only for Social alerts
+          anyOf:
+            - $ref: '#/components/schemas/Social'
+      required:
+        - id
+        - stream_id
+        - status
+        - ingestion_date
+        - detection_date
+        - customer
+        - ml
+        - matches
+        - category
+    CustomerFields:
+      type: object
+      title: CustomerFields
+      description: Fields set by customer in the alert.
+      properties:
+        assessment:
+          $ref: '#/components/schemas/CustomerAssessment'
+    Report:
+      type: object
+      title: Report
+      description: Fields set when publishing an incident report from this alert.
+      properties:
+        id:
+          type: string
+          title: Id
+          description: Id of the incident report sent for this alert.
+      required:
+        - id
+    MLFields:
+      type: object
+      title: MLFields
+      description: Fields set by our Machine Learning tool when evaluating the alert.
+      properties:
+        score:
+          title: Score
+          description: |-
+            Score between 0 and 100 set by our ML-based tools when evaluating the alert.
+            0 is certainly a false positive and will certainly be automatically discarded, 100 is most certain a true positive and should be checked carefully.
+          examples:
+            - 84
+          anyOf:
+            - type: integer
+              minimum: 0
+              maximum: 100
+    Match:
+      type: object
+      title: Match
+      description: Match of a keyword linking this alert to the user stream.
+      properties:
+        source:
+          type: string
+          title: Source
+          description: Indicates the technical source of the data.
+          examples:
+            - path
+        keyword:
+          type: string
+          title: Keyword
+          description: Label of the keyword that was detected in the extract.
+          examples:
+            - security
+        keyword_id:
+          type: string
+          title: Keyword Id
+          description: ID of the keyword that was detected in the extract.
+          examples:
+            - 590a6363-9df9-4d75-8f2a-41247357a9cc
+        extracts:
+          type: array
+          title: Extracts
+          description: |-
+            Snippets of the content where the keyword matched.
+
+            The whole content is HTML-encoded.
+            The matched content is marked by `<em>...</em>` markup.
+
+            Note: it is empty for 'database' alerts.
+          examples:
+            - /some_folder/Secret_Library_2025_9v2/Antivirus_<em>Security</em>_9-x_V1R1/U_Antivirus_<em>SECURITY</em>_Overview.pdf
+          items:
+            type: string
+      required:
+        - source
+        - keyword
+        - keyword_id
+        - extracts
+    Database:
+      type: object
+      title: Database
+      description: Potential confidential data matching the keywords was found on a publicly exposed database server.
+      properties:
+        city:
+          title: City
+          description: English name of the city where the database server is located.
+          examples:
+            - Paris
+          anyOf:
+            - type: string
+        country:
+          title: Country
+          description: English name of the country where the database is located.
+          examples:
+            - France
+          anyOf:
+            - type: string
+        country_code:
+          title: Country Code
+          description: ISO 3166-1 alpha-2 code of the country where the database server is located.
+          examples:
+            - FR
+          anyOf:
+            - type: string
+        database:
+          type: string
+          title: Database
+          description: Name of the main database with matching data on the server.
+          examples:
+            - admin_cluster
+        databases_count:
+          type: integer
+          title: Databases Count
+          description: Number of database with matching data found on the server.
+          default: 1
+        ip:
+          title: Ip
+          description: |-
+            IP address of the publicly accessible database.
+            Not set when the server is a cloud provider (AWS, Azure...) and thus has no consistent ip.
+          examples:
+            - 203.0.113.73
+          anyOf:
+            - type: string
+              format: ipvanyaddress
+        port:
+          type: integer
+          title: Port
+          description: 'Public database server port, used to check its content.'
+          examples:
+            - 27017
+        protocol:
+          $ref: '#/components/schemas/DBProtocol'
+          description: Public database server protocol.
+        reverse_hostname:
+          type: string
+          title: Reverse Hostname
+          description: Publicly accessible database server reverse hostname.
+          examples:
+            - vm123465.example.fr
+      required:
+        - database
+        - port
+        - protocol
+        - reverse_hostname
+    DBProtocol:
+      type: string
+      enum:
+        - elasticsearch
+        - mongo
+        - sql
+        - pgsql
+      title: DBProtocol
+      description: Different kind of databases.
+    ADM:
+      type: object
+      title: ADM
+      description: 'Asset Discovery Monitoring (ADM): Asset with an open port exposing information that matches keywords.'
+      properties:
+        city:
+          title: City
+          description: City where the asset is located.
+          examples:
+            - Zurich
+          anyOf:
+            - type: string
+        country:
+          title: Country
+          description: Country where the asset is located.
+          examples:
+            - Switzerland
+          anyOf:
+            - type: string
+        country_code:
+          title: Country Code
+          description: Country code where the asset is located.
+          examples:
+            - CH
+          anyOf:
+            - type: string
+        organization:
+          title: Organization
+          description: 'Name of the organisation where the asset is located, a cloud provider for example.'
+          examples:
+            - Zweiss Inc.
+          anyOf:
+            - type: string
+        ip:
+          title: Ip
+          description: |-
+            IP address of the publicly accessible asset.
+            Not set when the server is a cloud provider (AWS, Azure...) and thus has no consistent ip.
+          examples:
+            - 203.0.113.73
+          anyOf:
+            - type: string
+              format: ipvanyaddress
+        hostname:
+          title: Hostname
+          description: Host name of the publicly accessible asset.
+          examples:
+            - bba.zweiss.example.ae
+          anyOf:
+            - type: string
+        hostnames:
+          type: array
+          title: Hostnames
+          description: Hostnames associated with the ip of the asset.
+          examples:
+            - - bba.zweiss.example.ae
+              - ssl.zweiss.example.ae
+              - maintenance.example.ae
+          items:
+            type: string
+        open_ports:
+          type: array
+          title: Open Ports
+          description: |-
+            List of the open ports detected on the same IP address.
+            They may be identical for alerts on the same IP but with a different port.
+          examples:
+            - - 80
+              - 5000
+              - 8000
+              - 8035
+              - 8080
+          items:
+            type: integer
+        open_services:
+          type: array
+          title: Open Services
+          description: |-
+            List of the services running on the open ports.
+            Examples: mysql, telnet, ftp
+          default: []
+          examples:
+            - - netbios-ssn
+              - vnc-http
+          items:
+            type: string
+        port:
+          type: integer
+          title: Port
+          description: Number of the port considered in this alert.
+          examples:
+            - 80
+        protocol:
+          type: string
+          title: Protocol
+          description: Name of the protocol running on this port.
+          examples:
+            - http
+        product:
+          title: Product
+          description: Name of the product running on this port.
+          examples:
+            - nginx
+          anyOf:
+            - type: string
+        max_cve_severity:
+          type: number
+          title: Max Cve Severity
+          description: Severity max for a detected CVE.
+          minimum: 0
+          maximum: 10
+          examples:
+            - 9.7
+        cves:
+          type: array
+          title: Cves
+          description: CVEs detected on this port.
+          items:
+            $ref: '#/components/schemas/CVE'
+        ssl_cert:
+          description: SSL certificate associated to the port.
+          anyOf:
+            - $ref: '#/components/schemas/SSLCert'
+        title:
+          title: Title
+          description: Title of the HTML page if the protocol is HTTP.
+          examples:
+            - Our Partnership Portal
+          anyOf:
+            - type: string
+      required:
+        - hostnames
+        - open_ports
+        - port
+        - protocol
+        - max_cve_severity
+        - cves
+    CVE:
+      type: object
+      title: CVE
+      description: Common Vulnerabilities and Exposures.
+      properties:
+        summary:
+          type: string
+          title: Summary
+          description: Description of the CVE.
+          examples:
+            - A crafted request uri-path can cause mod_proxy to forward the request to an origin server choosen by the remote user. This issue affects Apache HTTP Server 2.4.48 and earlier.
+        cvss:
+          type: number
+          title: Cvss
+          description: CVSS (Common Vulnerability Scoring System) rating of the CVE.
+          minimum: 0
+          maximum: 10
+          examples:
+            - 9
+        references:
+          type: array
+          title: References
+          description: Sources of the description and rating.
+          examples:
+            - - 'https://nvd.nist.gov/vuln/detail/CVE-2021-40438'
+          items:
+            type: string
+        name:
+          type: string
+          title: Name
+          description: Name of the CVE.
+          examples:
+            - CVE-2021-40438
+      required:
+        - summary
+        - cvss
+        - references
+        - name
+    SSLCert:
+      type: object
+      title: SSLCert
+      description: SSL Certificate.
+      properties:
+        expires:
+          title: Expires
+          description: Date of expiration of the certificate.
+          examples:
+            - '2024-11-30T23:59:59'
+          anyOf:
+            - type: string
+              format: date-time
+        issued:
+          title: Issued
+          description: Date of publication of the certificate.
+          examples:
+            - '2023-12-22T00:00:00'
+          anyOf:
+            - type: string
+              format: date-time
+        expired:
+          type: boolean
+          title: Expired
+          description: Is the certificate expired or not.
+        subject:
+          $ref: '#/components/schemas/SSLCertSubject'
+          description: Subject.
+      required:
+        - expired
+        - subject
+    SSLCertSubject:
+      type: object
+      title: SSLCertSubject
+      description: SSL Certificate Subject following the X.509 standard.
+      properties:
+        C:
+          type: string
+          title: C
+          description: Country name.
+          examples:
+            - US
+        O:
+          type: string
+          title: O
+          description: Organization name.
+          examples:
+            - Some American Corp Inc.
+        ST:
+          type: string
+          title: St
+          description: State or Province name.
+          examples:
+            - California
+        CN:
+          type: string
+          title: Cn
+          description: Common Name.
+          examples:
+            - ourpartnershipportal.com
+      required:
+        - C
+        - O
+        - ST
+        - CN
+    DNS:
+      type: object
+      title: DNS
+      description: |-
+        Potential domain cyber-squatting.
+        An alert of that category indicates we found a domain name close enough to one of our keywords that does not belong to its rightful owner.
+      properties:
+        hostname:
+          type: string
+          title: Hostname
+          description: Suspicious host name.
+          examples:
+            - example.mycompanyportal.com
+        domain:
+          type: string
+          title: Domain
+          description: Domain name registered for the suspicious host name.
+          examples:
+            - mycompanyportal.com
+        ip:
+          title: Ip
+          description: |-
+            IP address resolved from the suspicious host name.
+            Not set when the server is a cloud provider (AWS, Azure...) and thus has no consistent ip.
+          examples:
+            - 203.0.113.73
+          anyOf:
+            - type: string
+              format: ipvanyaddress
+        domain_creation_date:
+          title: Domain Creation Date
+          description: Date of creation of the domain
+          examples:
+            - '2024-06-08T07:53:58Z'
+          anyOf:
+            - type: string
+              format: date-time
+        ns_servers:
+          type: array
+          title: Ns Servers
+          description: 'Nameserver record, indicating which DNS server is authoritative for that domain.'
+          default: []
+          examples:
+            - - ns1.abovedomains.com.
+              - ns2.abovedomains.com.
+          items:
+            type: string
+        mx:
+          title: Mx
+          description: |-
+            A mail exchanger record (MX record) specifies the mail server responsible for accepting email messages on behalf of a domain name.
+            It is a resource record in the Domain Name System (DNS). It is possible to configure several MX records, typically pointing to an array of mail servers for load balancing and redundancy.
+          examples:
+            - 10 park-mx.abovedomains.com.
+          anyOf:
+            - type: string
+        registrant_email:
+          title: Registrant Email
+          description: |-
+            Email address registered with the domain.
+            It can be a valid email or almost any string typed by the registrant.
+          examples:
+            - Please set email
+          anyOf:
+            - type: string
+        country:
+          title: Country
+          description: English name of the country in which the domain name is registered.
+          examples:
+            - Australia
+          anyOf:
+            - type: string
+        country_code:
+          title: Country Code
+          description: ISO 3166-1 alpha-2 code of the country in which the domain name is registered.
+          examples:
+            - AU
+          anyOf:
+            - type: string
+      required:
+        - hostname
+        - domain
+    Fileserver:
+      type: object
+      title: Fileserver
+      description: Potential document leak on a public server.
+      properties:
+        count_matched_files:
+          type: integer
+          title: Count Matched Files
+          description: |-
+            Number of files that matched with keywords.
+
+            Note: when millions of files could match, the matches may be distributed across several alerts.
+          examples:
+            - 157
+        city:
+          title: City
+          description: English name of the city where the server is located.
+          examples:
+            - Koszalin
+          anyOf:
+            - type: string
+        country:
+          title: Country
+          description: English name of the country where the service is located.
+          examples:
+            - Poland
+          anyOf:
+            - type: string
+        country_code:
+          title: Country Code
+          description: ISO 3166-1 alpha-2 code of the country in which the domain name is registered.
+          examples:
+            - PL
+          anyOf:
+            - type: string
+        oldest_last_modified_date:
+          title: Oldest Last Modified Date
+          description: Last modification date of the oldest file matching the keywords.
+          examples:
+            - '2024-08-12T19:01:52Z'
+          anyOf:
+            - type: string
+              format: date-time
+        newest_last_modified_date:
+          title: Newest Last Modified Date
+          description: Last modification date of the most recent file matching the keywords.
+          examples:
+            - '2024-08-13T10:13:41Z'
+          anyOf:
+            - type: string
+              format: date-time
+        ip:
+          title: Ip
+          description: |-
+            IP address of the publicly accessible file server.
+            Not set when the server is a cloud provider (AWS, Azure...) and thus has no consistent ip.
+          examples:
+            - 203.0.113.254
+          anyOf:
+            - type: string
+              format: ipvanyaddress
+        hostname:
+          type: string
+          title: Hostname
+          description: Host name of the publicly accessible file server.
+          examples:
+            - betelgueuse.example.pl
+        port:
+          type: integer
+          title: Port
+          description: Port on which the sharing service is active.
+          examples:
+            - 2042
+        protocol:
+          type: string
+          title: Protocol
+          description: Server's sharing protocol.
+          examples:
+            - nfs
+        reverse_hostname:
+          type: string
+          title: Reverse Hostname
+          description: Reverse lookup of the file server hostname.
+          examples:
+            - 203.0.113.254.ipv4.betelgueuse.example.pl
+        longest_filepath:
+          title: Longest Filepath
+          description: |-
+            The longest among publicly accessible file paths found on this server.
+
+            Note: This field may not be available for certain types of cloud buckets (GCS, ABS, AWS S3...).
+          examples:
+            - /tmplocal/examples/05448864179524ds41bg7g4147gf4j4754sezs/accounts.xslx
+          anyOf:
+            - type: string
+      required:
+        - count_matched_files
+        - hostname
+        - port
+        - protocol
+        - reverse_hostname
+    Clouddrive:
+      type: object
+      title: Clouddrive
+      description: |-
+        Potential document leak on a public cloud drive, like a GCS bucket or an openly shared personal dropbox.
+
+        This alert can aggregate multiple files linked by either a common drive, a common folder or a common detection parent (post in a message board or some file on the internet linking to exposed cloud drive files).
+      properties:
+        source:
+          $ref: '#/components/schemas/Source'
+          description: 'Source of the clouddrive: onedrive, googledrive or dropbox.'
+        count_matched_files:
+          type: integer
+          title: Count Matched Files
+          description: |-
+            Number of files that matched with keywords.
+
+            Note: when millions of files could match, the matches may be distributed across several alerts.
+          examples:
+            - 6589
+        oldest_last_modified_date:
+          title: Oldest Last Modified Date
+          description: Last modification date of the oldest file matching the keywords.
+          examples:
+            - '2024-08-12T19:01:52Z'
+          anyOf:
+            - type: string
+              format: date-time
+        newest_last_modified_date:
+          title: Newest Last Modified Date
+          description: Last modification date of the most recent file matching the keywords.
+          examples:
+            - '2024-08-13T10:13:41Z'
+          anyOf:
+            - type: string
+              format: date-time
+        owner_email:
+          title: Owner Email
+          description: 'Email provided by the user who owns the cloud drive, may not be accurate.'
+          examples:
+            - jcd75069@gmail.com
+          anyOf:
+            - type: string
+        parent_url:
+          title: Parent Url
+          description: |-
+            URL of the website where we found the link to the publicly shared cloud drive.
+
+            It may no longer be valid or openly accessible.
+            It may not be set when coming from an external provider.
+          examples:
+            - 'https://www.scribd.com/document/769624896/Hackers_of_Poland-PDF'
+          anyOf:
+            - type: string
+        sample_files:
+          type: array
+          title: Sample Files
+          description: |-
+            Some examples of files that triggered this alert, matching one of the keywords defined for the stream.
+            For now there should be only one per alert.
+          items:
+            $ref: '#/components/schemas/File'
+      required:
+        - source
+        - count_matched_files
+        - sample_files
+    Source:
+      type: string
+      enum:
+        - onedrive
+        - googledrive
+        - dropbox
+      title: Source
+      description: Cloud drive source type.
+    File:
+      type: object
+      title: File
+      description: Publicly exposed file in a cloud drive.
+      properties:
+        path:
+          type: string
+          title: Path
+          description: |-
+            Path of the file on the cloud drive.
+
+            This is only the ending path of the file on the cloud drive as it is usually not possible to access the root of the drive as an external user.
+            It may contain only the file name, or some parent folder names depending on what was publicly exposed at the time it was detected.
+          examples:
+            - '/sortedMenu Tool/2-Input/DataBase/[FREE] DataBase Data.txt'
+        url:
+          type: string
+          title: Url
+          description: URL of the file on the cloud drive.
+          examples:
+            - 'https://onedrive.live.com/redir.aspx?cid=527b8139d66816e7&page=browse&resid=527B8139D56816E7!14752&parId=527B8139D56816E7!14740&authkey=!AJb3iG4G1leXO0E'
+        size:
+          type: integer
+          title: Size
+          description: 'Size of the file, in bytes.'
+          examples:
+            - 191451
+      required:
+        - path
+        - url
+        - size
+    Docshare:
+      type: object
+      title: Docshare
+      description: 'Potential document leak on a public document sharing platform like Scribd, Trello, Prezi, Slideshare...'
+      properties:
+        author:
+          title: Author
+          description: 'Some identifier of the document author on the source platform. Could be a login, an email or not provided at all.'
+          examples:
+            - ydningrm78
+          anyOf:
+            - type: string
+        title:
+          title: Title
+          description: 'Title of the shared document, if present in the source.'
+          examples:
+            - Company Security deep dive
+          anyOf:
+            - type: string
+        context:
+          type: string
+          title: Context
+          description: |-
+            First few lines of the shared document.
+            It is also limited to a few thousand characters from the start of the document.
+          examples:
+            - |2-
+
+                      FOR INTERNAL USE ONLY!
+                      Our company security policy
+                      1/ Passwords
+                      2/ BYOD
+                      3/ Office rules
+                      
+        document_date:
+          type: string
+          title: Document Date
+          description: Date on which the document was shared on the source platform.
+          format: date-time
+          examples:
+            - '2024-09-16T00:00:00Z'
+        source:
+          type: string
+          title: Source
+          description: |-
+            Name of the platform on which the document was shared.
+            It can be a well-known website name like 'scribd' or 'prezi', or any domain name.
+          examples:
+            - scribd
+        url:
+          type: string
+          title: Url
+          description: URL of the shared document at the time it was detected. It may no longer be valid.
+          examples:
+            - 'https://www.scribd.com/document/4976346763/Company-Policy'
+      required:
+        - context
+        - document_date
+        - source
+        - url
+    Codeshare:
+      type: object
+      title: Codeshare
+      description: 'Alert triggered by code shared on a public repository, usually on a code sharing platform like GitHub.'
+      properties:
+        source:
+          type: string
+          title: Source
+          description: Platform on which the code was publicly shared. It is usually 'github.com'.
+          examples:
+            - github.com
+        title:
+          type: string
+          title: Title
+          description: 'Code repository title on the code sharing platform, usually following the author/repository pattern.'
+          examples:
+            - memtsuo5/gatto-blog
+        owner:
+          type: string
+          title: Owner
+          description: Username of the person or organization who owns the repository.
+          examples:
+            - memtsuo5
+        repository_name:
+          type: string
+          title: Repository Name
+          description: Identifier of the repository where files matching the keywords were edited.
+          examples:
+            - gatto-blog
+        context:
+          title: Context
+          description: |-
+            First few lines of the repository readme file.
+            It is also limited to a few thousand characters from the start of the document.
+          examples:
+            - |
+
+              <!-- AUTO-GENERATED-CONTENT:START (STARTER)
+              <p align="center">
+                <a href="https://www.gattojs.com">
+                  <img alt="Gatto" src="https://www.gattojs.com/Gatto-Icon.svg" width="60" />
+                </a>
+          anyOf:
+            - type: string
+        url:
+          type: string
+          title: Url
+          description: Public URL of the repository on the code sharing website.
+          examples:
+            - 'https://github.com/memtsuo5/gatto-blog'
+        repository_info:
+          description: |-
+            Metadata about the repository.
+
+            It is provided as a best effort as the repository can be deleted or become private at any time while we are collecting information.
+          anyOf:
+            - $ref: '#/components/schemas/RepositoryInfo'
+        owner_account:
+          description: Metadata about the owner of the repository.
+          anyOf:
+            - $ref: '#/components/schemas/UserAccount'
+        findings_stats:
+          anyOf:
+            - $ref: '#/components/schemas/FindingsStats'
+      required:
+        - source
+        - title
+        - owner
+        - repository_name
+        - url
+    RepositoryInfo:
+      type: object
+      title: RepositoryInfo
+      description: Metadata from the repository on the code sharing platform.
+      properties:
+        contributor_count:
+          type: integer
+          title: Contributor Count
+          description: Number of contributors to this public repository.
+          default: 0
+          examples:
+            - 3
+        contributor_emails:
+          type: array
+          title: Contributor Emails
+          description: |-
+            Email addresses of the repository most important contributors.
+            They will be provided only if the contributors made their email public.
+          default: []
+          examples:
+            - - gatto4976@hotmail.com
+              - ci-gatto@esfhg.edu.net
+          items:
+            type: string
+        created_at:
+          type: string
+          title: Created At
+          description: Date of creation of the repository.
+          format: date-time
+          examples:
+            - '2023-11-01T07:26:15Z'
+        updated_at:
+          type: string
+          title: Updated At
+          description: Last update date of the repository.
+          format: date-time
+          examples:
+            - '2024-09-16T08:29:36Z'
+        description:
+          title: Description
+          description: Description of the repository.
+          examples:
+            - Next generation blog
+          anyOf:
+            - type: string
+        language:
+          title: Language
+          description: Main programming language of the repository.
+          examples:
+            - JavaScript
+          anyOf:
+            - type: string
+        license:
+          title: License
+          description: Name of the license of the repository.
+          examples:
+            - BSD Zero Clause License
+          anyOf:
+            - type: string
+        files_count:
+          title: Files Count
+          description: Estimated number of files in the repository.
+          examples:
+            - 99
+          anyOf:
+            - type: integer
+        size:
+          type: integer
+          title: Size
+          description: 'Estimated size of the repository, in kilobytes.'
+          examples:
+            - 5381
+      required:
+        - created_at
+        - updated_at
+        - size
+    UserAccount:
+      type: object
+      title: UserAccount
+      description: Public account on a code sharing platform.
+      properties:
+        created_at:
+          type: string
+          title: Created At
+          description: Date of creation of the user account.
+          format: date-time
+          examples:
+            - '2023-11-01T07:26:15Z'
+        bio:
+          title: Bio
+          description: 'Biography of the user account, filled by the account creator.'
+          examples:
+            - 充满热情的技术黑客
+          anyOf:
+            - type: string
+        company:
+          title: Company
+          description: 'Company name of the account, filled by the account creator.'
+          examples:
+            - ESFG Inc.
+          anyOf:
+            - type: string
+        email:
+          title: Email
+          description: 'Email address of the account, if made public.'
+          examples:
+            - gatto4976@hotmail.com
+          anyOf:
+            - type: string
+        location:
+          title: Location
+          description: 'Location of the account, filled by the account creator.'
+          examples:
+            - The World
+          anyOf:
+            - type: string
+        name:
+          title: Name
+          description: 'Public name of the account, filled by the account creator.'
+          examples:
+            - My name
+          anyOf:
+            - type: string
+        type:
+          $ref: '#/components/schemas/AccountType'
+          description: 'Type of account: a single User or a whole Organization.'
+      required:
+        - created_at
+        - type
+    AccountType:
+      type: string
+      enum:
+        - User
+        - Organization
+      title: AccountType
+      description: Type of account on a code sharing platform.
+    FindingsStats:
+      type: object
+      title: FindingsStats
+      description: Statistics about findings across the repository.
+      properties:
+        count:
+          type: integer
+          title: Count
+          description: Number of findings in the repository for this rule.
+          examples:
+            - 28
+        rules:
+          type: array
+          title: Rules
+          default: []
+          items:
+            $ref: '#/components/schemas/RuleStats'
+      required:
+        - count
+    RuleStats:
+      type: object
+      title: RuleStats
+      description: Rule that matched some extracts of code from files committed into the repository.
+      properties:
+        id:
+          type: string
+          title: Id
+          description: Identifies the applied rule.
+          examples:
+            - SPECIFIC_GOOGLE_API_KEY
+        count:
+          type: integer
+          title: Count
+          description: Number of findings in the repository for this rule.
+          examples:
+            - 5
+        files_count:
+          title: Files Count
+          description: Number of file/commit pairs in the repository containing findings from this rule.
+          examples:
+            - 2
+          anyOf:
+            - type: integer
+      required:
+        - id
+        - count
+    Board:
+      type: object
+      title: Board
+      description: Message board (or internet forum) post that was matched by a keyword.
+      properties:
+        source:
+          type: string
+          title: Source
+          description: Message board platform where we found the post.
+          examples:
+            - administrator.example.co.uk
+        board:
+          type: string
+          title: Board
+          description: Name of the message board on the platform.
+          examples:
+            - forum
+        title:
+          type: string
+          title: Title
+          description: Tile of the post or its thread on the platform.
+          examples:
+            - AD - Give ownership of computer object
+        url:
+          type: string
+          title: Url
+          description: URL to the message board post.
+          examples:
+            - 'https://administrator.example.co.uk/forum/ad-give-ownership-of-computer-object-465997.html'
+        context:
+          type: string
+          title: Context
+          description: |-
+            First few lines of the message board post.
+            It is also limited to a few thousand characters from the start of the document.
+          examples:
+            - |-
+              AD - give ownership of computer object
+              Hi, do any of you have the time or desire to recreate the following? (It's NOT about taking ownership, it's about relinquishing ownership.) An AD user UserA is not a member of the Organization Admins, Domain Admins, or BuiltIn Admins. This user is the owner of a computer object. UserA also has full access to this object. UserA is trying to change the owner of this computer object. No matter which user or group he specifies: the error occurs: The new owner of COMPUTER1 cannot be set up. This security identifier cannot be assigned as the owner of the object. An admin change the owner of this object to UserB. UserA can then successfully change the owner of this computer object and enter other third parties there. And it repeats. But as soon as UserA registers himself as the owner again, he can no longer change the owner. The above error occurs again. Now I'm on the fence. An owner of the ACL cannot enter another owner? Huh, did I miss something? That would be new to me... If someone could recreate that, that would be really great. E
+      required:
+        - source
+        - board
+        - title
+        - url
+        - context
+    Leak:
+      type: object
+      title: Leak
+      description: Potential leak (credentials...) discovered on internet
+      properties:
+        source:
+          type: string
+          title: Source
+          description: |-
+            Indicates the technical source id of the leak.
+
+            Can be used to regroup leak alerts that come from the same source.
+          examples:
+            - new1
+        count_leaks:
+          type: integer
+          title: Count Leaks
+          description: Number of leaks that matched with keywords.
+          examples:
+            - 1
+        count_leaks_with_password:
+          type: integer
+          title: Count Leaks With Password
+          description: Number of leaks containing passwords and matching keywords.
+          examples:
+            - 1
+        infostealer:
+          description: Only available for leaks caused by an infostealer.
+          anyOf:
+            - $ref: '#/components/schemas/Infostealer'
+        creds_on_db:
+          description: Only available for leaks detected on a public database.
+          anyOf:
+            - $ref: '#/components/schemas/CredsOnDB'
+      required:
+        - source
+        - count_leaks
+        - count_leaks_with_password
+    Infostealer:
+      type: object
+      title: Infostealer
+      description: 'When Cred comes from an infostealer, it contains this field.'
+      properties:
+        victim_ip:
+          title: Victim Ip
+          description: IP address of the machine where the credentials were stolen.
+          anyOf:
+            - type: string
+        machine_name:
+          title: Machine Name
+          description: Name of the machine where the credentials were stolen.
+          anyOf:
+            - type: string
+        target:
+          title: Target
+          description: Website or system on which the credentials apply.
+          anyOf:
+            - type: string
+        leak_date:
+          title: Leak Date
+          description: Date when the credentials were stolen.
+          anyOf:
+            - type: string
+              format: date-time
+        malware_name:
+          title: Malware Name
+          description: Name of the malware that stole the credentials.
+          anyOf:
+            - type: string
+    CredsOnDB:
+      type: object
+      title: CredsOnDB
+      description: Public database with leaked credentials.
+      properties:
+        server_ip:
+          title: Server Ip
+          description: |-
+            IP address of the server of the leak.
+            Not set when the server is a cloud provider (AWS, Azure...) and thus has no consistent ip.
+          examples:
+            - 203.0.113.203
+          anyOf:
+            - type: string
+              format: ipvanyaddress
+        city:
+          title: City
+          description: English name of the city where the database is located.
+          examples:
+            - Moscow
+          anyOf:
+            - type: string
+        country:
+          title: Country
+          description: English name of the country where the database is located.
+          examples:
+            - Russian Federation
+          anyOf:
+            - type: string
+        country_code:
+          title: Country Code
+          description: ISO 3166-1 alpha-2 code of the country where the database is located.
+          examples:
+            - RU
+          anyOf:
+            - type: string
+    RSS:
+      type: object
+      title: RSS
+      description: 'Alerts published from RSS feeds, mostly from openbugbounty.org.'
+      properties:
+        source:
+          type: string
+          title: Source
+          description: 'Source website, usually ''openbugbounty.org''.'
+          examples:
+            - openbugbounty.org
+        title:
+          type: string
+          title: Title
+          description: Notification title.
+          examples:
+            - OpenBugBounty report for region.planework.aa.com
+        url:
+          type: string
+          title: Url
+          description: Link to the notification webpage.
+          examples:
+            - 'https://www.openbugbounty.org/reports/97964134152/'
+      required:
+        - source
+        - title
+        - url
+    Paste:
+      type: object
+      title: Paste
+      description: |-
+        Text matching the keywords published on a paste website like pastebin.com.
+
+        It can also come from data not associated with a paste website.
+      properties:
+        context:
+          type: string
+          title: Context
+          description: |-
+            First few lines of the paste.
+            It is also limited to a few thousand characters from the start.
+          examples:
+            - |
+
+              <?xml version="1.0" encoding="UTF-8"?>
+              <!DOCTYPE html>
+              <html xml:lang="en" lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
+              <head>
+              <title>Chapter 09:CI at a Major Telecommunications Company</title>
+        date:
+          type: string
+          title: Date
+          description: Date of the paste.
+          format: date-time
+          examples:
+            - '2024-08-22T13:54:22Z'
+        source:
+          type: string
+          title: Source
+          description: Paste website where the paste was published.
+          examples:
+            - vpaste.net
+        title:
+          title: Title
+          description: Title of the paste if available.
+          examples:
+            - 'Chapter 09:CI at a Major Telecommunications Company'
+          anyOf:
+            - type: string
+        url:
+          type: string
+          title: Url
+          description: URL of the paste. Can also be internal-cba-<id> when not coming from a paste website
+          examples:
+            - 'http://vpaste.net/GFgreFP74?raw'
+        uniq_bins:
+          type: array
+          title: Uniq Bins
+          description: BINs (Bank Identification Number) detected in the paste.
+          default: []
+          examples:
+            - - '26856477135481'
+          items:
+            type: string
+      required:
+        - context
+        - date
+        - source
+        - url
+    Social:
+      type: object
+      title: Social
+      description: 'Alerts published from social media feeds, mostly from Vetric.'
+      properties:
+        source:
+          type: string
+          title: Source
+          description: Source social media.
+          examples:
+            - facebook.com
+        url:
+          type: string
+          title: Url
+          description: Link to the social media webpage.
+          examples:
+            - 'https://www.facebook.com/posts/1234567890'
+      required:
+        - source
+        - url
+    APIErrorResponse_ValidationError_:
+      type: object
+      title: 'APIErrorResponse[ValidationError]'
+      properties:
+        error:
+          $ref: '#/components/schemas/ValidationError'
+      required:
+        - error
+    ValidationError:
+      type: object
+      title: ValidationError
+      description: Error on incorrect input fields
+      properties:
+        message:
+          type: string
+          title: Message
+        fields:
+          type: array
+          title: Fields
+          items:
+            $ref: '#/components/schemas/Field'
+      required:
+        - message
+        - fields
+    Field:
+      type: object
+      title: Field
+      description: Detail of an incorrect input field
+      properties:
+        name:
+          type: string
+          title: Name
+        msg:
+          type: string
+          title: Msg
+        input:
+          title: Input
+          anyOf:
+            - type: string
+            - type: array
+              items:
+                type: string
+        valid_input:
+          title: Valid Input
+          anyOf:
+            - type: string
+            - type: array
+              items:
+                type: string
+      required:
+        - name
+        - msg
+    APIErrorResponse_ForbiddenAccessError_:
+      type: object
+      title: 'APIErrorResponse[ForbiddenAccessError]'
+      properties:
+        error:
+          $ref: '#/components/schemas/ForbiddenAccessError'
+      required:
+        - error
+    ForbiddenAccessError:
+      type: object
+      title: ForbiddenAccessError
+      description: User cannot access some resource.
+      properties:
+        message:
+          type: string
+          title: Message
+      required:
+        - message
+    APIErrorResponse_NotFoundError_:
+      type: object
+      title: 'APIErrorResponse[NotFoundError]'
+      properties:
+        error:
+          $ref: '#/components/schemas/NotFoundError'
+      required:
+        - error
+    NotFoundError:
+      type: object
+      title: NotFoundError
+      description: Nothing matches the given URI
+      properties:
+        message:
+          type: string
+          title: Message
+      required:
+        - message
+    APIErrorResponse_UnknownError_:
+      type: object
+      title: 'APIErrorResponse[UnknownError]'
+      properties:
+        error:
+          $ref: '#/components/schemas/UnknownError'
+      required:
+        - error
+    UnknownError:
+      type: object
+      title: UnknownError
+      description: 'Unknown error on server-side, please contact support.'
+      properties:
+        message:
+          type: string
+          title: Message
+      required:
+        - message
+    AlertRequestCustomerFieldsPatch:
+      type: object
+      title: AlertRequestCustomerFieldsPatch
+      description: Fields set by customer in the alert.
+      additionalProperties: false
+      properties:
+        assessment:
+          $ref: '#/components/schemas/CustomerAssessment'
+      required:
+        - assessment
+    CredentialsResponse:
+      type: object
+      title: CredentialsResponse
+      description: List of credentials associated with an alert.
+      properties:
+        credentials:
+          type: array
+          title: Credentials
+          description: 'For each credentials: the login, the password (obfuscated) and infostealer data. The password and infostealer data may not exist.'
+          examples:
+            - - infostealer:
+                  leak_date: '2024-01-12T08:44:55.622173+00:00'
+                  machine_name: workstation-2
+                  malware_name: 1nf0st34l3r
+                  target: 'https://example.com/login'
+                  victim_ip: 1.2.3.4
+                login: user@example.com
+                password: G**************s
+          items:
+            $ref: '#/components/schemas/Cred'
+        message:
+          title: Message
+          description: Information about the credentials fetched.
+          examples:
+            - Not all credentials could be fetched.
+          anyOf:
+            - type: string
+      required:
+        - credentials
+    Cred:
+      type: object
+      title: Cred
+      description: Credentials returned by the API
+      properties:
+        login:
+          type: string
+          title: Login
+        password:
+          title: Password
+          anyOf:
+            - type: string
+        infostealer:
+          anyOf:
+            - $ref: '#/components/schemas/Infostealer'
+      required:
+        - login
+    APIErrorResponse_GoneError_:
+      type: object
+      title: 'APIErrorResponse[GoneError]'
+      properties:
+        error:
+          $ref: '#/components/schemas/GoneError'
+      required:
+        - error
+    GoneError:
+      type: object
+      title: GoneError
+      description: Resource was previously available but is not anymore.
+      properties:
+        message:
+          type: string
+          title: Message
+      required:
+        - message
+    FindingsResponse:
+      type: object
+      title: FindingsResponse
+      description: List of findings associated with a codeshare alert.
+      properties:
+        findings:
+          type: array
+          title: Findings
+          description: Findings associated with the codeshare alert.
+          items:
+            $ref: '#/components/schemas/Finding'
+        message:
+          title: Message
+          description: Additional information in case of non-blocking issue with the query.
+          examples:
+            - Not all findings could be fetched.
+          anyOf:
+            - type: string
+      required:
+        - findings
+    Finding:
+      type: object
+      title: Finding
+      description: |-
+        A finding we found in a document at a specific commit: a snippet of code matched by a rule.
+        This contains the snippet itself (the source code), along with some contextual information, such as the URL to the file or the commit ID, among others.
+      properties:
+        rule:
+          type: string
+          title: Rule
+          description: Identifier of the internal rule that matched this finding in the code.
+          examples:
+            - GENERIC_KEY
+        filepath:
+          type: string
+          title: Filepath
+          description: Relative path of the matched file in the repository.
+          examples:
+            - mysite/settings.py
+        match_url:
+          type: string
+          title: Match Url
+          description: URL to the matched file at the specific commit.
+          examples:
+            - 'https://github.com/johndoe/global-app/blob/dbc3641fee7cb8911f73fee6e255c1b0a96b32f5/mysite/settings.py#L23'
+        commit:
+          type: string
+          title: Commit
+          description: ID of the commit in which the rule matched.
+          examples:
+            - dbc3641fee7cb8911f73fee6e255c1b0a96b32f5
+        match_content:
+          $ref: '#/components/schemas/Region'
+          description: 'The precise code containing secrets or credentials, matched by the rule.'
+          example:
+            end_column: 83
+            end_line: 23
+            snippet: SECRET_KEY = 'django-insecure-9bf)5h*)pqkf12i)^lc5#gq$3q7v9m0x5wzm=r$qdde7br%uan'
+            start_column: 1
+            start_line: 23
+        match_context:
+          $ref: '#/components/schemas/Region'
+          description: Code snippet around the content matched by the rule.
+          example:
+            end_column: null
+            end_line: 28
+            snippet: |-
+              # Quick-start development settings - unsuitable for production
+              # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
+
+              # SECURITY WARNING: keep the secret key used in production secret!
+              SECRET_KEY = 'django-insecure-9bf)5h*)pqkf12i)^lc5#gq$3q7v9m0x5wzm=r$qdde7br%uan'
+
+              # SECURITY WARNING: don't run with debug turned on in production!
+              DEBUG = True 
+              # 'localhost', '127.0.0.1', '.pythonanywhere.com'
+              ALLOWED_HOSTS = ['*']
+            start_column: 1
+            start_line: 19
+      required:
+        - rule
+        - filepath
+        - match_url
+        - commit
+        - match_content
+        - match_context
+    Region:
+      type: object
+      title: Region
+      description: |-
+        Region of the file matched by the rule: the code snippet along with the line and column numbers that delimit it.
+        This schema complies with SARIF v2.0 standard.
+      properties:
+        snippet:
+          type: string
+          title: Snippet
+          description: Code extract from start_line and start_column to end_line and end_column.
+        start_line:
+          type: integer
+          title: Start Line
+          description: Starting line number of the code snippet in the source.
+          exclusiveMinimum: 0
+        start_column:
+          type: integer
+          title: Start Column
+          description: Starting column number of the code snippet in the source.
+          exclusiveMinimum: 0
+        end_line:
+          type: integer
+          title: End Line
+          description: Final line number of the code snippet in the source.
+          exclusiveMinimum: 0
+        end_column:
+          title: End Column
+          description: 'Final column number of the code snippet in the source. If not set, it means end of the line.'
+          anyOf:
+            - type: integer
+              exclusiveMinimum: 0
+      required:
+        - snippet
+        - start_line
+        - start_column
+        - end_line
+    StixAlertsResponse:
+      type: object
+      title: StixAlertsResponse
+      description: Response to a search of STIX objects from alerts data.
+      properties:
+        stix_bundle:
+          type: object
+          title: Stix Bundle
+          description: |-
+            STIX Bundle object used to aggregate STIX objects, both SDO, SCO and SRO.
+            See https://docs.oasis-open.org/cti/stix/v2.1/csprd01/stix-v2.1-csprd01.html#_Toc16070770 for more information.
+        more:
+          type: boolean
+          title: More
+          description: Set to true when there are more alerts to retrieve with the same search request parameters and a new 'cursor'.
+          default: false
+        cursor:
+          title: Cursor
+          description: 'Set when there are more alerts to retrieve. It can be used in another search request, with the same parameters, to download the following alerts.'
+          anyOf:
+            - type: string
+      required:
+        - stix_bundle

@@ -1,0 +1,722 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "Audit Logs Public API"
+  },
+  "servers": [
+    {
+      "url": "https://api.cybelangel.com"
+    }
+  ],
+  "paths": {
+    "/v1/{organization_id}/audit-logs": {
+      "get": {
+        "tags": [
+          "audit logs"
+        ],
+        "summary": "Search audit logs",
+        "description": "Search audit logs for an organization, according to user filters.",
+        "operationId": "audit_logs_search_audit_logs__organization_id__audit_logs_get",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "description": "Set it to the 'cursor' value received from previous search request to iterate on the following audit logs, beyond the limit set per request.\nSearching from a cursor does not impact the total number of results.\nBehavior is undefined if the filters and sort are changed between successive requests.\n\nNote: with big datasets, iterating on cursor can be much slower than iterating on 'date_from' filter.",
+            "required": false,
+            "schema": {
+              "title": "Cursor",
+              "description": "Set it to the 'cursor' value received from previous search request to iterate on the following audit logs, beyond the limit set per request.\nSearching from a cursor does not impact the total number of results.\nBehavior is undefined if the filters and sort are changed between successive requests.\n\nNote: with big datasets, iterating on cursor can be much slower than iterating on 'date_from' filter.",
+              "default": null,
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          {
+            "name": "date_from",
+            "in": "query",
+            "description": "Minimal ingestion date. Expects a date with timezone information.",
+            "required": false,
+            "schema": {
+              "title": "Date From",
+              "description": "Minimal ingestion date. Expects a date with timezone information.",
+              "default": null,
+              "examples": [
+                "2024-09-01T10:00:00.000Z"
+              ],
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "examples": {
+              "default": {
+                "value": "2024-09-01T10:00:00.000Z"
+              }
+            }
+          },
+          {
+            "name": "date_to",
+            "in": "query",
+            "description": "Maximal ingestion date. Expects a date with timezone information.",
+            "required": false,
+            "schema": {
+              "title": "Date To",
+              "description": "Maximal ingestion date. Expects a date with timezone information.",
+              "default": null,
+              "examples": [
+                "2024-09-30T10:00:00.000Z"
+              ],
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "examples": {
+              "default": {
+                "value": "2024-09-30T10:00:00.000Z"
+              }
+            }
+          },
+          {
+            "name": "object_type",
+            "in": "query",
+            "description": "Type of the object that was acted on in the audit log.",
+            "required": false,
+            "schema": {
+              "description": "Type of the object that was acted on in the audit log.",
+              "default": null,
+              "examples": [
+                "report"
+              ],
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/ObjectType"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "examples": {
+              "default": {
+                "value": "report"
+              }
+            }
+          },
+          {
+            "name": "author_email",
+            "in": "query",
+            "description": "Email of the author that performed the action logged in the audit log.",
+            "required": false,
+            "schema": {
+              "title": "Author Email",
+              "description": "Email of the author that performed the action logged in the audit log.",
+              "default": null,
+              "examples": [
+                "john.doe@example.com"
+              ],
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "examples": {
+              "default": {
+                "value": "john.doe@example.com"
+              }
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Number of results to return per request. Must be between 1 and 1000. Default is 100.",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "title": "Limit",
+              "description": "Number of results to return per request. Must be between 1 and 1000. Default is 100.",
+              "exclusiveMinimum": 0,
+              "maximum": 1000,
+              "default": 100,
+              "examples": [
+                100
+              ]
+            },
+            "examples": {
+              "default": {
+                "value": 100
+              }
+            }
+          },
+          {
+            "name": "organization_id",
+            "in": "path",
+            "description": "Organization id of the requested audit logs.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Organization Id",
+              "description": "Organization id of the requested audit logs.",
+              "minLength": 1,
+              "examples": [
+                "90b18fad-b9ca-41db-bae1-b4964c1a4e84"
+              ]
+            },
+            "examples": {
+              "default": {
+                "value": "90b18fad-b9ca-41db-bae1-b4964c1a4e84"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuditLogsList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIErrorResponse_ValidationError_"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIErrorResponse_ForbiddenAccessError_"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIErrorResponse_NotFoundError_"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIErrorResponse_UnknownError_"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "servers": [
+          {
+            "url": "https://api.cybelangel.com"
+          }
+        ]
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "audit logs",
+      "description": "Audit Logs Public API"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "jwt": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {
+      "ObjectType": {
+        "type": "string",
+        "enum": [
+          "report",
+          "keyword",
+          "user"
+        ],
+        "title": "ObjectType"
+      },
+      "AuditLogsList": {
+        "type": "object",
+        "title": "AuditLogsList",
+        "description": "List of audit logs.",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "title": "Total",
+            "description": "Total number of audit logs matching the request.",
+            "examples": [
+              153
+            ]
+          },
+          "events": {
+            "type": "array",
+            "title": "Events",
+            "description": "Events matching the request parameters. The number of returned events can be inferior to the total if there are more results than the requested limit.",
+            "items": {
+              "$ref": "#/components/schemas/PublicAuditLog"
+            }
+          },
+          "more": {
+            "type": "boolean",
+            "title": "More",
+            "description": "Set to true when there are more audit logs to retrieve with the same search request parameters and a new 'cursor'.",
+            "default": false
+          },
+          "cursor": {
+            "title": "Cursor",
+            "description": "Set when there are more audit logs to retrieve. It can be used in another search request, with the same parameters, to download the following audit logs.",
+            "default": null,
+            "examples": [
+              "646q4dzHTR6521grDs654gtr1hg3652eds2005496feHKrf"
+            ],
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "total",
+          "events"
+        ]
+      },
+      "PublicAuditLog": {
+        "type": "object",
+        "title": "PublicAuditLog",
+        "description": "Audit log model for public API responses.",
+        "properties": {
+          "action": {
+            "$ref": "#/components/schemas/Action",
+            "description": "Action performed in the audit log.",
+            "example": "update"
+          },
+          "author_id": {
+            "type": "string",
+            "title": "Author Id",
+            "description": "Identifier of the author of the action.",
+            "examples": [
+              "auth0|1246b8616c3dde2f225a61b7"
+            ]
+          },
+          "author_email": {
+            "type": "string",
+            "title": "Author Email",
+            "description": "Email of the author of the action.",
+            "examples": [
+              "john.doe@cybelangel.com"
+            ]
+          },
+          "event_date": {
+            "type": "string",
+            "title": "Event Date",
+            "description": "Date and time when the event occurred, with millisecond precision.",
+            "examples": [
+              "2026-03-17T09:00:43.030Z"
+            ]
+          },
+          "object_id": {
+            "type": "string",
+            "title": "Object Id",
+            "description": "Identifier of the object associated with the audit log.",
+            "examples": [
+              "91f0ef97-6633-4177-b45a-d4cca479e13d"
+            ]
+          },
+          "object_type": {
+            "$ref": "#/components/schemas/ObjectType",
+            "description": "Type of the object associated with the audit log.",
+            "example": "report"
+          },
+          "report": {
+            "description": "Metadata of the report associated with the audit log, if object type is 'report'.",
+            "default": null,
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ReportMetadata"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "keyword": {
+            "description": "Metadata of the keyword associated with the audit log, if object type is 'keyword'.",
+            "default": null,
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/KeywordMetadata"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "user": {
+            "description": "Metadata of the user associated with the audit log, if object type is 'user'.",
+            "default": null,
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/UserMetadata"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "updated_fields": {
+            "title": "Updated Fields",
+            "description": "List of updated fields in case of an update action.",
+            "default": null,
+            "examples": [
+              [
+                "status"
+              ]
+            ],
+            "anyOf": [
+              {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "event_id": {
+            "type": "string",
+            "title": "Event Id",
+            "description": "Unique identifier of the audit log event.",
+            "examples": [
+              "G9wG-5wB2sQfS6SkpjGw"
+            ]
+          },
+          "organization_id": {
+            "type": "string",
+            "title": "Organization Id",
+            "description": "Identifier of the organization associated with the audit log.",
+            "examples": [
+              "90b18fad-b9ca-41db-bae1-b4964c1a4e84"
+            ]
+          }
+        },
+        "required": [
+          "action",
+          "author_id",
+          "author_email",
+          "event_date",
+          "object_id",
+          "object_type",
+          "event_id",
+          "organization_id"
+        ]
+      },
+      "Action": {
+        "type": "string",
+        "enum": [
+          "create",
+          "update",
+          "delete",
+          "view",
+          "share_externally",
+          "export",
+          "add_comment",
+          "request_takedown",
+          "login",
+          "logout",
+          "change_password"
+        ],
+        "title": "Action"
+      },
+      "ReportMetadata": {
+        "type": "object",
+        "title": "ReportMetadata",
+        "properties": {
+          "incident_id": {
+            "type": "string",
+            "title": "Incident Id",
+            "description": "Incident ID of the report, unique within the organization.",
+            "examples": [
+              "YG0TCU"
+            ]
+          },
+          "incident_type": {
+            "type": "string",
+            "title": "Incident Type",
+            "description": "Incident type of the report, e.g. 'malicious_website', 'sensitive_code', 'fraud_scheme', etc.",
+            "examples": [
+              "malicious_website"
+            ]
+          },
+          "severity": {
+            "type": "integer",
+            "title": "Severity",
+            "description": "Severity of the report, from 0 (low) to 4 (high).",
+            "examples": [
+              4
+            ]
+          },
+          "status": {
+            "type": "string",
+            "title": "Status",
+            "description": "Status of the report, usually 'open', 'in_progress', 'resolved' or 'discarded'.",
+            "examples": [
+              "open"
+            ]
+          }
+        },
+        "required": [
+          "incident_id",
+          "incident_type",
+          "severity",
+          "status"
+        ]
+      },
+      "KeywordMetadata": {
+        "type": "object",
+        "title": "KeywordMetadata",
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name",
+            "description": "Name of the keyword.",
+            "examples": [
+              "Cybelangel"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "title": "Status",
+            "description": "Status of the keyword.",
+            "examples": [
+              "active"
+            ]
+          },
+          "type": {
+            "type": "string",
+            "title": "Type",
+            "description": "Type of the keyword.",
+            "examples": [
+              "brand"
+            ]
+          }
+        },
+        "required": [
+          "name",
+          "status",
+          "type"
+        ]
+      },
+      "UserMetadata": {
+        "type": "object",
+        "title": "UserMetadata",
+        "properties": {
+          "email": {
+            "type": "string",
+            "title": "Email",
+            "description": "Email of the user.",
+            "examples": [
+              "john.doe@cybelangel.com"
+            ]
+          }
+        },
+        "required": [
+          "email"
+        ]
+      },
+      "APIErrorResponse_ValidationError_": {
+        "type": "object",
+        "title": "APIErrorResponse[ValidationError]",
+        "properties": {
+          "error": {
+            "$ref": "#/components/schemas/ValidationError"
+          }
+        },
+        "required": [
+          "error"
+        ]
+      },
+      "ValidationError": {
+        "type": "object",
+        "title": "ValidationError",
+        "description": "Error on incorrect input fields",
+        "properties": {
+          "message": {
+            "type": "string",
+            "title": "Message"
+          },
+          "fields": {
+            "type": "array",
+            "title": "Fields",
+            "items": {
+              "$ref": "#/components/schemas/Field"
+            }
+          }
+        },
+        "required": [
+          "message",
+          "fields"
+        ]
+      },
+      "Field": {
+        "type": "object",
+        "title": "Field",
+        "description": "Detail of an incorrect input field",
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Msg"
+          },
+          "input": {
+            "title": "Input",
+            "default": null,
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "name",
+          "msg"
+        ]
+      },
+      "APIErrorResponse_ForbiddenAccessError_": {
+        "type": "object",
+        "title": "APIErrorResponse[ForbiddenAccessError]",
+        "properties": {
+          "error": {
+            "$ref": "#/components/schemas/ForbiddenAccessError"
+          }
+        },
+        "required": [
+          "error"
+        ]
+      },
+      "ForbiddenAccessError": {
+        "type": "object",
+        "title": "ForbiddenAccessError",
+        "description": "User cannot access some resource.",
+        "properties": {
+          "message": {
+            "type": "string",
+            "title": "Message"
+          }
+        },
+        "required": [
+          "message"
+        ]
+      },
+      "APIErrorResponse_NotFoundError_": {
+        "type": "object",
+        "title": "APIErrorResponse[NotFoundError]",
+        "properties": {
+          "error": {
+            "$ref": "#/components/schemas/NotFoundError"
+          }
+        },
+        "required": [
+          "error"
+        ]
+      },
+      "NotFoundError": {
+        "type": "object",
+        "title": "NotFoundError",
+        "description": "Nothing matches the given URI",
+        "properties": {
+          "message": {
+            "type": "string",
+            "title": "Message"
+          }
+        },
+        "required": [
+          "message"
+        ]
+      },
+      "APIErrorResponse_UnknownError_": {
+        "type": "object",
+        "title": "APIErrorResponse[UnknownError]",
+        "properties": {
+          "error": {
+            "$ref": "#/components/schemas/UnknownError"
+          }
+        },
+        "required": [
+          "error"
+        ]
+      },
+      "UnknownError": {
+        "type": "object",
+        "title": "UnknownError",
+        "description": "Unknown error on server-side, please contact support.",
+        "properties": {
+          "message": {
+            "type": "string",
+            "title": "Message"
+          }
+        },
+        "required": [
+          "message"
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,112 @@
+generated: '2026-08-17'
+method: searched
+source: https://cybelangel.com/changelog/
+scheme: quarterly-release-notes
+labels:
+  GA: 'shipped to all customers as part of your subscription'
+  Beta: 'available to opt-in customers; contact your Customer Success Manager to join'
+  Research: 'early-stage exploration, not yet a committed feature'
+  Coming Qn: "confirmed for the current quarter's roadmap"
+update_policy_quote: >-
+  The changelog is updated continuously as features ship. Each quarter we publish a structured
+  recap covering everything that moved to Generally Available, entered Beta, started Research,
+  or is planned for the next quarter.
+current_period: Q3 2026
+note: >-
+  A combined changelog + forward roadmap on one marketing-site page (there is no changelog on
+  the developer portal, and no per-API release notes). Entries are quarter-dated, not
+  day-dated, and are product-level rather than API-level — so an integrator cannot map a
+  breaking API change to a date from this page. Two entries in the window are directly about
+  the API surface: "Keywords API" (Q3 2026) and "Audit Log Accessibility" (shipped Q2 2026),
+  both of which correspond to Stoplight projects harvested into openapi/. Captured verbatim
+  headings only; the recent window, not full history.
+entries:
+  - period: Q3 2026
+    status: planned
+    theme: 'Vendor monitoring, vulnerability intelligence, and threat actor context'
+    highlights:
+      - Vendor Exposure Monitoring — third-party breach monitoring with early alerts
+      - 'Unified TI View: Vulnerability Intelligence — prioritized vulnerability listings'
+      - 'Unified TI View: Threat Actor Insights — enhanced threat actor context'
+  - period: Q3 2026
+    status: planned
+    theme: 'Wider coverage, faster signals, sharper context'
+    highlights:
+      - Continuous Improvement — expanded detection across Telegram, file servers, dark web
+      - Faster Time to Detect — smarter automation and new ML models
+      - Increased Accuracy on GitHub — pinpointed sensitive-file exposure alerts
+  - period: Q3 2026
+    status: planned
+    theme: 'Self-service, executive views, and active testing'
+    highlights:
+      - CybelAngel Starter — self-service platform entry point
+      - CISO Dashboard — executive-ready visibility
+      - Active Testing — automated attack-surface probing
+  - period: Q3 2026
+    status: planned
+    api_relevant: true
+    theme: 'Credits, keywords API, and new integrations'
+    highlights:
+      - Credits Monitoring — usage tracking
+      - Keywords API — programmatic keyword management
+      - New Partnership Exploration — integration expansion
+    maps_to: openapi/cybelangel-keywords-openapi.yml
+  - period: Q2 2026
+    status: shipped
+    theme: 'Social media, AI-generated risks, and your vendor ecosystem'
+    highlights:
+      - '[New] Dedicated Social Media Impersonation Module'
+      - '[New] Extended Social Media Monitoring'
+      - '[Coming Q3] AI Data Breach Detection'
+  - period: Q2 2026
+    status: shipped
+    theme: 'Smarter reports, unified threat intelligence, vendor visibility'
+    highlights:
+      - '[Beta] Smarter Reports on Exposed APIs'
+      - '[Beta] Unified Threat Intelligence View'
+      - '[Coming Q3] Vendor Exposure Monitoring'
+  - period: Q2 2026
+    status: shipped
+    api_relevant: true
+    theme: 'Dashboards, API access, and direct feedback loops'
+    highlights:
+      - '[Coming Q3] Custom Dashboard'
+      - '[Coming Q3] Reinforced API Access'
+      - '[Coming Q3] Native Report Rating'
+    note: >-
+      "Reinforced API Access" is the only roadmap item that speaks to the API contract itself;
+      the changelog does not say what it changes.
+  - period: Q2 2026
+    status: shipped
+    api_relevant: true
+    theme: 'Access controls, audit trails, and usage tracking'
+    highlights:
+      - '[New] Segment Access to Inventory'
+      - '[New] Audit Log Accessibility'
+      - '[New] Credits Monitoring'
+    maps_to: openapi/cybelangel-audit-logs-openapi.yml
+  - period: Q2 2026
+    status: shipped
+    theme: 'Self-service entry points and automated reporting'
+    highlights:
+      - '[Beta] Self-Service Plan'
+      - '[New] CybelAngel at Your Own Pace'
+  - period: '2025'
+    status: shipped
+    theme: 'An overview of what we shipped'
+    highlights:
+      - 'Wider inventory coverage, sharper threats'
+      - 'Automated reporting and AI-aware research'
+      - 'Vendor visibility, role-based access, audit traceability'
+    note: 'Rolled up as a single "Shipped in 2025" section rather than dated entries.'
+breaking_changes_recorded: 0
+breaking_change_note: >-
+  No entry in the captured window is labelled breaking, and the page has no breaking-change
+  category. The one deprecation visible anywhere is in the Alerts OpenAPI itself
+  (GET /v1/alerts/{alert_id}/credentials, deprecated: true) and it is NOT mentioned in the
+  changelog — see lifecycle/cybelangel-lifecycle.yml.
+feedback_channel:
+  url: https://cybelangel.com/product-feedback/
+  quote: >-
+    Use the Contact form, or raise it directly with your Customer Success Manager.
+    Customer-submitted ideas are reviewed during each quarterly roadmap planning cycle.

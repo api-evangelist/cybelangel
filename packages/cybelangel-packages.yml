@@ -1,0 +1,78 @@
+generated: '2026-08-17'
+method: searched
+source: >-
+  npm registry search, PyPI, RubyGems, NuGet, crates.io, pkg.go.dev, the CybelAngel
+  GitHub organization (https://github.com/CybelAngel), Splunkbase, and the
+  developers.cybelangel.com portal
+summary:
+  official_client_libraries: 0
+  official_distributions: 1
+  sdk_languages: []
+  note: >-
+    CybelAngel publishes NO first-party client library in any language. Every public
+    registry probed came back empty for "cybelangel": npm search returned 0 results,
+    PyPI 404s for cybelangel / cybelangel-api / pycybelangel, RubyGems 404, NuGet 404.
+    The CybelAngel GitHub organization has five public repos and none of them is an API
+    client — chardet (a Go port), wireguard-ui, rabbitmq-storage-recoverer,
+    atlantis-helm-charts and mini_usn are all internal infrastructure tools, the newest
+    pushed 2025-09-03. What CybelAngel does ship is a Splunk technical add-on on
+    Splunkbase and a copy-paste Python tutorial script in the docs. Consumers of the
+    seven REST APIs are expected to use curl / Postman / Insomnia directly.
+packages:
+  - language: python
+    registry: splunkbase
+    name: TA-cybelangel
+    title: CybelAngel EASM
+    url: https://splunkbase.splunk.com/app/7287/
+    kind: splunk-technical-add-on
+    install: install from Splunkbase into Splunk Cloud or Splunk Enterprise
+    official: true
+    version: 1.1.6
+    published: '2025-09-10'
+    downloads: 466
+    cloud_compatible: true
+    note: >-
+      Official CybelAngel Technical Add-on: "This TA will allow you to ingest all of your
+      CybelAngel data into your Splunk Cloud & Enterprise instances." Version and date read
+      from the Splunkbase API (splunkbase.splunk.com/api/v1/app/?query=cybelangel and
+      /api/v1/app/7287/release/); latest release 1.1.6 "Updating for Cloud compatibility",
+      app updated_time 2025-09-10T13:59:00Z. This is a SIEM ingestion add-on, not a client
+      SDK — it is why no `SDKs` pointer is wired in apis.yml.
+  - language: python
+    registry: none
+    name: CybelAlertFetcher.py
+    kind: tutorial-script
+    url: https://developers.cybelangel.com/docs/alerts-api/6e548d500150e-cybel-angel-api-toolbox-tutorial
+    install: 'pip install requests  # then download CybelAlertFetcher.txt from the docs and rename to .py'
+    official: true
+    version: null
+    published: null
+    note: >-
+      "CybelAngel API Toolbox" — a documented Python script that fetches an access token,
+      pages the Alerts API past the 1,000-alert response cap, writes alerts.json, then pulls
+      the credentials attached to leak alerts into credentials.json. Distributed as a .txt
+      docs asset with no registry, no repository and no version, so there is nothing to
+      date: version and published are null because there is no metadata endpoint to read,
+      not because they were not checked. The asset path published in the article
+      (/assets/code/CybelAlertFetcher.txt) 404s on the docs host as of this probe.
+  - language: n/a
+    registry: none
+    name: Alert Finder / Credential Finder
+    kind: hosted-viewer
+    url: https://cybelalerts-demo.cybelangel.com/
+    official: true
+    version: null
+    published: null
+    note: >-
+      Companion browser tools (HTTP 200) that render the alerts.json / credentials.json the
+      toolbox script produces. Unpinned hosted page, no versioned distribution to record.
+registries_probed:
+  - {registry: npm, query: cybelangel, endpoint: 'https://registry.npmjs.org/-/v1/search?text=cybelangel', results: 0}
+  - {registry: pypi, query: cybelangel, endpoint: 'https://pypi.org/pypi/cybelangel/json', status: 404}
+  - {registry: pypi, query: cybelangel-api, endpoint: 'https://pypi.org/pypi/cybelangel-api/json', status: 404}
+  - {registry: pypi, query: pycybelangel, endpoint: 'https://pypi.org/pypi/pycybelangel/json', status: 404}
+  - {registry: rubygems, query: cybelangel, endpoint: 'https://rubygems.org/api/v1/gems/cybelangel.json', status: 404}
+  - {registry: nuget, query: cybelangel, endpoint: 'https://api.nuget.org/v3/registration5-semver1/cybelangel/index.json', status: 404}
+  - {registry: crates.io, query: cybelangel, status: 'rate-limited by crates.io data-access policy; no package found via search'}
+  - {registry: github, query: 'org:CybelAngel', endpoint: 'https://api.github.com/orgs/CybelAngel/repos', results: 5, api_clients: 0}
+  - {registry: splunkbase, query: cybelangel, endpoint: 'https://splunkbase.splunk.com/api/v1/app/?query=cybelangel', results: 1}

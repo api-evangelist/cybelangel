@@ -1,0 +1,130 @@
+generated: '2026-08-17'
+method: derived
+status: candidate
+source: >-
+  openapi/cybelangel-alerts-openapi.yml, openapi/cybelangel-adm-inventory-openapi.yml,
+  openapi/cybelangel-platform-reports-openapi.yml, openapi/cybelangel-keywords-openapi.yml,
+  openapi/cybelangel-threat-intelligence-openapi.yml, openapi/cybelangel-audit-logs-openapi.yml
+deployment:
+  mode: none
+  auth: unknown
+  verified: searched
+  note: >-
+    CybelAngel ships NO MCP server — not a remote endpoint and not a stdio package. Searched
+    the developer portal (all eight Stoplight projects and their table-of-contents), the
+    marketing site and its Q3 2026 changelog/roadmap, the CybelAngel GitHub organization,
+    the npm registry and the MCP registries; nothing. The agent-facing integration story is
+    CybelAngel Connect (a Workato-based no-code automation studio for ServiceNow, Jira,
+    Splunk, Slack, Cortex XSOAR, IBM Security SOAR and Azure Sentinel) plus the Splunkbase
+    technical add-on. The tools below are a DERIVED candidate surface — one tool per real
+    OpenAPI operationId — not something CybelAngel publishes. No endpoint URL is recorded
+    because guessing one would read as a verified agent surface.
+server:
+  name: cybelangel
+  transport: null
+  url: null
+tools:
+  - name: search_alerts
+    description: Search alerts by date range, keyword, IP, hostname, category and minimum ML score
+    source_operation: openapi/cybelangel-alerts-openapi.yml#alerts_search_alerts_alerts_get
+  - name: get_alert
+    description: Fetch one alert by id
+    source_operation: openapi/cybelangel-alerts-openapi.yml#alerts_search_an_alert_alerts__alert_id__get
+  - name: set_alert_assessment
+    description: PATCH the customer assessment status of an alert (true positive / false positive / unknown)
+    source_operation: openapi/cybelangel-alerts-openapi.yml#alerts_patch_an_alert_alerts__alert_id__customer_patch
+  - name: get_alert_leak_credentials
+    description: List the leaked credentials attached to a leak alert
+    source_operation: openapi/cybelangel-alerts-openapi.yml#alerts_get_alert_credentials_alerts__alert_id__leak_credentials_get
+  - name: get_alert_codeshare_findings
+    description: List the findings attached to a codeshare alert
+    source_operation: openapi/cybelangel-alerts-openapi.yml#alerts_get_codeshare_findings_alerts__alert_id__codeshare_findings_get
+  - name: search_leak_credentials
+    description: Search leaked credentials across alerts
+    source_operation: openapi/cybelangel-alerts-openapi.yml#alerts_get_leak_credentials_leak_credentials_get
+  - name: search_alerts_stix
+    description: Search alerts and return OASIS STIX bundles
+    source_operation: openapi/cybelangel-alerts-openapi.yml#stix_search_stix_alerts_stix_alerts_get
+  - name: list_inventory_assets
+    description: List discovered external attack-surface assets
+    source_operation: openapi/cybelangel-adm-inventory-openapi.yml#get-inventory-assets
+  - name: list_inventory_hostnames
+    description: List hostnames observed on discovered assets
+    source_operation: openapi/cybelangel-adm-inventory-openapi.yml#get-inventory-assets-hostnames
+  - name: list_inventory_threats
+    description: List threats joined with the owning asset record
+    source_operation: openapi/cybelangel-adm-inventory-openapi.yml#get-inventory-threats-with-asset-info
+  - name: set_asset_status
+    description: Update the status of one or more inventory assets
+    source_operation: openapi/cybelangel-adm-inventory-openapi.yml#put-inventory-assets-status
+  - name: set_asset_threat_status
+    description: Update the status of one or more asset threats
+    source_operation: openapi/cybelangel-adm-inventory-openapi.yml#put-inventory-assets-threats-status
+  - name: search_reports
+    description: Search incident reports (v2)
+    source_operation: openapi/cybelangel-platform-reports-openapi.yml#get-v2-reports
+  - name: get_report
+    description: Fetch one incident report by id (v2)
+    source_operation: openapi/cybelangel-platform-reports-openapi.yml#get-v2-reports-by-id
+  - name: get_report_mirror
+    description: Fetch the file/mirror listing of a report
+    source_operation: openapi/cybelangel-platform-reports-openapi.yml#get-mirror-by-report-id
+  - name: get_report_pdf
+    description: Download the PDF rendering of a report
+    source_operation: openapi/cybelangel-platform-reports-openapi.yml#get-pdf-by-report-id
+  - name: set_report_status
+    description: Resolve or reopen an incident report
+    source_operation: openapi/cybelangel-platform-reports-openapi.yml#update-report-status-by-report-id
+  - name: set_report_statuses_bulk
+    description: Update the status of multiple reports in one call
+    source_operation: openapi/cybelangel-platform-reports-openapi.yml#update-multiple-reports-statuses
+  - name: get_report_comments
+    description: Read the comments on a report
+    source_operation: openapi/cybelangel-platform-reports-openapi.yml#get-report-comments
+  - name: post_report_comment
+    description: Add a comment to a report
+    source_operation: openapi/cybelangel-platform-reports-openapi.yml#post-report-comments
+  - name: create_remediation_request
+    description: Ask CybelAngel analysts to remediate an incident
+    source_operation: openapi/cybelangel-platform-reports-openapi.yml#create-remediation-request
+  - name: get_credential_watchlist
+    description: Read the leaked-credential watchlist
+    source_operation: openapi/cybelangel-platform-reports-openapi.yml#get-credential-watchlist
+  - name: export_credential_watchlist
+    description: Export the credential watchlist as CSV
+    source_operation: openapi/cybelangel-platform-reports-openapi.yml#get-export-credential-watchlist
+  - name: set_credential_status
+    description: Resolve or reopen a leaked credential
+    source_operation: openapi/cybelangel-platform-reports-openapi.yml#update-status-of-credential
+  - name: get_domain_watchlist
+    description: Read the malicious-domain watchlist
+    source_operation: openapi/cybelangel-platform-reports-openapi.yml#get-domain-watchlist
+  - name: get_report_stats
+    description: Report volume statistics
+    source_operation: openapi/cybelangel-platform-reports-openapi.yml#get-v2-stats-reports
+  - name: list_keywords
+    description: List monitored keywords
+    source_operation: openapi/cybelangel-keywords-openapi.yml#get-keywords
+  - name: create_keywords
+    description: Add monitored keywords
+    source_operation: openapi/cybelangel-keywords-openapi.yml#create-keywords
+  - name: update_keywords
+    description: Update monitored keywords
+    source_operation: openapi/cybelangel-keywords-openapi.yml#update-keywords
+  - name: set_keyword_status
+    description: Enable or disable monitored keywords
+    source_operation: openapi/cybelangel-keywords-openapi.yml#update-keywords-status
+  - name: list_workspaces
+    description: List the workspaces keywords belong to
+    source_operation: openapi/cybelangel-keywords-openapi.yml#get-workspaces
+  - name: get_claimed_attacks
+    description: Threat-intelligence claimed attacks (ransomware/extortion claims by actor and victim)
+    source_operation: openapi/cybelangel-threat-intelligence-openapi.yml#get-threat-intelligence-claimed-attacks
+  - name: search_audit_logs
+    description: Search the platform audit trail for an organization
+    source_operation: openapi/cybelangel-audit-logs-openapi.yml#audit_logs_search_audit_logs__organization_id__audit_logs_get
+searched:
+  - {surface: 'developers.cybelangel.com (8 Stoplight projects)', result: no MCP project or article}
+  - {surface: 'https://cybelangel.com/changelog/ (Q2 shipped + Q3 2026 roadmap)', result: no MCP item}
+  - {surface: 'https://github.com/CybelAngel', result: '5 public repos, none MCP'}
+  - {surface: 'npm registry search "cybelangel"', result: 0 results}

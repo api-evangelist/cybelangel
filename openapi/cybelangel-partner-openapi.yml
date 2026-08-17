@@ -1,0 +1,2597 @@
+openapi: 3.1.0
+info:
+  version: 1.0.0
+  title: References
+  description: |-
+    API for CybelAngel's Partners.
+    Authentication uses standard [OAuth2 Bearer Tokens](https://tools.ietf.org/html/rfc6750).
+
+    Here is a simple example of how to fetch such a token with curl:
+
+    ```shell
+    curl -X POST https://auth.cybelangel.com/oauth/token -H 'content-type: application/json -d '{"client_id": "client_id", "client_secret": "client_secret", "audience": "https://platform.cybelangel.com/", "grant_type": "client_credentials"}
+    ```
+
+    The received access token can then be used as a Bearer token to request our API.
+  contact:
+    email: support@cybelangel.com
+  license:
+    url: 'https://cybelangel.com/'
+    name: Proprietary
+servers:
+  - url: 'https://api.cybelangel.com'
+paths:
+  '/v1/{organization_id}/inventory/assets':
+    get:
+      tags:
+        - ADM Inventory
+      summary: Get Organization Inventory Assets
+      description: 'Get all inventory assets for one of your client organizations. Results are sorted by created_at (descending)<br/>and alphabetical order of value.<br/><br/>You can filter assets by either `values` or `ids` parameters, but not both at the same time.<br/><br/>**Recommendation**: Inventory data is refreshed every 8 hours.<br/>We recommend aligning the frequency of your queries with this update interval for optimal results and performance.<br/><br/>⚠️ **Asset Discovery and Monitoring module is required on the client organization.**'
+      operationId: get-organization-inventory-assets
+      parameters:
+        - name: cursor
+          in: query
+          description: 'Cursor returned by a previous call to this endpoint. If it is not set, you will get the first page.'
+          required: false
+          schema:
+            type: string
+            title: Cursor
+            description: 'Cursor returned by a previous call to this endpoint. If it is not set, you will get the first page.'
+            minLength: 1
+        - name: values
+          in: query
+          description: To get details for specific asset(s). Cannot be used together with 'ids' parameter.
+          required: false
+          schema:
+            type: array
+            title: Values
+            description: To get details for specific asset(s). Cannot be used together with 'ids' parameter.
+            items:
+              type: string
+              minLength: 1
+        - name: ids
+          in: query
+          description: List of asset IDs (UUIDs). Cannot be used together with 'values' parameter.
+          required: false
+          schema:
+            type: array
+            title: Ids
+            description: List of asset IDs (UUIDs). Cannot be used together with 'values' parameter.
+            items:
+              type: string
+              format: uuid
+        - name: status
+          in: query
+          description: '[Deprecated] Filter on the status on an asset (This query param will be removed on September 4 2026, use `asset_status` instead)'
+          required: false
+          deprecated: true
+          schema:
+            type: array
+            title: Status
+            description: '[Deprecated] Filter on the status on an asset (This query param will be removed on September 4 2026, use `asset_status` instead)'
+            items:
+              $ref: '#/components/schemas/PreviousAssetStatus'
+            x-deprecated: true
+        - name: asset_status
+          in: query
+          description: Filter on the status on an asset
+          required: false
+          schema:
+            type: array
+            title: Asset Status
+            description: Filter on the status on an asset
+            items:
+              $ref: '#/components/schemas/AssetStatus'
+        - name: first_seen_at_start_date
+          in: query
+          description: Filter assets based on when we detected the asset for the first time in our system (greater than this date)
+          required: false
+          schema:
+            type: string
+            title: First Seen At Start Date
+            description: Filter assets based on when we detected the asset for the first time in our system (greater than this date)
+            format: date-time
+            examples:
+              - '2023-10-05T14:48:00.000Z'
+          examples:
+            default:
+              value: '2023-10-05T14:48:00.000Z'
+        - name: first_seen_at_end_date
+          in: query
+          description: Filter assets based on when we detected the asset for the first time in our system (less than this date)
+          required: false
+          schema:
+            type: string
+            title: First Seen At End Date
+            description: Filter assets based on when we detected the asset for the first time in our system (less than this date)
+            format: date-time
+            examples:
+              - '2023-10-05T14:48:00.000Z'
+          examples:
+            default:
+              value: '2023-10-05T14:48:00.000Z'
+        - name: last_seen_at_start_date
+          in: query
+          description: Filter assets based on when we detected the asset for the last time in our system (greater than this date)
+          required: false
+          schema:
+            type: string
+            title: Last Seen At Start Date
+            description: Filter assets based on when we detected the asset for the last time in our system (greater than this date)
+            format: date-time
+            examples:
+              - '2023-10-05T14:48:00.000Z'
+          examples:
+            default:
+              value: '2023-10-05T14:48:00.000Z'
+        - name: last_seen_at_end_date
+          in: query
+          description: Filter assets based on when we detected the asset for the last time in our system (less than this date)
+          required: false
+          schema:
+            type: string
+            title: Last Seen At End Date
+            description: Filter assets based on when we detected the asset for the last time in our system (less than this date)
+            format: date-time
+            examples:
+              - '2023-10-05T14:48:00.000Z'
+          examples:
+            default:
+              value: '2023-10-05T14:48:00.000Z'
+        - name: type
+          in: query
+          description: Filter on the type of an asset
+          required: false
+          schema:
+            $ref: '#/components/schemas/AssetType'
+            title: Type
+            description: Filter on the type of an asset
+        - name: organization_id
+          in: path
+          description: ID of the organization to manage resources for
+          required: true
+          schema:
+            type: string
+            title: Organization Id
+            description: ID of the organization to manage resources for
+            format: uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetAssetsResponseDTO'
+                __errors__:
+                  '#/%24defs/TranslationElementDTO': Keys TranslationElementDTO_2 through TranslationElementDTO_20 already taken.
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_BadRequestError_'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_UnauthorizedError_'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_ForbiddenAccessError_'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_NotFoundError_'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_UnknownError_'
+      security:
+        - jwt: []
+      servers:
+        - url: 'https://api.cybelangel.com'
+  '/v1/{organization_id}/inventory/assets/hostnames':
+    get:
+      tags:
+        - ADM Inventory
+      summary: Get Organization Inventory Assets Hostnames
+      description: 'Get hostnames associated with IP assets for one of your client organizations.<br/><br/>You can filter assets by either ''asset_values'' or ''asset_ids'' parameters, but not both at the same time.<br/><br/>**Recommendation**: Inventory data is refreshed every 8 hours.<br/>We recommend aligning the frequency of your queries with this update interval for optimal results and performance.<br/><br/>⚠️ **Asset Discovery and Monitoring module is required on the client organization.**'
+      operationId: get-organization-inventory-assets-hostnames
+      parameters:
+        - name: cursor
+          in: query
+          description: 'Cursor returned by a previous call to this endpoint. If it is not set, you will get the first page.'
+          required: false
+          schema:
+            type: string
+            title: Cursor
+            description: 'Cursor returned by a previous call to this endpoint. If it is not set, you will get the first page.'
+            minLength: 1
+        - name: asset_values
+          in: query
+          description: To get hostnames for specific asset(s). Cannot be used together with 'asset_ids' parameter.
+          required: false
+          schema:
+            type: array
+            title: Asset Values
+            description: To get hostnames for specific asset(s). Cannot be used together with 'asset_ids' parameter.
+            examples:
+              - - 74.125.20.138
+                - 17.253.144.10
+            items:
+              type: string
+              minLength: 1
+          examples:
+            default:
+              value:
+                - 74.125.20.138
+                - 17.253.144.10
+        - name: asset_ids
+          in: query
+          description: List of asset IDs (UUIDs) to filter the results. Cannot be used together with 'asset_values' parameter.
+          required: false
+          schema:
+            type: array
+            title: Asset Ids
+            description: List of asset IDs (UUIDs) to filter the results. Cannot be used together with 'asset_values' parameter.
+            items:
+              type: string
+              format: uuid
+        - name: organization_id
+          in: path
+          description: ID of the organization to manage resources for
+          required: true
+          schema:
+            type: string
+            title: Organization Id
+            description: ID of the organization to manage resources for
+            format: uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetAssetsHostnamesResponseDTO'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_BadRequestError_'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_UnauthorizedError_'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_ForbiddenAccessError_'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_NotFoundError_'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_UnknownError_'
+      security:
+        - jwt: []
+      servers:
+        - url: 'https://api.cybelangel.com'
+  '/v1/{organization_id}/inventory/assets/threats':
+    get:
+      tags:
+        - ADM Inventory
+      summary: Get Organization Inventory Threats with Asset info
+      description: 'Get threats associated with assets for one of your client organizations. Threats are sorted by their first_seen field (descending), and returned by page of 50 items. If there are more elements, you can use the provided cursor to retrieve the next page as explained in [the how-to page](https://developers.cybelangel.com/docs/adm-inventory-api/7e88d945427a4-fetch-assets-details-from-adm-inventory#pagination).<br/><br/>**Recommendation**: Inventory data is refreshed every 8 hours.<br/>We recommend aligning the frequency of your queries with this update interval for optimal results and performance.<br/><br/>⚠️ **Asset Discovery and Monitoring module is required on the client organization.**'
+      operationId: get-organization-inventory-threats-with-asset-info
+      parameters:
+        - name: cursor
+          in: query
+          description: 'Cursor returned by a previous call to this endpoint. If it is not set, you will get the first page.'
+          required: false
+          schema:
+            type: string
+            title: Cursor
+            description: 'Cursor returned by a previous call to this endpoint. If it is not set, you will get the first page.'
+            minLength: 1
+        - name: asset_values
+          in: query
+          description: To get threats for specific asset(s). Cannot be used together with 'asset_ids' parameter.
+          required: false
+          schema:
+            type: array
+            title: Asset Values
+            description: To get threats for specific asset(s). Cannot be used together with 'asset_ids' parameter.
+            examples:
+              - - 127.0.0.1
+                - 192.168.0.1
+            items:
+              type: string
+              minLength: 1
+          examples:
+            default:
+              value:
+                - 127.0.0.1
+                - 192.168.0.1
+        - name: asset_ids
+          in: query
+          description: List of asset IDs (UUIDs). Cannot be used together with 'asset_values' parameter.
+          required: false
+          schema:
+            type: array
+            title: Asset Ids
+            description: List of asset IDs (UUIDs). Cannot be used together with 'asset_values' parameter.
+            items:
+              type: string
+              format: uuid
+        - name: severity
+          in: query
+          description: To get threats with specific severity
+          required: false
+          schema:
+            type: array
+            title: Severity
+            description: To get threats with specific severity
+            examples:
+              - - 1
+                - 2
+            items:
+              $ref: '#/components/schemas/ThreatSeverity'
+          examples:
+            default:
+              value:
+                - 1
+                - 2
+        - name: status
+          in: query
+          description: To get threats with specific status
+          required: false
+          schema:
+            type: array
+            title: Status
+            description: To get threats with specific status
+            examples:
+              - - open
+            items:
+              $ref: '#/components/schemas/ThreatStatus'
+          examples:
+            default:
+              value:
+                - open
+        - name: first_seen_start_date
+          in: query
+          description: 'Full datetime format with timezone (e.g., 2025-07-17T11:00:51Z)'
+          required: false
+          schema:
+            type: string
+            title: First Seen Start Date
+            description: 'Full datetime format with timezone (e.g., 2025-07-17T11:00:51Z)'
+            format: date-time
+            examples:
+              - '2025-07-17T11:00:51Z'
+          examples:
+            default:
+              value: '2025-07-17T11:00:51Z'
+        - name: first_seen_end_date
+          in: query
+          description: 'Full datetime format with timezone (e.g., 2025-07-18T11:00:51Z)'
+          required: false
+          schema:
+            type: string
+            title: First Seen End Date
+            description: 'Full datetime format with timezone (e.g., 2025-07-18T11:00:51Z)'
+            format: date-time
+            examples:
+              - '2025-07-18T11:00:51Z'
+          examples:
+            default:
+              value: '2025-07-18T11:00:51Z'
+        - name: organization_id
+          in: path
+          description: ID of the organization to manage resources for
+          required: true
+          schema:
+            type: string
+            title: Organization Id
+            description: ID of the organization to manage resources for
+            format: uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetThreatsWithAssetInfoResponseDTO'
+                __errors__:
+                  '#/%24defs/TranslationElementDTO': Keys TranslationElementDTO_2 through TranslationElementDTO_20 already taken.
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_BadRequestError_'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_UnauthorizedError_'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_ForbiddenAccessError_'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_NotFoundError_'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_UnknownError_'
+      security:
+        - jwt: []
+      servers:
+        - url: 'https://api.cybelangel.com'
+  '/v1/{organization_id}/inventory/assets/status':
+    put:
+      tags:
+        - ADM Inventory
+      summary: Update Organization Inventory Assets Status
+      description: 'Update the status of multiple assets for one of your client organizations.<br/><br/>You must provide either ''asset_values'' or ''asset_ids'', but not both.<br/><br/>⚠️ **Asset Discovery and Monitoring module is required on the client organization.**'
+      operationId: put-organization-inventory-assets-status
+      parameters:
+        - name: organization_id
+          in: path
+          description: ID of the organization to manage resources for
+          required: true
+          schema:
+            type: string
+            title: Organization Id
+            description: ID of the organization to manage resources for
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateAssetsStatusRequestBodyDTO'
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_BadRequestError_'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_UnauthorizedError_'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_ForbiddenAccessError_'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_NotFoundError_'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_ConflictError_'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_UnknownError_'
+      security:
+        - jwt: []
+      servers:
+        - url: 'https://api.cybelangel.com'
+  '/v1/{organization_id}/inventory/assets/threats/status':
+    put:
+      tags:
+        - ADM Inventory
+      summary: Update Organization Inventory Assets Threats Status
+      description: 'Update the status of multiple asset threats for one of your client organizations.<br/><br/>Each threat must identify its asset by either ''asset_value'' or ''asset_id'', but not both.<br/><br/>⚠️ **Asset Discovery and Monitoring module is required on the client organization.**'
+      operationId: put-organization-inventory-assets-threats-status
+      parameters:
+        - name: organization_id
+          in: path
+          description: ID of the organization to manage resources for
+          required: true
+          schema:
+            type: string
+            title: Organization Id
+            description: ID of the organization to manage resources for
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateAssetThreatStatusRequestBodyDTO'
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_BadRequestError_'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_UnauthorizedError_'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_ForbiddenAccessError_'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_NotFoundError_'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_UnknownError_'
+      security:
+        - jwt: []
+      servers:
+        - url: 'https://api.cybelangel.com'
+  '/v1/{organization_id}/keywords':
+    get:
+      tags:
+        - Keywords
+      summary: Get Organization Keywords
+      description: Get all keywords for one of your client organizations. Results are sorted alphabetically by the keyword name.
+      operationId: get-organization-keywords
+      parameters:
+        - name: ids
+          in: query
+          description: Filter keywords by ID. Accepts multiple values (`?ids=<uuid>&ids=<uuid>`).
+          required: false
+          schema:
+            type: array
+            title: Ids
+            description: Filter keywords by ID. Accepts multiple values (`?ids=<uuid>&ids=<uuid>`).
+            default: []
+            items:
+              type: string
+              format: uuid
+        - name: name
+          in: query
+          description: Filter keywords by name.
+          required: false
+          schema:
+            type: string
+            title: Name
+            description: Filter keywords by name.
+        - name: status
+          in: query
+          description: Filter keywords by status. Accepts multiple values (`?status=pending&status=active`).
+          required: false
+          schema:
+            type: array
+            title: Status
+            description: Filter keywords by status. Accepts multiple values (`?status=pending&status=active`).
+            default: []
+            items:
+              $ref: '#/components/schemas/KeywordStatus'
+        - name: creation_start_date
+          in: query
+          description: Filter keywords created on or after this date.
+          required: false
+          schema:
+            type: string
+            title: Creation Start Date
+            description: Filter keywords created on or after this date.
+            format: date-time
+            examples:
+              - '2023-10-05T14:48:00.000Z'
+          examples:
+            default:
+              value: '2023-10-05T14:48:00.000Z'
+        - name: creation_end_date
+          in: query
+          description: Filter keywords created on or before this date.
+          required: false
+          schema:
+            type: string
+            title: Creation End Date
+            description: Filter keywords created on or before this date.
+            format: date-time
+            examples:
+              - '2023-10-05T14:48:00.000Z'
+          examples:
+            default:
+              value: '2023-10-05T14:48:00.000Z'
+        - name: last_modification_start_date
+          in: query
+          description: Filter keywords last modified on or after this date.
+          required: false
+          schema:
+            type: string
+            title: Last Modification Start Date
+            description: Filter keywords last modified on or after this date.
+            format: date-time
+            examples:
+              - '2023-10-05T14:48:00.000Z'
+          examples:
+            default:
+              value: '2023-10-05T14:48:00.000Z'
+        - name: last_modification_end_date
+          in: query
+          description: Filter keywords last modified on or before this date.
+          required: false
+          schema:
+            type: string
+            title: Last Modification End Date
+            description: Filter keywords last modified on or before this date.
+            format: date-time
+            examples:
+              - '2023-10-05T14:48:00.000Z'
+          examples:
+            default:
+              value: '2023-10-05T14:48:00.000Z'
+        - name: cursor
+          in: query
+          description: 'Cursor returned by a previous call to this endpoint. If it is not set, you will get the first page.'
+          required: false
+          schema:
+            type: string
+            title: Cursor
+            description: 'Cursor returned by a previous call to this endpoint. If it is not set, you will get the first page.'
+        - name: workspaces
+          in: query
+          description: Filter keywords by workspace. Accepts multiple values (`?workspaces=<uuid>&workspaces=<uuid>`).
+          required: false
+          schema:
+            type: array
+            title: Workspaces
+            description: Filter keywords by workspace. Accepts multiple values (`?workspaces=<uuid>&workspaces=<uuid>`).
+            default: []
+            items:
+              type: string
+              format: uuid
+        - name: organization_id
+          in: path
+          description: ID of the organization to manage resources for
+          required: true
+          schema:
+            type: string
+            title: Organization Id
+            description: ID of the organization to manage resources for
+            format: uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PartnerKeywordListDTO'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_BadRequestError_'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_UnauthorizedError_'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_ForbiddenAccessError_'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_UnknownError_'
+      security:
+        - jwt: []
+      servers:
+        - url: 'https://api.cybelangel.com'
+    post:
+      tags:
+        - Keywords
+      summary: Create Organization Keywords
+      description: Create a batch of keywords for one of your client organizations. Maximum 10 keywords per request.<br/><br/>Keywords are created in "pending" status.
+      operationId: create-organization-keywords
+      parameters:
+        - name: organization_id
+          in: path
+          description: ID of the organization to manage resources for
+          required: true
+          schema:
+            type: string
+            title: Organization Id
+            description: ID of the organization to manage resources for
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PartnerCreateKeywordsBodyDTO'
+      responses:
+        '201':
+          description: All the keywords were created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PartnerCreateKeywords201ResponseDTO'
+        '207':
+          description: One of more keywords failed to be created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PartnerCreateKeywords207ResponseDTO'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_BadRequestError_'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_UnauthorizedError_'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_ForbiddenAccessError_'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_UnknownError_'
+      security:
+        - jwt: []
+      servers:
+        - url: 'https://api.cybelangel.com'
+    delete:
+      tags:
+        - Keywords
+      summary: Delete Organization Keywords
+      description: Delete a batch of keywords for one of your client organizations. Maximum 50 keywords per request.
+      operationId: delete-organization-keywords
+      parameters:
+        - name: organization_id
+          in: path
+          description: ID of the organization to manage resources for
+          required: true
+          schema:
+            type: string
+            title: Organization Id
+            description: ID of the organization to manage resources for
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeleteKeywordBodyDTO'
+      responses:
+        '200':
+          description: All the keywords were deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteKeywords200ResponseDTO'
+        '207':
+          description: One or more keywords failed to be deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteKeywords207ResponseDTO'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_BadRequestError_'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_UnauthorizedError_'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_ForbiddenAccessError_'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_UnknownError_'
+      security:
+        - jwt: []
+      servers:
+        - url: 'https://api.cybelangel.com'
+  '/v1/{organization_id}/keywords/status':
+    put:
+      tags:
+        - Keywords
+      summary: Update Organization Keywords Status
+      description: Update the status of a batch of keywords for one of your client organizations.<br/><br/>Only deactivation ("inactive") is supported. Maximum 10 keywords per request.
+      operationId: update-organization-keywords-status
+      parameters:
+        - name: organization_id
+          in: path
+          description: ID of the organization to manage resources for
+          required: true
+          schema:
+            type: string
+            title: Organization Id
+            description: ID of the organization to manage resources for
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateKeywordsStatusBodyDTO'
+      responses:
+        '200':
+          description: All the keywords were updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PartnerUpdateKeywords200ResponseDTO'
+        '207':
+          description: One or more keywords failed to be updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PartnerUpdateKeywords207ResponseDTO'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_BadRequestError_'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_UnauthorizedError_'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_ForbiddenAccessError_'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_UnknownError_'
+      security:
+        - jwt: []
+      servers:
+        - url: 'https://api.cybelangel.com'
+  '/v1/{organization_id}/workspaces':
+    get:
+      tags:
+        - Workspaces
+      summary: Get Organization Workspaces
+      description: Get all workspaces for one of your client organizations.
+      operationId: get-organization-workspaces
+      parameters:
+        - name: organization_id
+          in: path
+          description: ID of the organization to manage resources for
+          required: true
+          schema:
+            type: string
+            title: Organization Id
+            description: ID of the organization to manage resources for
+            format: uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkspaceListDTO'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_BadRequestError_'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_UnauthorizedError_'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_ForbiddenAccessError_'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_UnknownError_'
+      security:
+        - jwt: []
+      servers:
+        - url: 'https://api.cybelangel.com'
+tags:
+  - name: ADM Inventory
+    description: Manipulate ADM inventory assets and threats for a given organization.
+  - name: Keywords
+    description: Manipulate keywords for a given organization.
+  - name: Workspaces
+    description: List workspaces for a given organization.
+components:
+  securitySchemes:
+    jwt:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    PreviousAssetStatus:
+      type: string
+      enum:
+        - input
+        - discovered
+        - confirmed
+        - discarded
+      title: PreviousAssetStatus
+    AssetStatus:
+      type: string
+      enum:
+        - owned
+        - discovered
+        - external
+        - discarded
+      title: AssetStatus
+    AssetType:
+      type: string
+      enum:
+        - domain
+        - ip
+        - iprange
+      title: AssetType
+    GetAssetsResponseDTO:
+      type: object
+      title: GetAssetsResponseDTO
+      additionalProperties: false
+      properties:
+        items:
+          type: array
+          title: Items
+          description: List of assets matching the request
+          items:
+            $ref: '#/components/schemas/InventoryAssetDTO'
+        next_cursor:
+          title: Next Cursor
+          description: Cursor to the next page. You should use this cursor in the "cursor" query parameter to retrieve the next page.
+          anyOf:
+            - type: string
+        total:
+          type: integer
+          title: Total
+          description: Total number of assets through all pages (or in all your inventory)
+          minimum: 0
+      required:
+        - items
+        - total
+    InventoryAssetDTO:
+      type: object
+      title: InventoryAssetDTO
+      properties:
+        id:
+          type: string
+          title: Id
+          description: The id of the asset.
+          format: uuid
+        value:
+          type: string
+          title: Value
+          description: 'The value describing the asset. The format depends on the asset type. It will be the IP for an asset of type IP, the domain or subdomain name for an asset of type DOMAIN for instance.'
+          examples:
+            - shop.acme.com
+        type:
+          $ref: '#/components/schemas/AssetType'
+          description: Type of the assets
+        status:
+          description: '[Deprecated] Status of the asset (This field will be removed on September 4 2026, use `asset_status` instead)'
+          anyOf:
+            - $ref: '#/components/schemas/PreviousAssetStatus'
+          x-deprecated: true
+        asset_status:
+          $ref: '#/components/schemas/AssetStatus'
+          description: Status of the asset
+        first_seen_at:
+          type: string
+          title: First Seen At
+          description: When we detected the asset for the first time in our system
+          format: date-time
+          examples:
+            - '2023-10-05T14:48:00.000Z'
+        last_seen_at:
+          type: string
+          title: Last Seen At
+          description: When we detected the asset for the last time in our system
+          format: date-time
+          examples:
+            - '2023-10-05T14:48:00.000Z'
+        created_at:
+          type: string
+          title: Created At
+          description: When the asset ends in your inventory for the first time. It could be different from the first time we saw it
+          format: date-time
+          examples:
+            - '2023-10-05T14:48:00.000Z'
+        platform_link:
+          type: string
+          title: Platform Link
+          description: Direct link to the asset in the platform
+          format: url
+          examples:
+            - 'https://platform.cybelangel.com/asset-discovery-watchlist/6cfe8b81-f66c-47c9-9434-56e20738e179'
+        registrar:
+          title: Registrar
+          description: The registrar responsible for the asset registration.
+          examples:
+            - GoDaddy
+          anyOf:
+            - type: string
+        organization:
+          title: Organization
+          description: The organization or entity that manages the respective asset.
+          examples:
+            - Acme Corp
+          anyOf:
+            - type: string
+        localization:
+          title: Localization
+          examples:
+            - United States
+          anyOf:
+            - type: string
+        tags:
+          type: array
+          title: Tags
+          description: List of tags for this asset
+          examples:
+            - - Pod US
+              - Third Party
+          items:
+            type: string
+        fingerprints:
+          $ref: '#/components/schemas/FingerprintsDTO'
+          description: Metadata tied to your asset
+        threats:
+          $ref: '#/components/schemas/ThreatsInformationDTO'
+        graph:
+          anyOf:
+            - $ref: '#/components/schemas/InventoryAssetGraphDTO'
+        workspaces:
+          type: array
+          title: Workspaces
+          description: List of workspaces this asset belongs to
+          items:
+            $ref: '#/components/schemas/InventoryAssetWorkspaceDTO'
+      required:
+        - id
+        - value
+        - type
+        - asset_status
+        - first_seen_at
+        - last_seen_at
+        - created_at
+        - platform_link
+        - tags
+        - fingerprints
+        - threats
+    FingerprintsDTO:
+      type: object
+      title: FingerprintsDTO
+      properties:
+        open_ports:
+          type: array
+          title: Open Ports
+          description: List of ports with related fingerprints
+          items:
+            $ref: '#/components/schemas/OpenPortDTO'
+      required:
+        - open_ports
+    OpenPortDTO:
+      type: object
+      title: OpenPortDTO
+      properties:
+        port:
+          type: integer
+          title: Port
+          examples:
+            - 3306
+        transport:
+          $ref: '#/components/schemas/OpenPortTransport'
+          example: tcp
+        service:
+          $ref: '#/components/schemas/ServiceDTO'
+      required:
+        - port
+        - transport
+        - service
+    OpenPortTransport:
+      type: string
+      enum:
+        - tcp
+        - udp
+      title: OpenPortTransport
+    ServiceDTO:
+      type: object
+      title: ServiceDTO
+      properties:
+        protocol:
+          type: string
+          title: Protocol
+          minLength: 1
+          examples:
+            - mysql
+        cpes:
+          type: array
+          title: Cpes
+          description: List of CPEs associated with the service
+          items:
+            $ref: '#/components/schemas/OpenServiceCpeDTO'
+      required:
+        - protocol
+        - cpes
+    OpenServiceCpeDTO:
+      type: object
+      title: OpenServiceCpeDTO
+      properties:
+        name:
+          type: string
+          title: Name
+          description: The CPE 2.3 standard identifier
+          minLength: 1
+          examples:
+            - 'cpe:2.3:a:apache:http_server:2.4.46'
+        first_seen_at:
+          type: string
+          title: First Seen At
+          format: date-time
+          examples:
+            - '2023-10-05T14:48:00.000Z'
+        last_seen_at:
+          type: string
+          title: Last Seen At
+          format: date-time
+          examples:
+            - '2023-10-05T14:48:00.000Z'
+      required:
+        - name
+        - first_seen_at
+        - last_seen_at
+    ThreatsInformationDTO:
+      type: object
+      title: ThreatsInformationDTO
+      properties:
+        count:
+          type: integer
+          title: Count
+          examples:
+            - 1
+        level:
+          title: Level
+          examples:
+            - 3
+          anyOf:
+            - type: integer
+              minimum: 0
+        items:
+          type: array
+          title: Items
+          description: Threats tied to the asset
+          items:
+            $ref: '#/components/schemas/InventoryThreatWithReportIds'
+      required:
+        - count
+        - items
+    InventoryThreatWithReportIds:
+      type: object
+      title: InventoryThreatWithReportIds
+      description: Threat enriched with the list of reports ids created from it.
+      properties:
+        hash:
+          type: string
+          title: Hash
+          description: Hash of some attributes of a threat
+          examples:
+            - f34e5a49b1a1b1033e1c48e3f78863b3cc5be5dc1e0263cf2a13386241d0d16e
+        severity:
+          type: integer
+          title: Severity
+          description: The severity of this specific threat
+          minimum: 0
+          maximum: 4
+          examples:
+            - 3
+        port:
+          title: Port
+          description: The port where the threat is located
+          examples:
+            - 443
+          anyOf:
+            - type: integer
+              minimum: 0
+        first_seen:
+          type: string
+          title: First Seen
+          description: When we detected the threat for the first time
+          format: date-time
+          examples:
+            - '2023-10-05T14:48:00.000Z'
+        last_seen:
+          type: string
+          title: Last Seen
+          description: When we detected the threat for the last time (always less than 48 hours ago)
+          format: date-time
+          examples:
+            - '2023-10-05T14:48:00.000Z'
+        type:
+          $ref: '#/components/schemas/ThreatType'
+          description: |-
+            What type of threat we detected. Every type is mapped to a data object:
+            - DomainThreatDataDTO                --> accessible_sensitive_website, inaccessible_sensitive_website, accessible_website, forbidden_website, broken_website.
+            - ExposedSensitiveFileThreatDataDTO  --> exposed_sensitive_file.
+            - SubDomainTakeoverThreatDataDTO     --> subdomain_takeover.
+            - TLSCertificateThreatDataDTO        --> tls_certificate_expired, tls_certificate_soon_expired, accessible_website_with_tls_certificate_expired.
+            - SpfThreatDataDTO                   --> permissive_spf_misconfiguration, too_many_spf_records.
+            - VulnerableTechnologyThreatDataDTO  --> vulnerable_technology, vulnerable_technology_to_kev.
+            - OtherThreatDataDTO                 --> exposed_service, exposed_data_storage.
+        status:
+          $ref: '#/components/schemas/ThreatStatus'
+          description: The current status of the threat.
+        data:
+          title: Data
+          description: Additional metadata about a specific threat.
+          anyOf:
+            - $ref: '#/components/schemas/DomainThreatDataDTO'
+            - $ref: '#/components/schemas/SubDomainTakeoverThreatDataDTO'
+            - $ref: '#/components/schemas/ExposedSensitiveFileThreatDataDTO'
+            - $ref: '#/components/schemas/TLSCertificateThreatDataDTO'
+            - $ref: '#/components/schemas/SpfThreatDataDTO'
+            - $ref: '#/components/schemas/VulnerableTechnologyThreatDataDTO'
+            - $ref: '#/components/schemas/OtherThreatDataDTO'
+        report_ids:
+          type: array
+          title: Report Ids
+          description: List of report IDs associated created from the threat
+          items:
+            type: string
+      required:
+        - hash
+        - severity
+        - first_seen
+        - last_seen
+        - type
+        - status
+        - data
+        - report_ids
+    ThreatType:
+      type: string
+      enum:
+        - exposed_service
+        - exposed_data_storage
+        - accessible_website
+        - forbidden_website
+        - broken_website
+        - accessible_sensitive_website
+        - inaccessible_sensitive_website
+        - subdomain_takeover
+        - belonging_dangling_subdomain
+        - dangling_subdomain
+        - tls_certificate_expired
+        - tls_certificate_soon_expired
+        - accessible_website_with_tls_certificate_expired
+        - permissive_spf_misconfiguration
+        - too_many_spf_records
+        - vulnerable_technology
+        - vulnerable_technology_to_kev
+        - exposed_sensitive_file
+        - None
+      title: ThreatType
+      description: The type of the threat
+    ThreatStatus:
+      type: string
+      enum:
+        - open
+        - under_review
+        - remediated
+        - risk_accepted
+        - not_applicable
+      title: ThreatStatus
+      description: The status of the threat
+    DomainThreatDataDTO:
+      type: object
+      title: DomainThreatDataDTO
+      properties:
+        summary:
+          anyOf:
+            - $ref: '#/components/schemas/TranslationElementDTO'
+        how_we_found_it:
+          anyOf:
+            - $ref: '#/components/schemas/TranslationElementDTO'
+        risks:
+          anyOf:
+            - $ref: '#/components/schemas/TranslationElementDTO'
+        details:
+          anyOf:
+            - $ref: '#/components/schemas/TranslationElementDTO'
+        protocol:
+          type: string
+          title: Protocol
+        protocol_display_name:
+          title: Protocol Display Name
+          anyOf:
+            - type: string
+        status_code:
+          type: integer
+          title: Status Code
+      required:
+        - protocol
+        - status_code
+    TranslationElementDTO:
+      type: object
+      title: TranslationElementDTO
+      properties:
+        en:
+          title: En
+          anyOf:
+            - type: string
+        fr:
+          title: Fr
+          anyOf:
+            - type: string
+    SubDomainTakeoverThreatDataDTO:
+      type: object
+      title: SubDomainTakeoverThreatDataDTO
+      description: Metadata related to dangling subdomains (CNAME misconfiguration)
+      properties:
+        summary:
+          anyOf:
+            - $ref: '#/components/schemas/TranslationElementDTO'
+        how_we_found_it:
+          anyOf:
+            - $ref: '#/components/schemas/TranslationElementDTO'
+        risks:
+          anyOf:
+            - $ref: '#/components/schemas/TranslationElementDTO'
+        details:
+          anyOf:
+            - $ref: '#/components/schemas/TranslationElementDTO'
+        target_domain:
+          type: string
+          title: Target Domain
+      required:
+        - target_domain
+    ExposedSensitiveFileThreatDataDTO:
+      type: object
+      title: ExposedSensitiveFileThreatDataDTO
+      properties:
+        path:
+          type: string
+          title: Path
+          examples:
+            - /.env
+        url:
+          type: string
+          title: Url
+          examples:
+            - 'https://www.example.com/.env'
+        status_code:
+          type: integer
+          title: Status Code
+          examples:
+            - 200
+        details:
+          $ref: '#/components/schemas/TranslationElementDTO'
+        risks:
+          $ref: '#/components/schemas/TranslationElementDTO'
+      required:
+        - path
+        - url
+        - status_code
+        - details
+        - risks
+    TLSCertificateThreatDataDTO:
+      type: object
+      title: TLSCertificateThreatDataDTO
+      description: Metadata related to certificates issues
+      properties:
+        summary:
+          anyOf:
+            - $ref: '#/components/schemas/TranslationElementDTO'
+        how_we_found_it:
+          anyOf:
+            - $ref: '#/components/schemas/TranslationElementDTO'
+        risks:
+          anyOf:
+            - $ref: '#/components/schemas/TranslationElementDTO'
+        details:
+          anyOf:
+            - $ref: '#/components/schemas/TranslationElementDTO'
+        not_before_date:
+          type: string
+          title: Not Before Date
+          format: date-time
+          examples:
+            - '2023-10-05T14:48:00.000Z'
+        not_after_date:
+          type: string
+          title: Not After Date
+          format: date-time
+          examples:
+            - '2023-10-05T14:48:00.000Z'
+      required:
+        - not_before_date
+        - not_after_date
+    SpfThreatDataDTO:
+      type: object
+      title: SpfThreatDataDTO
+      description: Metadata related to SPF configuration issues
+      properties:
+        summary:
+          anyOf:
+            - $ref: '#/components/schemas/TranslationElementDTO'
+        how_we_found_it:
+          anyOf:
+            - $ref: '#/components/schemas/TranslationElementDTO'
+        risks:
+          anyOf:
+            - $ref: '#/components/schemas/TranslationElementDTO'
+        details:
+          anyOf:
+            - $ref: '#/components/schemas/TranslationElementDTO'
+        records:
+          type: array
+          title: Records
+          description: The SPF records that we found for this asset.
+          examples:
+            - - v=spf1 a mx +all
+          items:
+            type: string
+      required:
+        - records
+    VulnerableTechnologyThreatDataDTO:
+      type: object
+      title: VulnerableTechnologyThreatDataDTO
+      properties:
+        cpe_id:
+          type: string
+          title: Cpe Id
+          examples:
+            - 'cpe:2.3:a:apache:zookeeper:3.9.0:*:*:*:*:*:*:*'
+        cpe_vendor:
+          title: Cpe Vendor
+          examples:
+            - apache
+          anyOf:
+            - type: string
+        cpe_product:
+          type: string
+          title: Cpe Product
+          examples:
+            - zookeeper
+        cpe_product_version:
+          type: string
+          title: Cpe Product Version
+          examples:
+            - 3.9.0
+        cve_count:
+          type: integer
+          title: Cve Count
+          examples:
+            - 11
+        cve_in_kev_count:
+          title: Cve In Kev Count
+          examples:
+            - 2
+          anyOf:
+            - type: integer
+        highest_cvss_score:
+          type: number
+          title: Highest Cvss Score
+          examples:
+            - 7.7
+        highest_epss_score:
+          type: number
+          title: Highest Epss Score
+          examples:
+            - 0.2
+        cves:
+          type: array
+          title: Cves
+          items:
+            $ref: '#/components/schemas/VulnerableTechnologyCveDTO'
+        details:
+          $ref: '#/components/schemas/TranslationElementDTO'
+        risks:
+          $ref: '#/components/schemas/TranslationElementDTO'
+      required:
+        - cpe_id
+        - cpe_product
+        - cpe_product_version
+        - cve_count
+        - highest_cvss_score
+        - highest_epss_score
+        - cves
+        - details
+        - risks
+    VulnerableTechnologyCveDTO:
+      type: object
+      title: VulnerableTechnologyCveDTO
+      properties:
+        cve_id:
+          type: string
+          title: Cve Id
+          examples:
+            - CVE-2023-44981
+        description:
+          type: string
+          title: Description
+        cvss_score:
+          type: number
+          title: Cvss Score
+          examples:
+            - 7.7
+        cvss_version:
+          type: number
+          title: Cvss Version
+          examples:
+            - 3.1
+        epss_score:
+          type: number
+          title: Epss Score
+          examples:
+            - 0.2
+        have_known_exploit:
+          title: Have Known Exploit
+          anyOf:
+            - type: boolean
+        required_action:
+          title: Required Action
+          anyOf:
+            - type: string
+      required:
+        - cve_id
+        - description
+        - cvss_score
+        - cvss_version
+        - epss_score
+    OtherThreatDataDTO:
+      type: object
+      title: OtherThreatDataDTO
+      description: Metadata for all other threats
+      properties:
+        summary:
+          anyOf:
+            - $ref: '#/components/schemas/TranslationElementDTO'
+        how_we_found_it:
+          anyOf:
+            - $ref: '#/components/schemas/TranslationElementDTO'
+        risks:
+          anyOf:
+            - $ref: '#/components/schemas/TranslationElementDTO'
+        details:
+          anyOf:
+            - $ref: '#/components/schemas/TranslationElementDTO'
+        protocol:
+          title: Protocol
+          anyOf:
+            - type: string
+        protocol_display_name:
+          title: Protocol Display Name
+          anyOf:
+            - type: string
+    InventoryAssetGraphDTO:
+      type: object
+      title: InventoryAssetGraphDTO
+      properties:
+        edges:
+          type: array
+          title: Edges
+          items:
+            $ref: '#/components/schemas/InventoryGraphEdgeDTO'
+        nodes:
+          type: array
+          title: Nodes
+          items:
+            $ref: '#/components/schemas/InventoryGraphNodeDTO'
+      required:
+        - edges
+        - nodes
+    InventoryGraphEdgeDTO:
+      type: object
+      title: InventoryGraphEdgeDTO
+      properties:
+        from_node:
+          type: string
+          title: From Node
+        to_node:
+          type: string
+          title: To Node
+        method:
+          $ref: '#/components/schemas/PivotMethod'
+        updated_at:
+          type: string
+          title: Updated At
+          format: date-time
+          examples:
+            - '2023-10-05T14:48:00.000Z'
+      required:
+        - from_node
+        - to_node
+        - method
+        - updated_at
+    PivotMethod:
+      type: string
+      enum:
+        - A
+        - CNAME
+        - WHOIS
+        - CIDR_ENUMERATION
+        - REVERSE_WHOIS
+        - REVERSE_DNS
+        - PASSIVE_MATCHING
+        - EXTRACT
+      title: PivotMethod
+    InventoryGraphNodeDTO:
+      type: object
+      title: InventoryGraphNodeDTO
+      properties:
+        value:
+          type: string
+          title: Value
+        type:
+          $ref: '#/components/schemas/InventoryNodeType'
+          description: Type of the assets in graph node
+      required:
+        - value
+        - type
+    InventoryNodeType:
+      type: string
+      enum:
+        - unknown
+        - domain
+        - ip
+        - iprange
+        - email
+      title: InventoryNodeType
+    InventoryAssetWorkspaceDTO:
+      type: object
+      title: InventoryAssetWorkspaceDTO
+      properties:
+        id:
+          type: string
+          title: Id
+          description: Unique identifier of the workspace
+          format: uuid
+        name:
+          type: string
+          title: Name
+          description: Name of the workspace
+          examples:
+            - My Workspace
+      required:
+        - id
+        - name
+    APIErrorResponse_BadRequestError_:
+      type: object
+      title: 'APIErrorResponse[BadRequestError]'
+      properties:
+        error:
+          $ref: '#/components/schemas/BadRequestError'
+      required:
+        - error
+    BadRequestError:
+      type: object
+      title: BadRequestError
+      description: User sent a bad request.
+      properties:
+        message:
+          type: string
+          title: Message
+      required:
+        - message
+    APIErrorResponse_UnauthorizedError_:
+      type: object
+      title: 'APIErrorResponse[UnauthorizedError]'
+      properties:
+        error:
+          $ref: '#/components/schemas/UnauthorizedError'
+      required:
+        - error
+    UnauthorizedError:
+      type: object
+      title: UnauthorizedError
+      description: User cannot access some resource.
+      properties:
+        message:
+          type: string
+          title: Message
+      required:
+        - message
+    APIErrorResponse_ForbiddenAccessError_:
+      type: object
+      title: 'APIErrorResponse[ForbiddenAccessError]'
+      properties:
+        error:
+          $ref: '#/components/schemas/ForbiddenAccessError'
+      required:
+        - error
+    ForbiddenAccessError:
+      type: object
+      title: ForbiddenAccessError
+      description: User cannot access some resource.
+      properties:
+        message:
+          type: string
+          title: Message
+      required:
+        - message
+    APIErrorResponse_NotFoundError_:
+      type: object
+      title: 'APIErrorResponse[NotFoundError]'
+      properties:
+        error:
+          $ref: '#/components/schemas/NotFoundError'
+      required:
+        - error
+    NotFoundError:
+      type: object
+      title: NotFoundError
+      description: Nothing matches the given URI
+      properties:
+        message:
+          type: string
+          title: Message
+      required:
+        - message
+    APIErrorResponse_UnknownError_:
+      type: object
+      title: 'APIErrorResponse[UnknownError]'
+      properties:
+        error:
+          $ref: '#/components/schemas/UnknownError'
+      required:
+        - error
+    UnknownError:
+      type: object
+      title: UnknownError
+      description: 'Unknown error on server-side, please contact support.'
+      properties:
+        message:
+          type: string
+          title: Message
+      required:
+        - message
+    GetAssetsHostnamesResponseDTO:
+      type: object
+      title: GetAssetsHostnamesResponseDTO
+      additionalProperties: false
+      properties:
+        items:
+          type: object
+          title: Items
+          description: 'Map of assets with their corresponding hostnames. By default, the key is the asset value. But if the ''asset_ids'' filter is used, the key is the asset ID.'
+          additionalProperties:
+            type: array
+            items:
+              type: string
+          examples:
+            - 17.253.144.10:
+                - apple.com
+              74.125.20.138:
+                - google.com
+                - images.google.com
+        next_cursor:
+          title: Next Cursor
+          description: Cursor to the next page. You should use this cursor in the "cursor" query parameter to retrieve the next page.
+          anyOf:
+            - type: string
+        total:
+          type: integer
+          title: Total
+          description: Total number of assets with available hostnames through all pages
+          minimum: 0
+      required:
+        - items
+        - total
+    ThreatSeverity:
+      type: integer
+      enum:
+        - 0
+        - 1
+        - 2
+        - 3
+        - 4
+      title: ThreatSeverity
+    GetThreatsWithAssetInfoResponseDTO:
+      type: object
+      title: GetThreatsWithAssetInfoResponseDTO
+      additionalProperties: false
+      properties:
+        items:
+          type: array
+          title: Items
+          description: List of threats with asset value matching the request
+          items:
+            $ref: '#/components/schemas/InventoryThreatWithAssetInfoDTO'
+        next_cursor:
+          title: Next Cursor
+          description: Cursor to the next page. You should use this cursor in the "cursor" query parameter to retrieve the next page.
+          anyOf:
+            - type: string
+        total:
+          type: integer
+          title: Total
+          description: Total number of threats through all pages
+          minimum: 0
+      required:
+        - items
+        - total
+    InventoryThreatWithAssetInfoDTO:
+      type: object
+      title: InventoryThreatWithAssetInfoDTO
+      description: Threat enriched with its parent asset info.
+      properties:
+        hash:
+          type: string
+          title: Hash
+          description: Hash of some attributes of a threat
+          examples:
+            - f34e5a49b1a1b1033e1c48e3f78863b3cc5be5dc1e0263cf2a13386241d0d16e
+        severity:
+          type: integer
+          title: Severity
+          description: The severity of this specific threat
+          minimum: 0
+          maximum: 4
+          examples:
+            - 3
+        port:
+          title: Port
+          description: The port where the threat is located
+          examples:
+            - 443
+          anyOf:
+            - type: integer
+              minimum: 0
+        first_seen:
+          type: string
+          title: First Seen
+          description: When we detected the threat for the first time
+          format: date-time
+          examples:
+            - '2023-10-05T14:48:00.000Z'
+        last_seen:
+          type: string
+          title: Last Seen
+          description: When we detected the threat for the last time (always less than 48 hours ago)
+          format: date-time
+          examples:
+            - '2023-10-05T14:48:00.000Z'
+        type:
+          $ref: '#/components/schemas/ThreatType'
+          description: |-
+            What type of threat we detected. Every type is mapped to a data object:
+            - DomainThreatDataDTO                --> accessible_sensitive_website, inaccessible_sensitive_website, accessible_website, forbidden_website, broken_website.
+            - ExposedSensitiveFileThreatDataDTO  --> exposed_sensitive_file.
+            - SubDomainTakeoverThreatDataDTO     --> subdomain_takeover.
+            - TLSCertificateThreatDataDTO        --> tls_certificate_expired, tls_certificate_soon_expired, accessible_website_with_tls_certificate_expired.
+            - SpfThreatDataDTO                   --> permissive_spf_misconfiguration, too_many_spf_records.
+            - VulnerableTechnologyThreatDataDTO  --> vulnerable_technology, vulnerable_technology_to_kev.
+            - OtherThreatDataDTO                 --> exposed_service, exposed_data_storage.
+        status:
+          $ref: '#/components/schemas/ThreatStatus'
+          description: The current status of the threat.
+        data:
+          title: Data
+          description: Additional metadata about a specific threat.
+          anyOf:
+            - $ref: '#/components/schemas/DomainThreatDataDTO'
+            - $ref: '#/components/schemas/SubDomainTakeoverThreatDataDTO'
+            - $ref: '#/components/schemas/ExposedSensitiveFileThreatDataDTO'
+            - $ref: '#/components/schemas/TLSCertificateThreatDataDTO'
+            - $ref: '#/components/schemas/SpfThreatDataDTO'
+            - $ref: '#/components/schemas/VulnerableTechnologyThreatDataDTO'
+            - $ref: '#/components/schemas/OtherThreatDataDTO'
+        asset_value:
+          type: string
+          title: Asset Value
+          description: Value of the parent asset.
+        asset_id:
+          title: Asset Id
+          description: ID of the parent asset.
+          anyOf:
+            - type: string
+      required:
+        - hash
+        - severity
+        - first_seen
+        - last_seen
+        - type
+        - status
+        - data
+        - asset_value
+    UpdateAssetsStatusRequestBodyDTO:
+      type: object
+      title: UpdateAssetsStatusRequestBodyDTO
+      additionalProperties: false
+      properties:
+        asset_values:
+          type: array
+          title: Asset Values
+          description: List of asset values to update. Cannot be used together with 'asset_ids'.
+          minItems: 1
+          maxItems: 50
+          examples:
+            - - example.com
+              - 192.168.1.1
+              - subdomain.example.com
+          items:
+            type: string
+            minLength: 1
+        asset_ids:
+          type: array
+          title: Asset Ids
+          description: List of asset IDs (UUIDs) to update. Cannot be used together with 'asset_values'.
+          minItems: 1
+          maxItems: 50
+          examples:
+            - - c683aa1a-a029-4bcf-9333-a029f2964444
+              - d794bb2b-b130-5cdf-a444-b130a3075555
+          items:
+            type: string
+            format: uuid
+        status:
+          description: '[Deprecated] The new status to apply to the assets (This field will be removed on September 4 2026, use `asset_status` instead)'
+          anyOf:
+            - $ref: '#/components/schemas/PreviousAssetStatus'
+          x-deprecated: true
+        asset_status:
+          $ref: '#/components/schemas/AssetStatus'
+          description: The new status to apply to the assets
+      required:
+        - asset_status
+    APIErrorResponse_ConflictError_:
+      type: object
+      title: 'APIErrorResponse[ConflictError]'
+      properties:
+        error:
+          $ref: '#/components/schemas/ConflictError'
+      required:
+        - error
+    ConflictError:
+      type: object
+      title: ConflictError
+      description: Conflict with the current state of the resource
+      properties:
+        message:
+          type: string
+          title: Message
+      required:
+        - message
+    UpdateAssetThreatStatusRequestBodyDTO:
+      type: object
+      title: UpdateAssetThreatStatusRequestBodyDTO
+      additionalProperties: false
+      properties:
+        threats:
+          type: array
+          title: Threats
+          description: List of threats on which to update their status
+          minItems: 1
+          maxItems: 50
+          items:
+            $ref: '#/components/schemas/UpdateAssetThreatStatusItemDTO'
+        status:
+          $ref: '#/components/schemas/ThreatStatus'
+          description: The new status to apply to the given threats
+          example: open
+      required:
+        - threats
+        - status
+    UpdateAssetThreatStatusItemDTO:
+      type: object
+      title: UpdateAssetThreatStatusItemDTO
+      additionalProperties: false
+      properties:
+        threat_hash:
+          type: string
+          title: Threat Hash
+          description: Hash of the threat to update
+          pattern: '^[0-9a-f]{64}$'
+          examples:
+            - 630a19f1608943fe069e2f56d178860a35277519c241cdb1ac777b7964bd424f
+        asset_value:
+          title: Asset Value
+          description: Value of the asset. Cannot be used together with 'asset_id'.
+          examples:
+            - 127.0.0.1
+          anyOf:
+            - type: string
+              minLength: 1
+        asset_id:
+          title: Asset Id
+          description: ID of the asset (UUID). Cannot be used together with 'asset_value'.
+          examples:
+            - c683aa1a-a029-4bcf-9333-a029f2964444
+          anyOf:
+            - type: string
+              format: uuid
+      required:
+        - threat_hash
+    KeywordStatus:
+      type: string
+      enum:
+        - pending
+        - active
+        - inactive
+      title: KeywordStatus
+    PartnerKeywordListDTO:
+      type: object
+      title: PartnerKeywordListDTO
+      additionalProperties: false
+      properties:
+        items:
+          type: array
+          title: Items
+          description: List of keywords matching the request
+          items:
+            $ref: '#/components/schemas/PartnerKeywordDTO'
+        total:
+          type: integer
+          title: Total
+          description: Total number of keywords through all pages
+          minimum: 0
+        next_cursor:
+          title: Next Cursor
+          description: Cursor to the next page. You should use this cursor in the "cursor" query parameter to retrieve the next page.
+          anyOf:
+            - type: string
+      required:
+        - items
+        - total
+    PartnerKeywordDTO:
+      type: object
+      title: PartnerKeywordDTO
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+          title: Id
+          description: Unique identifier of the keyword.
+          format: uuid
+        name:
+          type: string
+          title: Name
+          description: Name of the keyword.
+        type:
+          $ref: '#/components/schemas/KeywordType'
+          description: Type of the keyword.
+        status:
+          $ref: '#/components/schemas/KeywordStatus'
+          description: Current status of the keyword.
+        description:
+          type: string
+          title: Description
+          description: Description of the keyword.
+        workspaces:
+          type: array
+          title: Workspaces
+          description: Workspaces the keyword belongs to.
+          default: []
+          items:
+            $ref: '#/components/schemas/WorkspaceDTO'
+        creation_date:
+          type: string
+          title: Creation Date
+          description: Date of creation.
+          format: date-time
+          examples:
+            - '2023-10-05T14:48:00.000Z'
+        last_modification_date:
+          type: string
+          title: Last Modification Date
+          description: Date of the last modification.
+          format: date-time
+          examples:
+            - '2023-10-05T14:48:00.000Z'
+        rule:
+          title: Rule
+          description: Rule associated with the keyword.
+          anyOf:
+            - type: string
+        sources:
+          title: Sources
+          description: List of sources associated with the keyword.
+          anyOf:
+            - type: array
+              items:
+                $ref: '#/components/schemas/KeywordSource'
+        active_search:
+          title: Active Search
+          description: Whether active search is enabled for this keyword.
+          anyOf:
+            - type: boolean
+        infostealer_search:
+          title: Infostealer Search
+          description: Whether infostealer search is enabled for this keyword.
+          anyOf:
+            - type: boolean
+      required:
+        - id
+        - name
+        - type
+        - status
+        - description
+        - creation_date
+        - last_modification_date
+    KeywordType:
+      type: string
+      enum:
+        - subsidiaries
+        - projects
+        - domain
+        - ip
+        - bin
+        - vip
+        - product
+        - misc
+      title: KeywordType
+    WorkspaceDTO:
+      type: object
+      title: WorkspaceDTO
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+          title: Id
+          description: Unique identifier of the workspace.
+          format: uuid
+        name:
+          type: string
+          title: Name
+          description: Name of the workspace.
+        description:
+          title: Description
+          description: Description of the workspace.
+          anyOf:
+            - type: string
+      required:
+        - id
+        - name
+    KeywordSource:
+      type: string
+      enum:
+        - board
+        - codeshare
+        - database
+        - dns
+        - docshare
+        - fileserver
+        - iot
+        - leak
+        - paste
+        - rss
+        - social
+        - clouddrive
+      title: KeywordSource
+    PartnerCreateKeywordsBodyDTO:
+      type: object
+      title: PartnerCreateKeywordsBodyDTO
+      additionalProperties: false
+      properties:
+        keywords:
+          type: array
+          title: Keywords
+          description: List of keywords to create. Maximum 10 items.
+          minItems: 1
+          maxItems: 10
+          items:
+            $ref: '#/components/schemas/PartnerCreateKeywordInputDTO'
+      required:
+        - keywords
+    PartnerCreateKeywordInputDTO:
+      type: object
+      title: PartnerCreateKeywordInputDTO
+      additionalProperties: false
+      properties:
+        name:
+          type: string
+          title: Name
+          description: Name of the keyword.
+          minLength: 1
+          maxLength: 500
+        description:
+          type: string
+          title: Description
+          description: Description of the keyword.
+        type:
+          $ref: '#/components/schemas/KeywordType'
+          description: Type of the keyword.
+        sources:
+          type: array
+          title: Sources
+          description: List of sources associated with the keyword.
+          items:
+            $ref: '#/components/schemas/KeywordSource'
+        rule:
+          type: string
+          title: Rule
+          description: Rule associated with the keyword.
+          minLength: 1
+          maxLength: 10000
+        infostealer_search:
+          type: boolean
+          title: Infostealer Search
+          description: Whether infostealer search is enabled for this keyword.
+        active_search:
+          type: boolean
+          title: Active Search
+          description: Whether active search is enabled for this keyword.
+        workspaces:
+          type: array
+          title: Workspaces
+          description: Workspaces the keyword belongs to. Required if the organization has workspaces enabled; otherwise defaults to the organization's workspace.
+          default: []
+          items:
+            type: string
+            format: uuid
+      required:
+        - name
+        - description
+        - type
+        - sources
+        - rule
+        - infostealer_search
+        - active_search
+    PartnerCreateKeywords201ResponseDTO:
+      type: object
+      title: PartnerCreateKeywords201ResponseDTO
+      additionalProperties: false
+      properties:
+        created_keywords:
+          type: array
+          title: Created Keywords
+          description: List of successfully created keywords
+          items:
+            $ref: '#/components/schemas/PartnerKeywordDTO'
+        failed_keywords:
+          type: array
+          title: Failed Keywords
+          description: List of keywords that could not be created
+          items:
+            $ref: '#/components/schemas/FailedToCreateKeywordDTO'
+      required:
+        - created_keywords
+        - failed_keywords
+    FailedToCreateKeywordDTO:
+      type: object
+      title: FailedToCreateKeywordDTO
+      properties:
+        name:
+          type: string
+          title: Name
+        error_code:
+          $ref: '#/components/schemas/CreateKeywordErrorCode'
+        error_details:
+          title: Error Details
+          anyOf:
+            - type: string
+      required:
+        - name
+        - error_code
+    CreateKeywordErrorCode:
+      type: string
+      enum:
+        - NAME_ALREADY_EXISTS
+        - INVALID_NAME
+        - INVALID_RULE
+        - INFOSTEALER_NOT_AVAILABLE_FOR_TYPE
+        - INFOSTEALER_NOT_ACTIVATED
+        - INTERNAL_ERROR
+      title: CreateKeywordErrorCode
+    PartnerCreateKeywords207ResponseDTO:
+      type: object
+      title: PartnerCreateKeywords207ResponseDTO
+      additionalProperties: false
+      properties:
+        created_keywords:
+          type: array
+          title: Created Keywords
+          description: List of successfully created keywords
+          items:
+            $ref: '#/components/schemas/PartnerKeywordDTO'
+        failed_keywords:
+          type: array
+          title: Failed Keywords
+          description: List of keywords that could not be created
+          items:
+            $ref: '#/components/schemas/FailedToCreateKeywordDTO'
+      required:
+        - created_keywords
+        - failed_keywords
+    DeleteKeywordBodyDTO:
+      type: object
+      title: DeleteKeywordBodyDTO
+      additionalProperties: false
+      properties:
+        keyword_ids:
+          type: array
+          title: Keyword Ids
+          description: List of keyword IDs to delete. Maximum 50 items.
+          minItems: 1
+          maxItems: 50
+          items:
+            type: string
+            format: uuid
+      required:
+        - keyword_ids
+    DeleteKeywords200ResponseDTO:
+      type: object
+      title: DeleteKeywords200ResponseDTO
+      additionalProperties: false
+      properties:
+        deleted_keywords:
+          type: array
+          title: Deleted Keywords
+          description: List of successfully deleted keywords
+          items:
+            $ref: '#/components/schemas/DeletedKeywordDTO'
+        failed_keywords:
+          type: array
+          title: Failed Keywords
+          description: List of keywords that could not be deleted
+          items:
+            $ref: '#/components/schemas/FailedKeywordDTO'
+      required:
+        - deleted_keywords
+        - failed_keywords
+    DeletedKeywordDTO:
+      type: object
+      title: DeletedKeywordDTO
+      properties:
+        id:
+          type: string
+          title: Id
+          format: uuid
+        name:
+          type: string
+          title: Name
+      required:
+        - id
+        - name
+    FailedKeywordDTO:
+      type: object
+      title: FailedKeywordDTO
+      properties:
+        id:
+          type: string
+          title: Id
+          format: uuid
+        error_code:
+          $ref: '#/components/schemas/DeleteKeywordErrorCode'
+      required:
+        - id
+        - error_code
+    DeleteKeywordErrorCode:
+      type: string
+      enum:
+        - NOT_FOUND
+        - INTERNAL_ERROR
+      title: DeleteKeywordErrorCode
+    DeleteKeywords207ResponseDTO:
+      type: object
+      title: DeleteKeywords207ResponseDTO
+      additionalProperties: false
+      properties:
+        deleted_keywords:
+          type: array
+          title: Deleted Keywords
+          description: List of successfully deleted keywords
+          items:
+            $ref: '#/components/schemas/DeletedKeywordDTO'
+        failed_keywords:
+          type: array
+          title: Failed Keywords
+          description: List of keywords that could not be deleted
+          items:
+            $ref: '#/components/schemas/FailedKeywordDTO'
+      required:
+        - deleted_keywords
+        - failed_keywords
+    UpdateKeywordsStatusBodyDTO:
+      type: object
+      title: UpdateKeywordsStatusBodyDTO
+      additionalProperties: false
+      properties:
+        keywords:
+          type: array
+          title: Keywords
+          description: List of keywords whose status to update. Maximum 10 items.
+          minItems: 1
+          maxItems: 10
+          items:
+            $ref: '#/components/schemas/UpdateKeywordStatusInputDTO'
+      required:
+        - keywords
+    UpdateKeywordStatusInputDTO:
+      type: object
+      title: UpdateKeywordStatusInputDTO
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+          title: Id
+          description: Unique identifier of the keyword to update.
+          format: uuid
+        status:
+          const: inactive
+          title: Status
+          description: New status of the keyword. Only "inactive" (deactivation) is accepted.
+      required:
+        - id
+        - status
+    PartnerUpdateKeywords200ResponseDTO:
+      type: object
+      title: PartnerUpdateKeywords200ResponseDTO
+      additionalProperties: false
+      properties:
+        updated_keywords:
+          type: array
+          title: Updated Keywords
+          description: List of successfully updated keywords
+          items:
+            $ref: '#/components/schemas/PartnerKeywordDTO'
+        failed_keywords:
+          type: array
+          title: Failed Keywords
+          description: List of keywords that could not be updated
+          items:
+            $ref: '#/components/schemas/FailedToUpdateKeywordDTO'
+      required:
+        - updated_keywords
+        - failed_keywords
+    FailedToUpdateKeywordDTO:
+      type: object
+      title: FailedToUpdateKeywordDTO
+      properties:
+        id:
+          type: string
+          title: Id
+          format: uuid
+        error_code:
+          $ref: '#/components/schemas/UpdateKeywordErrorCode'
+        error_details:
+          title: Error Details
+          anyOf:
+            - type: string
+      required:
+        - id
+        - error_code
+    UpdateKeywordErrorCode:
+      type: string
+      enum:
+        - NOT_FOUND
+        - NAME_ALREADY_EXISTS
+        - INVALID_NAME
+        - INVALID_RULE
+        - INFOSTEALER_NOT_AVAILABLE_FOR_TYPE
+        - INFOSTEALER_NOT_ACTIVATED
+        - INTERNAL_ERROR
+      title: UpdateKeywordErrorCode
+    PartnerUpdateKeywords207ResponseDTO:
+      type: object
+      title: PartnerUpdateKeywords207ResponseDTO
+      additionalProperties: false
+      properties:
+        updated_keywords:
+          type: array
+          title: Updated Keywords
+          description: List of successfully updated keywords
+          items:
+            $ref: '#/components/schemas/PartnerKeywordDTO'
+        failed_keywords:
+          type: array
+          title: Failed Keywords
+          description: List of keywords that could not be updated
+          items:
+            $ref: '#/components/schemas/FailedToUpdateKeywordDTO'
+      required:
+        - updated_keywords
+        - failed_keywords
+    WorkspaceListDTO:
+      type: object
+      title: WorkspaceListDTO
+      additionalProperties: false
+      properties:
+        items:
+          type: array
+          title: Items
+          description: List of workspaces matching the request
+          items:
+            $ref: '#/components/schemas/WorkspaceDTO'
+        total:
+          type: integer
+          title: Total
+          description: Total number of workspaces
+          minimum: 0
+      required:
+        - items
+        - total

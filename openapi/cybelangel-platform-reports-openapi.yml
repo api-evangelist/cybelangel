@@ -1,0 +1,2085 @@
+openapi: 3.1.0
+info:
+  version: 0.1.0
+  title: References
+  description: |
+    API for CybelAngel's Platform.
+    Authentication uses standard [OAuth2 Bearer Tokens](https://tools.ietf.org/html/rfc6750).
+    [Activate your API access](docs/Activate-API-service.md) to obtain your credentials.
+    You will be communicated a client `client_id` and a `client_secret` that will allow you to fetch tokens for our API.
+    These tokens expire 24 hours.
+
+    Here is a simple example of how to fetch such a token with curl:
+
+    ```shell
+    curl -XPOST https://auth.cybelangel.com/oauth/token -H 'content-type: application/json' -d '{"client_id": "client_id", "client_secret": "client_secret", "audience": "https://platform.cybelangel.com/", "grant_type": "client_credentials"}'
+    ```
+
+    The received access token can then be used as a Bearer token to request our API.
+  contact:
+    email: support@cybelangel.com
+  license:
+    url: 'https://cybelangel.com/'
+    name: Proprietary
+servers:
+  - url: 'https://platform.cybelangel.com/api'
+paths:
+  /v1/reports/permissions:
+    get:
+      tags:
+        - Reports
+      summary: Get user permissions for reports
+      description: |
+        Retrieves the list of permissions that the authenticated user has for reports.
+        This endpoint requires user authentication.
+      operationId: getReportPermissions
+      responses:
+        '200':
+          description: Successfully retrieved user permissions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '500':
+          $ref: '#/components/responses/Error500'
+      security:
+        - bearer_token: []
+      servers:
+        - url: 'https://platform.cybelangel.com/api'
+  /v2/reports:
+    get:
+      tags:
+        - Incident reports
+      summary: Get reports (V2)
+      description: Return the list of reports between the specified dates. The range between start-date and end-date must be less than or equal to 1 year The reports are returned in ascending order by date.
+      operationId: get-v2-reports
+      parameters:
+        - name: start-date
+          in: query
+          description: Filter the reports that have been sent before this date
+          required: true
+          schema:
+            type: string
+            format: date-time
+            examples:
+              - '2021-10-15T13:45:30'
+        - name: end-date
+          in: query
+          description: Filter the reports that have been sent after this date
+          required: true
+          schema:
+            type: string
+            format: date-time
+            examples:
+              - '2009-06-18T13:45:30'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  reports:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Report-v2'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '500':
+          $ref: '#/components/responses/Error500'
+      security:
+        - bearer_token:
+            - reports.read
+      servers:
+        - url: 'https://platform.cybelangel.com/api'
+      x-internal: false
+  '/v2/reports/{report-id}':
+    get:
+      tags:
+        - Incident reports
+      summary: Get reports by ID (V2)
+      description: Return a report with a particular ID.
+      operationId: get-v2-reports-by-id
+      parameters:
+        - name: report-id
+          in: path
+          description: UUID of the report
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Report-v2'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          description: Report can't be found
+        '500':
+          $ref: '#/components/responses/Error500'
+      security:
+        - bearer_token:
+            - reports.read
+      servers:
+        - url: 'https://platform.cybelangel.com/api'
+      x-internal: false
+  '/v1/reports/{report-id}/mirror':
+    get:
+      tags:
+        - Incident reports
+      summary: Get mirror details of a report (by ID)
+      description: |
+        Get mirror details information about the report identified by `report-id`.
+        Your teams can leverage this API endpoint to retrieve:
+          - **Russian Market incident report attachments**, as part of our Dark Web Monitoring module
+          - **Sensitive documents downloaded through the Access to Cache** feature of our Data Breach Prevention module
+
+        **Recommendation**: Upgrade your connector to query both the "attachments" endpoint and this one to ensure you are always receiving all available data.
+      operationId: get-mirror-by-report-id
+      parameters:
+        - name: report-id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportMirror'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '500':
+          $ref: '#/components/responses/Error500'
+      security:
+        - bearer_token:
+            - reports.read
+      servers:
+        - url: 'https://platform.cybelangel.com/api'
+  '/v1/reports/{report-id}/mirror/csv':
+    get:
+      tags:
+        - Incident reports
+      summary: Get mirror details in CSV of a report (by ID)
+      description: |
+        Get a csv containing information about files related to report identified by `report-id`.
+        Your teams can leverage this API endpoint to retrieve:
+          - **Russian Market incident report attachments**, as part of our Dark Web Monitoring module
+          - **Sensitive documents downloaded through the Access to Cache** feature of our Data Breach Prevention module
+
+        **Recommendation**: Upgrade your connector to query both the "attachments" endpoint and this one to ensure you are always receiving all available data.
+      operationId: get-mirror-csv-by-report-id
+      parameters:
+        - name: report-id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '302':
+          description: Redirect to the csv file
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '500':
+          $ref: '#/components/responses/Error500'
+      security:
+        - bearer_token:
+            - reports.read
+      servers:
+        - url: 'https://platform.cybelangel.com/api'
+  '/v1/reports/{report-id}/mirror/archive':
+    get:
+      tags:
+        - Incident reports
+      summary: Get archive from report (by ID)
+      description: |
+        Get the archive containing files related to report identified by `report-id`.
+        Your teams can leverage this API endpoint to retrieve:
+          - **Russian Market incident report attachments**, as part of our Dark Web Monitoring module
+          - **Sensitive documents downloaded through the Access to Cache** feature of our Data Breach Prevention module
+
+        **Recommendation**: Upgrade your connector to query both the "attachments" endpoint and this one to ensure you are always receiving all available data.
+      operationId: get-mirror-archive-by-report-id
+      parameters:
+        - name: report-id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '302':
+          description: Redirect to the archive file
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '500':
+          $ref: '#/components/responses/Error500'
+      security:
+        - bearer_token:
+            - reports.read
+      servers:
+        - url: 'https://platform.cybelangel.com/api'
+  '/v1/reports/{report-id}/status':
+    put:
+      tags:
+        - Incident reports
+      summary: Update status of a report
+      description: Update status of a specific report identified by `report-id`
+      operationId: update-report-status-by-report-id
+      parameters:
+        - name: report-id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  $ref: '#/components/schemas/ReportStatus'
+              required:
+                - status
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: string
+                    examples:
+                      - updated
+                  id:
+                    type: string
+                    description: The id of the report
+                    format: uuid
+                    examples:
+                      - 670e7227-74c9-4579-b6e3-f91ad0169a08
+                  status:
+                    $ref: '#/components/schemas/ReportStatus'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '500':
+          $ref: '#/components/responses/Error500'
+      security:
+        - bearer_token:
+            - reports.move
+      servers:
+        - url: 'https://platform.cybelangel.com/api'
+  /v1/reports/status:
+    post:
+      tags:
+        - Incident reports
+      summary: Update multiple statuses (bulk)
+      description: Update multiple reports statuses
+      operationId: update-multiple-reports-statuses
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  $ref: '#/components/schemas/ReportStatus'
+                ids:
+                  type: array
+                  items:
+                    type: string
+                    format: uuid
+                    examples:
+                      - 670e7227-74c9-4579-b6e3-f91ad0169a08
+              required:
+                - status
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  updated:
+                    type: integer
+                    examples:
+                      - 1
+                  total:
+                    type: integer
+                    description: Number of updated reports
+                    examples:
+                      - 1
+                required:
+                  - updated
+                  - total
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '500':
+          $ref: '#/components/responses/Error500'
+      security:
+        - bearer_token:
+            - reports.move
+      servers:
+        - url: 'https://platform.cybelangel.com/api'
+      x-codegen-request-body-name: body
+  '/v1/reports/{report-id}/comments':
+    get:
+      tags:
+        - Incident reports
+      summary: Get comments of a report
+      description: Get the list of comments on a specific report
+      operationId: get-report-comments
+      parameters:
+        - name: report-id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total:
+                    type: integer
+                    description: Total number of comments returned
+                    examples:
+                      - 1
+                  new:
+                    type: integer
+                    description: Number of comments which are new to current user
+                    examples:
+                      - 0
+                  comments:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ReportComment'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '500':
+          $ref: '#/components/responses/Error500'
+      security:
+        - bearer_token:
+            - reports_global_comments.read
+      servers:
+        - url: 'https://platform.cybelangel.com/api'
+    post:
+      tags:
+        - Incident reports
+      summary: Post a comment on a report
+      description: Create a new comments attached to a specific report
+      operationId: post-report-comments
+      parameters:
+        - name: report-id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                content:
+                  type: string
+                  examples:
+                    - This is a comment message
+                discussion_id:
+                  type: string
+                  description: Deprecated property. The discussion_id will be ignored. The discussion_id is computed automatically.
+                parent_id:
+                  type:
+                    - string
+                    - 'null'
+                  description: 'Defining the id of the previous comment if it''s a reply, null for top-level comments'
+                  format: uuid
+                  examples:
+                    - 3500bb64-6081-4cf5-8e6f-dca82dab4983
+                assigned:
+                  type: boolean
+                  description: boolean describing if this message was assigned to the analysts
+              required:
+                - content
+      responses:
+        '201':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AddReportCommentResponse'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '500':
+          $ref: '#/components/responses/Error500'
+      security:
+        - bearer_token:
+            - reports_global_comments.write
+      servers:
+        - url: 'https://platform.cybelangel.com/api'
+  '/v1/reports/{report-id}/attachments/{attachment-id}':
+    get:
+      tags:
+        - Incident reports
+      summary: Get Attachments
+      description: Get an attachment on a specific report
+      operationId: get-attachments-by-report-id
+      parameters:
+        - name: report-id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: attachment-id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                contentMediaType: application/octet-stream
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '500':
+          $ref: '#/components/responses/Error500'
+      security:
+        - bearer_token:
+            - reports.read
+      servers:
+        - url: 'https://platform.cybelangel.com/api'
+  '/v1/reports/{report-id}/pdf':
+    get:
+      tags:
+        - Incident reports
+      summary: Get PDF version of a report (by ID)
+      description: Return a specified report as a PDF file
+      operationId: get-pdf-by-report-id
+      parameters:
+        - name: report-id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            application/pdf:
+              schema:
+                type: string
+                contentMediaType: application/octet-stream
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '500':
+          $ref: '#/components/responses/Error500'
+      security:
+        - bearer_token:
+            - reports.read
+      servers:
+        - url: 'https://platform.cybelangel.com/api'
+  /v1/reports/remediation-request:
+    post:
+      tags:
+        - Incident reports
+      summary: Create a Remediation Request
+      description: Create a remediation request
+      operationId: create-remediation-request
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                report_id:
+                  type: string
+                  format: uuid
+                  examples:
+                    - d334220f-0f41-48e5-b01a-129d2b0a73f5
+                requester_email:
+                  type: string
+                  format: email
+                  examples:
+                    - john.doe@corp.com
+                requester_fullname:
+                  type: string
+                  examples:
+                    - John Doe
+              required:
+                - report_id
+                - requester_email
+                - requester_fullname
+      responses:
+        '201':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  report_id:
+                    type: string
+                    format: uuid
+                    examples:
+                      - d334220f-0f41-48e5-b01a-129d2b0a73f5
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '500':
+          $ref: '#/components/responses/Error500'
+      security:
+        - bearer_token:
+            - reports.read
+      servers:
+        - url: 'https://platform.cybelangel.com/api'
+      x-codegen-request-body-name: body
+  /v1/reports_credentials/count:
+    get:
+      tags:
+        - Credential watchlist
+      summary: Get Number of Credentials Reports
+      description: |-
+        Return the number of credentials reports matching the specified filters.
+
+        ⚠️ **Account Takeover Prevention module is required.**
+      operationId: get-reports-credentials-count
+      parameters:
+        - name: query
+          in: query
+          description: A text to look up in the credentials reports.
+          schema:
+            type: string
+        - name: start
+          in: query
+          schema:
+            $ref: '#/components/schemas/Date'
+        - name: end
+          in: query
+          schema:
+            $ref: '#/components/schemas/Date'
+        - name: email
+          in: query
+          schema:
+            type: string
+        - name: severity
+          in: query
+          style: form
+          explode: false
+          schema:
+            type: array
+            items:
+              type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  all:
+                    type: integer
+                    description: Total number of reports matching these criteria (without `draft` one)
+                    examples:
+                      - 1
+                  discarded:
+                    type: integer
+                    description: Total number of *discarded* reports matching these criteria
+                    examples:
+                      - 1
+                  draft:
+                    type: integer
+                    description: Total number of *draft* reports matching these criteria if user has permission to see them
+                    examples:
+                      - 1
+                  in_progress:
+                    type: integer
+                    description: Total number of *in_progress* reports matching these criteria
+                    examples:
+                      - 1
+                  open:
+                    type: integer
+                    description: Total number of *open* reports matching these criteria
+                    examples:
+                      - 1
+                  resolved:
+                    type: integer
+                    description: Total number of *resolved* reports matching these criteria
+                    examples:
+                      - 1
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '500':
+          $ref: '#/components/responses/Error500'
+      security:
+        - bearer_token: []
+      servers:
+        - url: 'https://platform.cybelangel.com/api'
+  /v1/credentials:
+    get:
+      tags:
+        - Credential watchlist
+      summary: Get credential watchlist
+      description: |
+        Return the list of monitored credentials matching the specified filters.
+
+        ⚠️ **Account Takeover Protection module is required.**
+      operationId: get-credential-watchlist
+      parameters:
+        - name: status
+          in: query
+          style: form
+          explode: false
+          schema:
+            type: array
+            default:
+              - compromised
+              - addressed
+            items:
+              $ref: '#/components/schemas/CredentialStatus'
+        - name: start
+          in: query
+          schema:
+            $ref: '#/components/schemas/Date'
+        - name: end
+          in: query
+          schema:
+            $ref: '#/components/schemas/Date'
+        - name: email
+          in: query
+          schema:
+            type: string
+        - name: skip
+          in: query
+          description: The number of results that are skipped.
+          schema:
+            type: integer
+            default: 0
+        - name: limit
+          in: query
+          description: The number of results that are returned.
+          schema:
+            type: integer
+            default: 10
+        - name: sort_by
+          in: query
+          description: The field on which we sort the results.
+          schema:
+            type: string
+            default: last_detection_date
+        - name: order
+          in: query
+          description: The sort order.
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+            default: desc
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Credential'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '500':
+          $ref: '#/components/responses/Error500'
+      security:
+        - bearer_token:
+            - credentials.read
+      servers:
+        - url: 'https://platform.cybelangel.com/api'
+  /v1/credentials/count:
+    get:
+      tags:
+        - Credential watchlist
+      summary: Get volume of credentials
+      description: |
+        Return the number of credentials matching the specified filters.
+
+        ⚠️ **Account Takeover Protection module is required.**
+      operationId: get-volume-of-credentials
+      parameters:
+        - name: start
+          in: query
+          schema:
+            $ref: '#/components/schemas/Date'
+        - name: end
+          in: query
+          schema:
+            $ref: '#/components/schemas/Date'
+        - name: email
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  addressed:
+                    type: integer
+                  all:
+                    type: integer
+                  compromised:
+                    type: integer
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '500':
+          $ref: '#/components/responses/Error500'
+      security:
+        - bearer_token: []
+      servers:
+        - url: 'https://platform.cybelangel.com/api'
+  /v1/credentials/export:
+    get:
+      tags:
+        - Credential watchlist
+      summary: Get export credential watchlist (CSV file)
+      description: |
+        Export a CSV that contains the list of Account Takeover Protection reports matching the specified filters.
+
+        ⚠️ **Account Takeover Protection module is required.**
+      operationId: get-export-credential-watchlist
+      parameters:
+        - name: email
+          in: query
+          schema:
+            type: string
+            examples:
+              - john.doe@acme.fr
+        - name: end
+          in: query
+          schema:
+            $ref: '#/components/schemas/Date'
+        - name: start
+          in: query
+          schema:
+            $ref: '#/components/schemas/Date'
+        - name: status
+          in: query
+          style: form
+          explode: false
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/ReportStatus'
+      responses:
+        '200':
+          description: OK
+          content:
+            text/csv:
+              schema:
+                type: string
+                examples:
+                  - |
+                    Email,Password,Incident id,Source,Category,Severity,Published date,Keywords
+                    john.doe@acme.fr,MZIzNDU2,333e67ff-2aef-4367-8b62-8fb2c74efe3e,Gist.githubusercontent.com,paste,4,14/12/2020,['test.com']
+                    jane.doe@acme.fr,DZlJDK34,333e67ff-2aef-4367-8b62-8fb2c74efe3e,Gist.githubusercontent.com,paste,4,14/12/2020,['test.com']
+              examples:
+                default:
+                  value: |
+                    Email,Password,Incident id,Source,Category,Severity,Published date,Keywords
+                    john.doe@acme.fr,MZIzNDU2,333e67ff-2aef-4367-8b62-8fb2c74efe3e,Gist.githubusercontent.com,paste,4,14/12/2020,['test.com']
+                    jane.doe@acme.fr,DZlJDK34,333e67ff-2aef-4367-8b62-8fb2c74efe3e,Gist.githubusercontent.com,paste,4,14/12/2020,['test.com']
+          headers:
+            Content-Disposition:
+              schema:
+                type: string
+                example: attachment; filename=credentials.csv
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '500':
+          $ref: '#/components/responses/Error500'
+      security:
+        - bearer_token:
+            - credentials.export
+      servers:
+        - url: 'https://platform.cybelangel.com/api'
+  /v1/credentials/status:
+    post:
+      tags:
+        - Credential watchlist
+      summary: Update status of credential
+      description: |
+        Update status of the specified credentials
+
+        ⚠️ **Account Takeover Protection module is required.**
+      operationId: update-status-of-credential
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ids:
+                  type: array
+                  description: The ids of the credentials to update
+                  items:
+                    type: string
+                    format: uuid
+                    examples:
+                      - 670e7227-74c9-4579-b6e3-f91ad0169a08
+                status:
+                  $ref: '#/components/schemas/CredentialStatus'
+              required:
+                - ids
+                - status
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: integer
+                description: Number of updated credentials
+                examples:
+                  - 27
+              examples:
+                default:
+                  value: 27
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '500':
+          $ref: '#/components/responses/Error500'
+      security:
+        - bearer_token:
+            - credentials.move
+      servers:
+        - url: 'https://platform.cybelangel.com/api'
+      x-codegen-request-body-name: body
+  /v1/domains:
+    get:
+      tags:
+        - Domain watchlist
+      summary: Get Domain watchlist
+      description: |
+        Return the list of the monitored domains (domain watchlist), in descending order.
+
+        ⚠️ **Domain Protection module is required**
+      operationId: get-domain-watchlist
+      parameters:
+        - name: status
+          in: query
+          style: form
+          explode: false
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/DomainStatus'
+        - name: min-date
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: max-date
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: query
+          in: query
+          description: A text to look up in the domains.
+          schema:
+            type: string
+        - name: skip
+          in: query
+          description: The number of results that are skipped.
+          schema:
+            type: integer
+            default: 0
+        - name: limit
+          in: query
+          description: The number of results that are returned.
+          schema:
+            type: integer
+            default: 100
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total:
+                    type: integer
+                    description: Total number of domains matching these criteria
+                    examples:
+                      - 42
+                  results:
+                    type: array
+                    description: A list of domains (in desc order)
+                    items:
+                      $ref: '#/components/schemas/Domain'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '500':
+          $ref: '#/components/responses/Error500'
+      security:
+        - bearer_token:
+            - reports.read
+      servers:
+        - url: 'https://platform.cybelangel.com/api'
+  '/v1/assets/{asset-type}/{asset-name}':
+    get:
+      tags:
+        - Asset
+      summary: Get assets from reports
+      description: |
+        Download a static file, given its type and its name. Is used to retrieve screenshots, attachments, etc.
+        The content of the file can be retrieved in base64 if the `Accept` header is set to `application/base64`
+      operationId: get-report-asset
+      parameters:
+        - name: asset-type
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: asset-name
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                contentMediaType: application/octet-stream
+            application/base64:
+              schema:
+                type: string
+                contentMediaType: application/octet-stream
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '500':
+          $ref: '#/components/responses/Error500'
+      security:
+        - bearer_token:
+            - assets.download
+      servers:
+        - url: 'https://platform.cybelangel.com/api'
+  /v2/stats/reports:
+    get:
+      tags:
+        - Stats
+      summary: Get volume of reports (stats)
+      description: Return the volume of reports received over a specified period
+      operationId: get-v2-stats-reports
+      parameters:
+        - name: start
+          in: query
+          description: Start date in ISO format
+          schema:
+            type: string
+            format: date
+        - name: end
+          in: query
+          description: 'End date in ISO format, default to the current date'
+          schema:
+            type: string
+            format: date
+        - name: limit
+          in: query
+          description: 'Limit the number of results, no effect when `split_by` equals `month`'
+          schema:
+            type: integer
+        - name: split_by
+          in: query
+          description: Aggregate results by the given property
+          schema:
+            type: string
+            enum:
+              - severity
+              - top_keywords
+              - use_case
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total:
+                    type: integer
+                    examples:
+                      - 42
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '500':
+          $ref: '#/components/responses/Error500'
+      security:
+        - bearer_token:
+            - reports.read
+      servers:
+        - url: 'https://platform.cybelangel.com/api'
+tags:
+  - name: Incident reports
+    description: Manipulate incident reports.
+  - name: Credential watchlist
+    description: Credentials incident reports and credentials
+  - name: Domain watchlist
+    description: Domain Protection
+  - name: Asset
+    description: Accessing the application assets
+  - name: Threat Intelligence
+    description: Accessing Threat Intelligence (Claimed Attacks) data.
+  - name: Stats
+    description: 'Statistics on the reports, keywords, etc.'
+components:
+  securitySchemes:
+    bearer_token:
+      type: oauth2
+      flows:
+        clientCredentials:
+          scopes:
+            assets.download: Downloading an asset
+            reports.move: Resolve or reopen an incident report
+            reports.read: Read incident reports
+            reports_global_comments.read: Read comments of a incident report
+            reports_global_comments.write: 'Write comments on a incident report (Endpoint not accessible, yet)'
+            usergroups.admin: Read and manage usergroups
+            usergroups.read: Read subscribed usergroups
+            credentials.read: Read list of leaked monitored credentials
+            credentials.move: Resolve or reopen a credential
+            credentials.export: Export list of credentials
+          tokenUrl: 'https://auth.cybelangel.com/oauth/token'
+  responses:
+    Error400:
+      description: |
+        **Bad request**
+
+        Check query parameters
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: number
+                description: internal error code
+              msg:
+                type: string
+                description: internal error message
+              type:
+                description: internal error type
+                examples:
+                  - error
+    Error401:
+      description: |
+        **Unauthorized**
+
+        Authentication is required
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: number
+                description: internal error code
+              msg:
+                type: string
+                description: internal error message
+              type:
+                description: internal error type
+                examples:
+                  - error
+    Error403:
+      description: |
+        **Forbidden**
+
+        Access to requested resource is forbidden with current credentials.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: number
+                description: internal error code
+              msg:
+                type: string
+                description: internal error message
+              type:
+                description: internal error type
+                examples:
+                  - error
+    Error404:
+      description: |
+        **Not Found**
+
+        Requested resource was not found. Please check parameters or spelling and try again.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: number
+                description: internal error code
+              msg:
+                type: string
+                description: internal error message
+              type:
+                description: internal error type
+                examples:
+                  - error
+    Error500:
+      description: |
+        **Internal server error**
+
+        An unexpected error occurred during request
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: number
+                description: internal error code
+              msg:
+                type: string
+                description: internal error message
+              type:
+                description: internal error type
+                examples:
+                  - error
+  schemas:
+    Report-v2:
+      type: object
+      title: Report (V2)
+      description: Report schema response
+      properties:
+        id:
+          type: string
+          format: uuid
+          examples:
+            - 92f7baa2-59f7-436e-86fc-d0ee153bc51e
+        report_content:
+          type: string
+          description: Report content in markdown format
+          format: text
+          examples:
+            - Report content\nWritten by an analyst.
+        url:
+          type: string
+          format: url
+          examples:
+            - 'https://platform.cybelangel.com/reports/4abf0132-194e-47dd-9584-3270a456cd37'
+        abstract:
+          type: string
+          description: Report abstract in markdown format
+          format: text
+          examples:
+            - Report abstract\nWritten by an analyst.
+        category:
+          $ref: '#/components/schemas/ReportCategoryResponse'
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+          examples:
+            - '2021-10-30T18:00:00.000Z'
+        detected_at:
+          type: string
+          format: date-time
+          readOnly: true
+          examples:
+            - '2021-10-30T18:00:00.000Z'
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+          examples:
+            - '2021-10-30T18:00:00.000Z'
+        incident_id:
+          type: string
+          examples:
+            - ABC123
+        incident_type:
+          $ref: '#/components/schemas/ReportIncidentType'
+        investigation_id:
+          type: string
+          readOnly: true
+          examples:
+            - 'a3b8cc8c-bc7d-4a33-a32a-93b0336a20fe:9a4c1e53-4864-4e3c-aca7-736109e0d5cb'
+        ip:
+          type: string
+          format: ip
+          examples:
+            - 254.181.32.18
+        keywords:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                examples:
+                  - 43ar92d1-1fdd-4e7b-9628-e30t7a2ce5ea
+              name:
+                type: string
+                examples:
+                  - my-keyword
+        attachments:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReportAttachment'
+        liveness:
+          type:
+            - object
+            - 'null'
+          properties:
+            online:
+              type: boolean
+            last_checked_at:
+              type:
+                - string
+                - 'null'
+              format: date-time
+              examples:
+                - '2018-01-30T18:00:00.000Z'
+        machine_name:
+          type: string
+          description: Machine name
+          examples:
+            - Office-28
+        malware_location:
+          type: string
+          description: Malware location
+          examples:
+            - Drive C
+        malware_name:
+          type: string
+          description: Malware name
+          examples:
+            - Raccoon
+        origins:
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+              value:
+                type: string
+        port:
+          type:
+            - integer
+            - 'null'
+          examples:
+            - 80
+        registrant_email:
+          type: string
+          format: email
+          examples:
+            - best.hacker@malicious.com
+        registrar_name:
+          type: string
+          examples:
+            - OVH
+        report_type:
+          $ref: '#/components/schemas/ReportType'
+        risks:
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+              message:
+                type: string
+        samples:
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+              sample:
+                type: string
+        sender:
+          type: string
+          format: email
+          examples:
+            - john.doe@cybelangel.com
+        sender_tenant_id:
+          type: string
+          examples:
+            - 43ath2d1-1fdd-4e7b-9628-e30t7a2ce5rd
+        sent_at:
+          type:
+            - string
+            - 'null'
+          format: date-time
+          examples:
+            - '2018-01-30T18:00:00.000Z'
+        severity:
+          type: integer
+          format: int32
+          minimum: 0
+          maximum: 4
+          examples:
+            - 4
+        source:
+          type:
+            - string
+            - 'null'
+          examples:
+            - www.doma1n.com
+        status:
+          $ref: '#/components/schemas/ReportStatus'
+        suggestions:
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+              message:
+                type: string
+        threat:
+          type:
+            - string
+            - 'null'
+          examples:
+            - malicious.co
+        title:
+          type: string
+          examples:
+            - Inaccessible sensitive website on malicious.co
+        city:
+          type: string
+          examples:
+            - Paris
+        country_code:
+          type: string
+          examples:
+            - FR
+        location:
+          type: string
+          examples:
+            - France
+        user_session:
+          type: string
+          description: User session
+          examples:
+            - john.doe
+        volume:
+          type:
+            - object
+            - 'null'
+          properties:
+            bins:
+              type:
+                - integer
+                - 'null'
+            documents:
+              type:
+                - integer
+                - 'null'
+              examples:
+                - 6
+            domain:
+              type:
+                - integer
+                - 'null'
+            email:
+              type:
+                - integer
+                - 'null'
+            passwords:
+              type:
+                - integer
+                - 'null'
+            ips:
+              type:
+                - integer
+                - 'null'
+        usergroups:
+          type: array
+          items:
+            type: string
+            examples:
+              - '[UG1, UG2, UG3]'
+        workspaces:
+          type: array
+          description: Only available for migrated organizations. The workspaces the report is shared with.
+          items:
+            $ref: '#/components/schemas/ReportWorkspace'
+        screenshots:
+          type: array
+          examples:
+            - - 'https://platform.cybelangel.com/api/v1/assets/report_image/f3851f63-f27c-4b0e-xxxx-7d2cd3d5ffc'
+              - 'https://platform.cybelangel.com/api/v1/assets/report_image/2e8908d3-f109-42d5-xxxx-79c6719dd12'
+          items:
+            type: string
+            format: url
+        abuse_email:
+          type: string
+          examples:
+            - abuse@acme.com
+        analysis:
+          type: string
+          description: Report analysis in markdown format
+          format: text
+          examples:
+            - Here's my analysis
+        domain_registered_at:
+          type:
+            - string
+            - 'null'
+          format: date-time
+          examples:
+            - '2023-02-16T16:03:24Z'
+        hostnames:
+          type: array
+          examples:
+            - - www.acme.com
+              - www.emca.com
+          items:
+            type: string
+            examples:
+              - www.doma1n.co
+        mx_servers:
+          type: array
+          examples:
+            - - value: mx1.acme.com
+                priority: 10
+              - value: mx2.acme.com
+                priority: 5
+          items:
+            type: object
+            properties:
+              priority:
+                type: integer
+              value:
+                type: string
+        ns_servers:
+          type: array
+          examples:
+            - - ns1.acme.com
+              - ns2.acme.com
+          items:
+            type: string
+        tags:
+          type: array
+          examples:
+            - - tag1
+              - tag2
+          items:
+            type: string
+        asset_urls:
+          type: array
+          examples:
+            - - 'http://www.org.com/asset1'
+              - 'http://www.org.com/asset2'
+          items:
+            type: string
+        board:
+          type: string
+          examples:
+            - tor
+        whois:
+          type: string
+          format: text
+          examples:
+            - Info whois here
+        stream:
+          type: string
+          format: uuid
+          readOnly: true
+          examples:
+            - b2196357-dd51-4c9b-8e97-2c62xxxxx24f
+        module:
+          $ref: '#/components/schemas/ReportModule'
+    ReportCategoryResponse:
+      type: string
+      enum:
+        - ''
+        - board
+        - paste
+        - social
+        - codeshare
+        - docshare
+        - leak
+        - database
+        - iot
+        - dns
+        - fileserver
+        - rss
+        - openserver
+      description: The category of the report (can be empty)
+      examples:
+        - dns
+    ReportIncidentType:
+      type: string
+      enum:
+        - computer_attack
+        - cve
+        - targeting
+        - sensitive_code
+        - sensitive_documents
+        - sensitive_open_ports
+        - banking_information
+        - credentials
+        - fraud_scheme
+        - vulnerability
+        - malicious_website
+        - unsecured_database
+        - social_media
+        - third_party_data_leak
+        - other
+        - exposed_service
+        - exposed_data_storage
+        - accessible_website
+        - forbidden_website
+        - broken_website
+        - accessible_sensitive_website
+        - inaccessible_sensitive_website
+        - subdomain_takeover
+        - belonging_dangling_subdomain
+        - dangling_subdomain
+        - tls_certificate_expired
+        - tls_certificate_soon_expired
+        - accessible_website_with_tls_certificate_expired
+        - vulnerable_technology
+        - vulnerable_technology_to_kev
+      examples:
+        - computer_attack
+    ReportAttachment:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          examples:
+            - fe3ar92d1-1fdd-4d7b-9628-e30t7a2ce5ea
+        name:
+          type: string
+          examples:
+            - cybelangel-attachment.png
+        attached_to:
+          type: string
+          enum:
+            - investigation_id
+            - report_id
+    ReportType:
+      type: string
+      enum:
+        - incident_report
+        - incident_detection
+        - preliminary_report
+        - reminder
+        - communication
+      examples:
+        - incident_report
+    ReportStatus:
+      type: string
+      enum:
+        - draft
+        - open
+        - in_progress
+        - resolved
+        - discarded
+      examples:
+        - resolved
+    ReportWorkspace:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          examples:
+            - e7b5ea39-a627-4e7d-a836-abcfd4f11f01
+        name:
+          type: string
+          examples:
+            - Workspace 1
+    ReportModule:
+      type: string
+      enum:
+        - account_takeover_prevention
+        - domain_protection
+        - data_breach_prevention
+        - dark_web_monitoring
+        - asset_discovery_monitoring
+        - social_media
+        - inbox
+        - ''
+      examples:
+        - account_takeover_prevention
+    ReportMirror:
+      type: object
+      properties:
+        available_files_count:
+          type: integer
+          description: The number of downloadable files in the mirror
+          examples:
+            - 1
+        created_at:
+          type: string
+          description: The mirror's creation date
+          format: date-time
+          examples:
+            - '2022-03-10T13:52:48Z'
+        files_count:
+          type: integer
+          description: The number of files that matched on the server
+          examples:
+            - 155
+        files_volume:
+          type: integer
+          description: The total volume of files in bytes
+          examples:
+            - 88726
+        report_id:
+          type: string
+          description: The id of the report to which this mirror is linked
+          format: uuid
+          examples:
+            - 2fa68ccc-005d-4033-8fcd-7d38a2370b44
+        status:
+          $ref: '#/components/schemas/ReportMirrorStatus'
+          description: The mirror status
+        stream_id:
+          type: string
+          description: The id of the mirror's stream
+          format: uuid
+          examples:
+            - c683aa1a-a029-4bcf-9333-a029f2963d2b
+        updated_at:
+          type: string
+          description: The mirror's last update date
+          format: date-time
+          examples:
+            - '2022-03-10T13:52:48Z'
+    ReportMirrorStatus:
+      type: string
+      enum:
+        - error
+        - expired
+        - pending
+        - ready
+      examples:
+        - ready
+    ReportComment:
+      type: object
+      properties:
+        author:
+          type: object
+          properties:
+            firstname:
+              type: string
+              examples:
+                - John
+            lastname:
+              type: string
+              examples:
+                - Doe
+            id:
+              type: string
+              examples:
+                - google-oauth2|112361861605444479803
+            notFound:
+              type: boolean
+              description: true if the user doesn't exist anymore
+        content:
+          type: string
+          description: Body of the comment
+          examples:
+            - Body of the comment
+        created_at:
+          type: string
+          description: Creation date
+          format: date-time
+        discussion_id:
+          type: string
+          description: 'discussion id: made of report id and tenant id like uuid:uuid'
+          examples:
+            - '3500bb64-6081-4cf5-8e6f-dca82dab4982:41ce4e85-9bd0-4a4f-bab9-c3cf3d0d97da'
+        id:
+          type: string
+          description: Id of comment
+          format: uuid
+          examples:
+            - 3500bb64-6081-4cf5-8e6f-dca82dab4982
+        isNew:
+          type: boolean
+          description: true if comment is a new one to the current user
+        last_updated_at:
+          type: string
+          description: Date of comment last update by its author
+          format: date-time
+        parent_id:
+          type:
+            - string
+            - 'null'
+          description: 'id of parent comment if this comment is a reply to another comment, null if this is a top-level comment'
+          format: uuid
+          examples:
+            - 3500bb64-6081-4cf5-8e6f-dca82dab4982
+        assigned:
+          type: boolean
+          description: boolean describing if this message was assigned to the analysts
+    AddReportCommentResponse:
+      type: object
+      properties:
+        author:
+          type: string
+          description: User ID of the author
+          examples:
+            - 78006d2b-1563-4a08-9567-97879df3d2b0
+        content:
+          type: string
+          description: Body of the comment
+          examples:
+            - Body of the comment
+        created_at:
+          type: string
+          description: Creation date
+          format: date-time
+        discussion_id:
+          type: string
+          description: 'discussion id: made of report id and tenant id like uuid:uuid'
+          examples:
+            - '3500bb64-6081-4cf5-8e6f-dca82dab4982:41ce4e85-9bd0-4a4f-bab9-c3cf3d0d97da'
+        id:
+          type: string
+          description: Id of comment
+          format: uuid
+          examples:
+            - 3500bb64-6081-4cf5-8e6f-dca82dab4982
+        isNew:
+          type: boolean
+          description: true if comment is a new one to the current user
+        last_updated_at:
+          type: string
+          description: Date of comment last update by its author
+          format: date-time
+        parent_id:
+          type:
+            - string
+            - 'null'
+          description: 'id of parent comment if this comment is a reply to another comment, null if this is a top-level comment'
+          format: uuid
+          examples:
+            - 3500bb64-6081-4cf5-8e6f-dca82dab4982
+        assigned:
+          type: boolean
+          description: boolean describing if this message was assigned to the analysts
+    Date:
+      type: string
+      format: date
+      examples:
+        - '2021-07-05T22:00:00.000Z'
+    CredentialStatus:
+      type: string
+      enum:
+        - compromised
+        - addressed
+      examples:
+        - addressed
+    Credential:
+      type: object
+      properties:
+        alert_ids:
+          type: array
+          items:
+            type: string
+            description: Ids of alerts in data processing
+            format: uuid
+            examples:
+              - 739d79f6-b18b-4819-9444-bb52d42af2ff
+        cred_ids:
+          type: array
+          items:
+            type: string
+            description: Credential identifiers in database
+            format: uuid
+            examples:
+              - af2774a2-6f2d-4395-a9cf-768c99dc4849
+        domain:
+          type: string
+          description: 'For Infostealer Credentials only: domain on which the credential can be used'
+          examples:
+            - 'http://www.example.com'
+        email:
+          type: string
+          description: The email
+          format: email
+          examples:
+            - john.doe@acme.com
+        extracted_at:
+          type: string
+          description: 'For Infostealer Credentials only: date on which the credential has been extracted from the victim computer'
+          examples:
+            - '2021-01-21T14:03:07Z'
+        ip_address:
+          type: string
+          description: 'For Infostealer Credentials only: IP address of the victim'
+          examples:
+            - 123.123.123.123
+        malware_name:
+          type: string
+          description: 'For Infostealer Credentials only: Detected malware name'
+        malware_location:
+          type: string
+          description: 'For Infostealer Credentials only: Path of malware on victim''s machine'
+        user_machine_name:
+          type: string
+          description: 'For Infostealer Credentials only: Victim''s machine name'
+        user_session:
+          type: string
+          description: 'For Infostealer Credentials only: Victim''s session identifier'
+        is_new_to_user:
+          type: boolean
+          description: Whether the current user has already seen this credential or not
+          examples:
+            - true
+        last_detection_date:
+          type: string
+          description: The last date at which this credential has been detected
+          format: date
+          examples:
+            - '2020-12-16T13:27:49Z'
+        password:
+          type: string
+          description: The obfuscated (or clear if permitted) password
+          examples:
+            - 315bea••••••••••••••••••••cc5ed3
+        report_ids:
+          type: array
+          items:
+            type: string
+            description: Ids of the related reports
+            format: uuid
+            examples:
+              - 333e67ff-2aef-4367-8b62-8fb2c74efe3e
+        reports_count:
+          type: integer
+          description: Number of related reports
+          examples:
+            - 1
+        status:
+          $ref: '#/components/schemas/CredentialStatus'
+        stream_id:
+          type: string
+          description: Ids of the stream
+          format: uuid
+          examples:
+            - caa4eb9e-2741-4e9a-8b1c-4eeceb490e2a
+    DomainStatus:
+      type: string
+      enum:
+        - monitored
+        - reported
+      examples:
+        - monitored
+    Domain:
+      type: object
+      properties:
+        abuse_email:
+          type: string
+          description: The abuse email
+          examples:
+            - abuse@acme.com
+        country:
+          type: string
+          description: The country
+          examples:
+            - France
+        creation_date:
+          type: string
+          description: The date at which this domain has been created
+          examples:
+            - 'Tue, 28 Jan 2020 19:23:41 GMT'
+        detection_date:
+          type: string
+          description: The date at which this domain has been detected
+          examples:
+            - 'Wed, 19 Aug 2020 19:52:15 GMT'
+        domain:
+          type: string
+          description: The full domain
+          examples:
+            - acme.com
+        ip:
+          type: string
+          description: The list of IP addresses
+          examples:
+            - 33.102.136.170
+        mx:
+          type: string
+          description: The list of MX servers
+          examples:
+            - 5 alt1.aspmx.l.google.com.;5 alt2.aspmx.l.google.com.
+        ns:
+          type: string
+          description: The list of name servers
+          examples:
+            - ns26.domaincontrol.com.;ns25.domaincontrol.com.
+        registrant_name:
+          type: string
+          description: The registrant name
+          examples:
+            - Domain Administrator
+        registrant_organisation:
+          type: string
+          description: The registrant organization
+          examples:
+            - Acme Inc
+        report_id:
+          type: string
+          description: The report id
+          format: uuid
+          examples:
+            - e5f30260-4104-4742-babe-195b20867db9
+        status:
+          $ref: '#/components/schemas/DomainStatus'
+        stream:
+          type: string
+          description: The stream id
+          format: uuid
+          examples:
+            - 77f50671-e723-47ce-85e0-5749f82b96da
+security:
+  - bearer_token: []

@@ -1,0 +1,69 @@
+generated: '2026-08-17'
+method: probed
+source: >-
+  Stoplight project node links.mock_url for all seven http_service nodes in the cybelangel
+  workspace (https://stoplight.io/api/v1/projects/<id>/nodes/<slug>), each POST/GET-probed live
+  on 2026-08-17
+test_live_separation:
+  modes: []
+  key_prefixes: []
+  note: >-
+    CybelAngel publishes NO test mode, NO sandbox tenant and NO test credentials. There is one
+    set of credentials (client_id + client_secret from Platform > Settings > CybelAngel API) and
+    it points at production data — which is the customer's own leaked credentials and exposed
+    assets. The only free-of-charge way to exercise the contract is the 30-day API trial (real
+    data, real tenant) or the Prism mock servers below.
+prism_mocks:
+  provider: 'Stoplight Prism (hosted by the docs platform, wired to the provider''s own published specs)'
+  auth: 'any Bearer token — the mock enforces the security requirement but does not validate the value'
+  probe_evidence:
+    - {url: 'https://stoplight.io/mocks/cybelangel/alerts-api/133714/v1/alerts', headers: none, status: 401, body: 'prism UNAUTHORIZED, WWW-Authenticate: Bearer'}
+    - {url: 'https://stoplight.io/mocks/cybelangel/alerts-api/133714/v1/alerts?start-date=2026-01-01T00:00:00Z&end-date=2026-01-02T00:00:00Z', headers: 'Authorization: Bearer test', status: 400, body: '{"error":{"message":"string","fields":[{"name":"string","msg":"string","input":"string","valid_input":"string"}]}}'}
+    - {url: 'https://stoplight.io/mocks/cybelangel/cybelangel-platform-api/84330/v2/reports', headers: none, status: 401, body: '{"code":0,"msg":"string","type":"error"}'}
+    - {url: 'https://stoplight.io/mocks/cybelangel/audit-logs-api/182542/v1/x/audit-logs', headers: none, status: 401, body: 'prism UNAUTHORIZED'}
+  note: >-
+    Real and usable: a bearer header of any value gets past the security gate and Prism then
+    returns the spec's own example payloads (the 400 above is the genuine ValidationError
+    envelope, generated from the published schema). That makes the whole 52-operation surface
+    testable pre-sales, which matters a lot for an API whose production data is a customer's own
+    breach exposure. Not advertised anywhere in the prose docs — these URLs come from the
+    Stoplight node metadata, not from a "sandbox" page.
+  endpoints:
+    - {api: Reports, url: 'https://stoplight.io/mocks/cybelangel/cybelangel-platform-api/84330', spec: openapi/cybelangel-platform-reports-openapi.yml}
+    - {api: Alerts, url: 'https://stoplight.io/mocks/cybelangel/alerts-api/133714', spec: openapi/cybelangel-alerts-openapi.yml}
+    - {api: ADM Inventory, url: 'https://stoplight.io/mocks/cybelangel/adm-inventory-api/133714', spec: openapi/cybelangel-adm-inventory-openapi.yml}
+    - {api: Keywords, url: 'https://stoplight.io/mocks/cybelangel/keywords-api/133714', spec: openapi/cybelangel-keywords-openapi.yml}
+    - {api: Threat Intelligence, url: 'https://stoplight.io/mocks/cybelangel/threat-intelligence-api/133714', spec: openapi/cybelangel-threat-intelligence-openapi.yml}
+    - {api: Partner, url: 'https://stoplight.io/mocks/cybelangel/partner-api/133714', spec: openapi/cybelangel-partner-openapi.yml}
+    - {api: Audit Logs, url: 'https://stoplight.io/mocks/cybelangel/audit-logs-api/182542', spec: openapi/cybelangel-audit-logs-openapi.yml}
+try_it_console:
+  available: true
+  url: https://developers.cybelangel.com/docs/cybelangel-platform-api/68a341c676710-references
+  note: 'Stoplight Elements "Try It" panel on every operation page, pre-wired to the mock server above.'
+magic_test_values: []
+magic_test_values_note: >-
+  None published. No test alert ids, no fixture report ids, no seeded credential values, no
+  trigger mechanism to generate a synthetic alert. Nothing to record verbatim, and nothing was
+  invented.
+test_clock: null
+fixture_tooling:
+  - name: CybelAngel API Toolbox (CybelAlertFetcher.py)
+    url: https://developers.cybelangel.com/docs/alerts-api/6e548d500150e-cybel-angel-api-toolbox-tutorial
+    note: >-
+      Documented Python script that authenticates, pages the Alerts API past the 1,000-record
+      cap and writes alerts.json + credentials.json to disk — the closest thing to a fixture
+      generator, but it needs real credentials and a real stream_id.
+  - name: Alert Finder / Credential Finder
+    url: https://cybelalerts-demo.cybelangel.com/
+    status: 200
+    note: 'Browser viewers that render the toolbox output; upload alerts.json or credentials.json to inspect it.'
+free_trial:
+  mechanism: 'Platform > Settings > CybelAngel API > "Start 30-day trial" (admin only)'
+  duration_days: 30
+  cost: 0
+  data: 'production tenant data, not synthetic'
+  source: https://developers.cybelangel.com/docs/audit-logs-api/b87d37ae48a0d-authentication
+gaps:
+  - 'No test/live key separation and no key prefix to tell them apart.'
+  - 'No sandbox tenant with synthetic exposures, which is the obvious fixture for this product category.'
+  - 'The Prism mock URLs are not linked from any prose page — a developer only finds them via the Try It panel.'

@@ -1,0 +1,161 @@
+generated: '2026-08-17'
+method: searched
+source: probed live over HTTPS across every CybelAngel host named in apis.yml and in the OpenAPI servers[] blocks
+note: >-
+  The only real /.well-known/ surface CybelAngel serves is on its Auth0 tenant host
+  auth.cybelangel.com, which answers OIDC discovery (RFC 8414 / OpenID Connect Discovery
+  1.0) and JWKS. api.cybelangel.com and platform.cybelangel.com serve nothing at
+  /.well-known/. platform.cybelangel.com is a single-page app whose catch-all returns
+  HTTP 200 with the same 3,510-byte HTML shell for EVERY /.well-known/* path probed —
+  those are recorded as html-shell misses, not documents. A security-contact file IS
+  served, but at the legacy /security.txt path on the marketing site rather than the
+  RFC 9116 location /.well-known/security.txt (which 404s).
+hosts:
+  - host: https://auth.cybelangel.com
+    role: OAuth 2.0 / OIDC authorization server (Auth0 tenant; token endpoint used by every CybelAngel API)
+    documents:
+      - path: /.well-known/openid-configuration
+        status: 200
+        content_type: application/json
+        file: cybelangel-openid-configuration.json
+        note: OpenID Connect Discovery 1.0 document; issuer https://auth.cybelangel.com/
+      - path: /.well-known/oauth-authorization-server
+        status: 200
+        content_type: application/json
+        file: cybelangel-oauth-authorization-server.json
+        note: RFC 8414 authorization server metadata (byte-identical to the OIDC document on this Auth0 tenant)
+      - path: /.well-known/jwks.json
+        status: 200
+        content_type: application/json
+        file: cybelangel-jwks.json
+        note: JSON Web Key Set used to verify the RS256 bearer tokens the APIs accept
+      - path: /.well-known/security.txt
+        status: 404
+      - path: /.well-known/api-catalog
+        status: 404
+      - path: /.well-known/ai-plugin.json
+        status: 404
+      - path: /.well-known/agent-card.json
+        status: 404
+      - path: /.well-known/agent.json
+        status: 404
+      - path: /.well-known/oauth-protected-resource
+        status: 404
+  - host: https://api.cybelangel.com
+    role: API host for Alerts, ADM Inventory, Keywords, Threat Intelligence, Audit Logs and Partner APIs
+    documents:
+      - path: /.well-known/security.txt
+        status: 404
+      - path: /.well-known/openid-configuration
+        status: 404
+      - path: /.well-known/oauth-authorization-server
+        status: 404
+      - path: /.well-known/oauth-protected-resource
+        status: 404
+      - path: /.well-known/api-catalog
+        status: 404
+      - path: /.well-known/ai-plugin.json
+        status: 404
+      - path: /.well-known/agent-card.json
+        status: 404
+      - path: /.well-known/agent.json
+        status: 404
+      - path: /llms.txt
+        status: 404
+  - host: https://platform.cybelangel.com
+    role: Customer platform + Reports API host (baseURL https://platform.cybelangel.com/api)
+    note: >-
+      SPA catch-all. Every path below returned HTTP 200 with an identical 3,510-byte
+      text/html application shell, so none of them is a document. Treated as misses.
+    documents:
+      - path: /.well-known/security.txt
+        status: 200
+        content_type: text/html
+        document: false
+        note: html-shell (SPA catch-all), not a security.txt
+      - path: /.well-known/openid-configuration
+        status: 200
+        content_type: text/html
+        document: false
+        note: html-shell (SPA catch-all)
+      - path: /.well-known/oauth-authorization-server
+        status: 200
+        content_type: text/html
+        document: false
+        note: html-shell (SPA catch-all)
+      - path: /.well-known/oauth-protected-resource
+        status: 200
+        content_type: text/html
+        document: false
+        note: html-shell (SPA catch-all)
+      - path: /.well-known/api-catalog
+        status: 200
+        content_type: text/html
+        document: false
+        note: html-shell (SPA catch-all)
+      - path: /.well-known/ai-plugin.json
+        status: 200
+        content_type: text/html
+        document: false
+        note: html-shell (SPA catch-all)
+      - path: /.well-known/agent-card.json
+        status: 200
+        content_type: text/html
+        document: false
+        note: html-shell (SPA catch-all) — rejected as an agent card
+      - path: /.well-known/agent.json
+        status: 200
+        content_type: text/html
+        document: false
+        note: html-shell (SPA catch-all) — rejected as an agent card
+      - path: /llms.txt
+        status: 200
+        content_type: text/html
+        document: false
+        note: html-shell (SPA catch-all)
+  - host: https://cybelangel.com
+    role: marketing site (WordPress)
+    documents:
+      - path: /security.txt
+        status: 200
+        content_type: text/plain
+        file: cybelangel-security.txt
+        note: >-
+          Served, but at the pre-RFC-9116 root path; /.well-known/security.txt returns 404.
+          Two lines only, and its Contact: is security@beapi.fr — the address of BeAPI, the
+          WordPress agency that operates the marketing site, not a cybelangel.com address.
+          No Expires, Policy, Encryption or Preferred-Languages field, so it is not a
+          conformant RFC 9116 document.
+      - path: /.well-known/security.txt
+        status: 404
+      - path: /.well-known/agent-card.json
+        status: 404
+      - path: /.well-known/agent.json
+        status: 404
+      - path: /.well-known/api-catalog
+        status: 404
+      - path: /.well-known/ai-plugin.json
+        status: 404
+      - path: /llms.txt
+        status: 404
+  - host: https://developers.cybelangel.com
+    role: developer portal (Stoplight-hosted)
+    documents:
+      - path: /.well-known/security.txt
+        status: 404
+      - path: /.well-known/api-catalog
+        status: 404
+      - path: /.well-known/agent-card.json
+        status: 404
+      - path: /.well-known/agent.json
+        status: 404
+      - path: /llms.txt
+        status: 404
+summary:
+  documents_found: 4
+  hosts_probed: 5
+  paths_probed: 44
+  html_shell_false_positives: 9
+  agent_card: none
+  api_catalog: none
+  llms_txt: none

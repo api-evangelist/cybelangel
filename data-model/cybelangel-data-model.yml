@@ -1,0 +1,181 @@
+generated: '2026-08-17'
+method: derived
+source: >-
+  derived from components.schemas $ref links and id-reference fields across all seven OpenAPI
+  documents in openapi/ (251 schemas total); enriched from
+  https://developers.cybelangel.com/docs/alerts-api/3d22245755b86-alerts-in-stix-format
+  and https://developers.cybelangel.com/docs/cybelangel-platform-api/39d4926befc14-what-can-i-do-with-this-api
+overview: >-
+  Two generations of data model coexist, and they do NOT share entity shapes even where they
+  describe the same thing. The older Reports API (platform.cybelangel.com/api) is built around
+  Report-v2, Credential and Domain with flat snake_case objects and *_ids arrays. The newer
+  api.cybelangel.com family is built around PublicAlert (Alerts), InventoryAssetDTO +
+  InventoryThreatWithReportIds (ADM Inventory / Partner), ClientKeywordDTO (Keywords),
+  ClaimedAttackDTO (Threat Intelligence) and PublicAuditLog (Audit Logs), with *DTO suffixes
+  and next_cursor envelopes. The join between the generations is report_ids / report.id: an
+  alert and an inventory threat both point back at a Report in the older API, but there is no
+  operation that resolves that pointer in one call.
+entities:
+  - name: Report
+    schema: Report-v2
+    api: Reports
+    id_field: id
+    business_key: incident_id
+    key_fields: [id, incident_id, incident_type, category, status, severity, created_at, detected_at, updated_at, url, abstract, ip, keywords, attachments, workspace, module, report_content]
+    note: 'The central unit of the original product: an analyst-grade incident report a human reads and resolves.'
+  - name: ReportMirror
+    schema: ReportMirror
+    api: Reports
+    id_field: report_id
+    key_fields: [report_id, stream_id, status, files_count, files_volume, available_files_count, created_at, updated_at]
+    note: 'The file listing behind a report — retrievable as JSON, CSV or a zip archive.'
+  - name: ReportComment
+    schema: ReportComment
+    api: Reports
+    id_field: id
+    key_fields: [id, discussion_id, parent_id, author, content, assigned, created_at, last_updated_at, isNew]
+    note: 'Threaded (parent_id + discussion_id). The only free-text customer write in the estate.'
+  - name: ReportAttachment
+    schema: ReportAttachment
+    api: Reports
+    id_field: id
+    key_fields: [id, name, attached_to]
+  - name: Credential
+    schema: Credential
+    api: Reports
+    id_field: cred_ids
+    key_fields: [cred_ids, alert_ids, report_ids, email, password, domain, ip_address, malware_name, malware_location, user_machine_name, user_session, extracted_at, last_detection_date, is_new_to_user, status]
+    note: >-
+      Carries THREE cross-generation id arrays (cred_ids, alert_ids, report_ids) — the clearest
+      evidence that alerts and reports are two views of one detection core.
+  - name: Domain
+    schema: Domain
+    api: Reports
+    id_field: domain
+    key_fields: [domain, report_id, status, stream, ip, mx, ns, registrant_name, registrant_organisation, abuse_email, country, creation_date, detection_date]
+    note: 'Keyed by the domain name itself, not a surrogate id.'
+  - name: Alert
+    schema: PublicAlert
+    api: Alerts
+    id_field: id
+    key_fields: [id, stream_id, status, category, ingestion_date, detection_date, customer, report, ml, matches]
+    polymorphic_payload:
+      discriminator_field: category
+      variants: [ADM, Board, Clouddrive, Codeshare, Database, DNS, Docshare, Fileserver, Leak, Paste, RSS, Social]
+      note: >-
+        One optional sibling object per category rather than a oneOf — a client must read
+        `category` and then look in the matching key. Each variant has its own field set (e.g.
+        Leak → count_leaks, infostealer, creds_on_db; Codeshare → repository_info,
+        findings_stats, owner_account; ADM → open_ports, cves, max_cve_severity).
+  - name: Asset
+    schema: InventoryAssetDTO
+    api: ADM Inventory / Partner
+    id_field: id
+    business_key: value
+    key_fields: [id, value, type, status, asset_status, first_seen_at, last_seen_at, created_at, platform_link, registrar, organization, localization, tags, fingerprints]
+    note: 'Both id and value are accepted as write selectors (asset_ids OR asset_values on the status write).'
+  - name: AssetThreat
+    schema: InventoryThreatWithReportIds / InventoryThreatWithAssetInfoDTO
+    api: ADM Inventory / Partner
+    id_field: hash
+    key_fields: [hash, severity, type, status, port, first_seen, last_seen, data, report_ids, asset_id, asset_value]
+    polymorphic_payload:
+      discriminator_field: type
+      variants: [DomainThreatDataDTO, SubDomainTakeoverThreatDataDTO, ExposedSensitiveFileThreatDataDTO, TLSCertificateThreatDataDTO, SpfThreatDataDTO, VulnerableTechnologyThreatDataDTO, OtherThreatDataDTO]
+      note: 'Content-addressed by `hash`, not a surrogate id — a threat identity is its fingerprint.'
+  - name: Keyword
+    schema: ClientKeywordDTO / PartnerKeywordDTO
+    api: Keywords / Partner
+    id_field: id
+    key_fields: [id, name, type, status, description, workspaces, creation_date, last_modification_date]
+    partner_only_fields: [rule, sources, active_search, infostealer_search]
+    note: >-
+      The Partner variant exposes four detection-tuning fields the customer-facing Keywords API
+      does not — a real capability asymmetry between the two surfaces, not a naming difference.
+  - name: Workspace
+    schema: WorkspaceDTO / InventoryAssetWorkspaceDTO / ReportWorkspace
+    api: Keywords / ADM Inventory / Partner / Reports
+    id_field: id
+    key_fields: [id, name, description]
+    note: 'The one entity that appears in all three generations — and it has three different schema names for it.'
+  - name: ClaimedAttack
+    schema: ClaimedAttackDTO
+    api: Threat Intelligence
+    id_field: reference_id
+    key_fields: [reference_id, claimed_at, category, title, summary, source, threat_actors, countries, industries, victims, domains]
+    note: 'Not customer-scoped — a world-view feed of ransomware/extortion claims.'
+  - name: AuditLog
+    schema: PublicAuditLog
+    api: Audit Logs
+    id_field: event_id
+    key_fields: [event_id, organization_id, action, object_type, object_id, author_id, author_email, event_date, updated_fields, report, keyword, user]
+    note: 'Embeds ReportMetadata / KeywordMetadata / UserMetadata snapshots rather than referencing them by id.'
+  - name: CVE
+    schema: CVE / VulnerableTechnologyCveDTO
+    api: Alerts / ADM Inventory / Partner
+    id_field: cve_id
+    key_fields: [cve_id, cvss_score, cvss_version, epss_score, have_known_exploit, required_action, description]
+    note: >-
+      An external-standard entity (NVD CVE ids, CVSS, EPSS, CISA KEV via cve_in_kev_count and
+      have_known_exploit). Two incompatible shapes: `CVE {name, cvss, summary, references}` in
+      Alerts vs `VulnerableTechnologyCveDTO {cve_id, cvss_score, epss_score, ...}` in Inventory.
+relationships:
+  - {from: Report, to: ReportMirror, kind: has_one, via: report_id}
+  - {from: Report, to: ReportComment, kind: has_many, via: 'report-id (path)'}
+  - {from: Report, to: ReportAttachment, kind: has_many, via: attachments}
+  - {from: Report, to: ReportWorkspace, kind: belongs_to, via: workspace}
+  - {from: Report, to: Keyword, kind: has_many, via: keywords}
+  - {from: Credential, to: Report, kind: has_many, via: report_ids}
+  - {from: Credential, to: Alert, kind: has_many, via: alert_ids}
+  - {from: Domain, to: Report, kind: belongs_to, via: report_id}
+  - {from: Alert, to: Report, kind: has_one, via: report.id}
+  - {from: Alert, to: Match, kind: has_many, via: matches}
+  - {from: Match, to: Keyword, kind: belongs_to, via: keyword_id}
+  - {from: Alert, to: Cred, kind: has_many, via: 'GET /v1/alerts/{alert_id}/leak-credentials'}
+  - {from: Alert, to: Finding, kind: has_many, via: 'GET /v1/alerts/{alert_id}/codeshare-findings'}
+  - {from: Finding, to: Region, kind: has_one, via: match_context}
+  - {from: Asset, to: AssetThreat, kind: has_many, via: fingerprints/ThreatsInformationDTO.items}
+  - {from: AssetThreat, to: Report, kind: has_many, via: report_ids}
+  - {from: AssetThreat, to: Asset, kind: belongs_to, via: 'asset_id / asset_value'}
+  - {from: Asset, to: OpenPort, kind: has_many, via: fingerprints.open_ports}
+  - {from: OpenPort, to: Service, kind: has_one, via: service}
+  - {from: Service, to: OpenServiceCpe, kind: has_many, via: cpes}
+  - {from: AssetThreat, to: CVE, kind: has_many, via: 'VulnerableTechnologyThreatDataDTO.cves'}
+  - {from: Asset, to: Workspace, kind: has_many, via: 'InventoryAssetWorkspaceDTO'}
+  - {from: Asset, to: InventoryAssetGraph, kind: has_one, via: 'graph (nodes + edges with a PivotMethod on each edge)'}
+  - {from: Keyword, to: Workspace, kind: has_many, via: workspaces}
+  - {from: AuditLog, to: Report, kind: has_one, via: 'report (embedded ReportMetadata)'}
+  - {from: AuditLog, to: Keyword, kind: has_one, via: 'keyword (embedded KeywordMetadata)'}
+  - {from: AuditLog, to: User, kind: has_one, via: 'author_id / author_email'}
+  - {from: ClaimedAttack, to: ThreatActor, kind: has_many, via: threat_actors}
+  - {from: ClaimedAttack, to: Domain, kind: has_many, via: domains}
+id_conventions:
+  - {entity: Report, form: 'opaque id + a separate human incident_id'}
+  - {entity: Alert, form: 'opaque id, scoped by stream_id'}
+  - {entity: AssetThreat, form: 'content hash — stable across re-detections of the same finding'}
+  - {entity: Domain, form: 'natural key (the domain name)'}
+  - {entity: Asset, form: 'surrogate id AND natural key (value); both accepted on writes'}
+  - {entity: ClaimedAttack, form: reference_id}
+  - {entity: AuditLog, form: event_id}
+  - note: 'No prefixed ids anywhere (no rpt_/al_ style), so an id alone does not tell a client which entity it addresses.'
+observations:
+  - >-
+    The graph is genuinely a graph, not a tree: InventoryAssetGraphDTO ships nodes + edges with
+    a PivotMethod recorded on each edge — CybelAngel exposes HOW it pivoted from one observable
+    to another, which is unusual and valuable for an EASM API.
+  - >-
+    Localization leaks into the data model: threat descriptions are TranslationElementDTO
+    objects with `en` and `fr` keys rather than a single string plus a locale header.
+  - >-
+    Partial-success is a first-class shape on the Keywords surfaces — HTTP 207 with
+    created_keywords[] + failed_keywords[] (each failure carrying error_code and error_details).
+    A client that only checks for 200 will silently drop failures.
+  - >-
+    The Reports API duplicates ReportComment as AddReportCommentResponse with identical fields
+    instead of reusing the schema — 17 schemas for 21 operations, versus 48-73 for the newer APIs.
+counts:
+  entities: 15
+  relationships: 30
+  schemas_total: 251
+  specs: 7
+render: null
