@@ -23,6 +23,20 @@ created: '2026-08-17'
 modified: '2026-08-17'
 tags:
   - Company
+  - Cybersecurity
+  - Threat Intelligence
+  - external-attack-surface-management
+  - data-breach-prevention
+  - Credential Intelligence
+  - Brand Protection
+  - Dark Web Monitoring
+  - Digital Risk Protection
+  - STIX
+  - security-alerts
+  - Asset Inventory
+  - Audit Logs
+tags_raw:
+  - Company
   - cybersecurity
   - threat-intelligence
   - external-attack-surface-management
@@ -47,6 +61,12 @@ apis:
     humanURL: https://developers.cybelangel.com/docs/cybelangel-platform-api/39d4926befc14-what-can-i-do-with-this-api
     baseURL: https://platform.cybelangel.com/api
     tags:
+      - Incident Reports
+      - Credential Intelligence
+      - Domain Monitoring
+      - Remediation
+      - Cybersecurity
+    tags_raw:
       - incident-reports
       - credential-intelligence
       - domain-monitoring
@@ -81,6 +101,12 @@ apis:
     baseURL: https://api.cybelangel.com
     tags:
       - security-alerts
+      - Threat Intelligence
+      - STIX
+      - Dark Web Monitoring
+      - Credential Intelligence
+    tags_raw:
+      - security-alerts
       - threat-intelligence
       - stix
       - dark-web-monitoring
@@ -110,6 +136,11 @@ apis:
     baseURL: https://api.cybelangel.com
     tags:
       - external-attack-surface-management
+      - Asset Inventory
+      - Vulnerability Management
+      - Cybersecurity
+    tags_raw:
+      - external-attack-surface-management
       - asset-inventory
       - vulnerability-management
       - cybersecurity
@@ -132,6 +163,10 @@ apis:
     baseURL: https://api.cybelangel.com
     tags:
       - keyword-monitoring
+      - Configuration
+      - Cybersecurity
+    tags_raw:
+      - keyword-monitoring
       - configuration
       - cybersecurity
     properties:
@@ -151,6 +186,11 @@ apis:
     humanURL: https://developers.cybelangel.com/docs/threat-intelligence-api/38e63ab3d5c42-fetch-threat-intelligence-claimed-attacks
     baseURL: https://api.cybelangel.com
     tags:
+      - Threat Intelligence
+      - Ransomware
+      - threat-actors
+      - Cybersecurity
+    tags_raw:
       - threat-intelligence
       - ransomware
       - threat-actors
@@ -172,6 +212,11 @@ apis:
     humanURL: https://developers.cybelangel.com/docs/audit-logs-api/72b66de24898e-cybel-angel-audit-logs-api
     baseURL: https://api.cybelangel.com
     tags:
+      - Audit Logs
+      - Compliance
+      - Observability
+      - Cybersecurity
+    tags_raw:
       - audit-logs
       - compliance
       - observability
@@ -198,6 +243,12 @@ apis:
     humanURL: https://developers.cybelangel.com/docs/partner-api/72b66de24898e-cybel-angel-partners-api
     baseURL: https://api.cybelangel.com
     tags:
+      - Partner API
+      - MSSP
+      - Asset Inventory
+      - keyword-monitoring
+      - Multi-Tenant
+    tags_raw:
       - partner-api
       - mssp
       - asset-inventory
