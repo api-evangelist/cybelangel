@@ -50,225 +50,897 @@ tags_raw:
   - asset-inventory
   - audit-logs
 apis:
-  - name: CybelAngel Reports API
-    description: >-
-      The original CybelAngel Platform API. Retrieves incident reports (v2 search plus
-      per-report detail, mirror listings in JSON/CSV/archive, PDF export, attachments and
-      comments), the leaked-credential watchlist and its CSV export, the malicious-domain
-      watchlist, report assets, report volume statistics, and the caller's report
-      permissions. Also moves report and credential statuses and files analyst remediation
-      requests. OAuth 2.0 client-credentials with a documented scope set.
-    humanURL: https://developers.cybelangel.com/docs/cybelangel-platform-api/39d4926befc14-what-can-i-do-with-this-api
-    baseURL: https://platform.cybelangel.com/api
-    tags:
-      - Incident Reports
-      - Credential Intelligence
-      - Domain Monitoring
-      - Remediation
-      - Cybersecurity
-    tags_raw:
-      - incident-reports
-      - credential-intelligence
-      - domain-monitoring
-      - remediation
-      - cybersecurity
-    properties:
-      - type: OpenAPI
-        url: openapi/cybelangel-platform-reports-openapi.yml
-      - type: Documentation
-        url: https://developers.cybelangel.com/docs/cybelangel-platform-api/39d4926befc14-what-can-i-do-with-this-api
-      - type: APIReference
-        url: https://developers.cybelangel.com/docs/cybelangel-platform-api/68a341c676710-references
-      - type: GettingStarted
-        url: https://developers.cybelangel.com/docs/cybelangel-platform-api/05d245301ecc5-get-your-api-credentials
-      - type: Authentication
-        url: https://developers.cybelangel.com/docs/cybelangel-platform-api/b6b6c2d4906e9-authentication
-      - type: OAuthScopes
-        url: scopes/cybelangel-scopes.yml
-      - type: Sandbox
-        url: https://stoplight.io/mocks/cybelangel/cybelangel-platform-api/84330
-      - type: Overlay
-        url: overlays/cybelangel-platform-reports-overlay.yaml
-  - name: CybelAngel Alerts API
-    description: >-
-      "Alerts in Feed" — real-time machine-readable access to the alerts CybelAngel's
-      collection and ML pipeline generates across ADM, Board, Cloud Drive, DNS, Database,
-      Docshare, Codeshare, Fileserver, Leak, Paste and RSS categories. Search by keyword,
-      IP, hostname and detection date; fetch a single alert; fetch leaked credentials and
-      codeshare findings attached to an alert; fetch a DNS screenshot; PATCH a customer
-      assessment status; and retrieve the same alerts as OASIS STIX bundles.
-    humanURL: https://developers.cybelangel.com/docs/alerts-api/72b66de24898e-cybel-angel-alerts-api-real-time-threat-intelligence
-    baseURL: https://api.cybelangel.com
-    tags:
-      - security-alerts
-      - Threat Intelligence
-      - STIX
-      - Dark Web Monitoring
-      - Credential Intelligence
-    tags_raw:
-      - security-alerts
-      - threat-intelligence
-      - stix
-      - dark-web-monitoring
-      - credential-intelligence
-    properties:
-      - type: OpenAPI
-        url: openapi/cybelangel-alerts-openapi.yml
-      - type: Documentation
-        url: https://developers.cybelangel.com/docs/alerts-api/72b66de24898e-cybel-angel-alerts-api-real-time-threat-intelligence
-      - type: APIReference
-        url: https://developers.cybelangel.com/docs/alerts-api/a3ab024122156-search-alerts
-      - type: GettingStarted
-        url: https://developers.cybelangel.com/docs/alerts-api/c53add3c8b16f-getting-started
-      - type: RateLimits
-        url: https://developers.cybelangel.com/docs/alerts-api/304dab003eb13-limitations
-      - type: Sandbox
-        url: https://stoplight.io/mocks/cybelangel/alerts-api/133714
-      - type: Overlay
-        url: overlays/cybelangel-alerts-overlay.yaml
-  - name: CybelAngel ADM Inventory API
-    description: >-
-      Attack surface (Asset Discovery & Monitoring) inventory. Lists discovered assets and
-      their hostnames, lists threats joined with the owning asset record, and writes back
-      asset and asset-threat statuses so an external system can triage shadow IT and
-      exposed services programmatically.
-    humanURL: https://developers.cybelangel.com/docs/adm-inventory-api/7e88d945427a4-fetch-assets-details-from-adm-inventory
-    baseURL: https://api.cybelangel.com
-    tags:
-      - external-attack-surface-management
-      - Asset Inventory
-      - Vulnerability Management
-      - Cybersecurity
-    tags_raw:
-      - external-attack-surface-management
-      - asset-inventory
-      - vulnerability-management
-      - cybersecurity
-    properties:
-      - type: OpenAPI
-        url: openapi/cybelangel-adm-inventory-openapi.yml
-      - type: Documentation
-        url: https://developers.cybelangel.com/docs/adm-inventory-api/7e88d945427a4-fetch-assets-details-from-adm-inventory
-      - type: Sandbox
-        url: https://stoplight.io/mocks/cybelangel/adm-inventory-api/133714
-      - type: Overlay
-        url: overlays/cybelangel-adm-inventory-overlay.yaml
-  - name: CybelAngel Keywords API
-    description: >-
-      Manages the keyword set that drives CybelAngel detection: list, create, update and
-      change the status of monitored keywords, and list the workspaces those keywords
-      belong to. Shipped on the Q3 2026 roadmap as "Keywords API — programmatic keyword
-      management".
-    humanURL: https://developers.cybelangel.com/docs/keywords-api/c812fc6b544b0-manipulate-your-keywords
-    baseURL: https://api.cybelangel.com
-    tags:
-      - keyword-monitoring
-      - Configuration
-      - Cybersecurity
-    tags_raw:
-      - keyword-monitoring
-      - configuration
-      - cybersecurity
-    properties:
-      - type: OpenAPI
-        url: openapi/cybelangel-keywords-openapi.yml
-      - type: Documentation
-        url: https://developers.cybelangel.com/docs/keywords-api/c812fc6b544b0-manipulate-your-keywords
-      - type: Sandbox
-        url: https://stoplight.io/mocks/cybelangel/keywords-api/133714
-      - type: Overlay
-        url: overlays/cybelangel-keywords-overlay.yaml
-  - name: CybelAngel Threat Intelligence API
-    description: >-
-      Returns claimed attacks observed by CybelAngel's threat-intelligence collection —
-      ransomware and extortion claims attributed to threat actors — for ingestion into a
-      SIEM, TIP or internal risk dashboard.
-    humanURL: https://developers.cybelangel.com/docs/threat-intelligence-api/38e63ab3d5c42-fetch-threat-intelligence-claimed-attacks
-    baseURL: https://api.cybelangel.com
-    tags:
-      - Threat Intelligence
-      - Ransomware
-      - threat-actors
-      - Cybersecurity
-    tags_raw:
-      - threat-intelligence
-      - ransomware
-      - threat-actors
-      - cybersecurity
-    properties:
-      - type: OpenAPI
-        url: openapi/cybelangel-threat-intelligence-openapi.yml
-      - type: Documentation
-        url: https://developers.cybelangel.com/docs/threat-intelligence-api/38e63ab3d5c42-fetch-threat-intelligence-claimed-attacks
-      - type: Sandbox
-        url: https://stoplight.io/mocks/cybelangel/threat-intelligence-api/133714
-      - type: Overlay
-        url: overlays/cybelangel-threat-intelligence-overlay.yaml
-  - name: CybelAngel Audit Logs API
-    description: >-
-      Searches the audit trail for an organization — who did what in the CybelAngel
-      platform — scoped by organization_id in the path, for export into a SIEM or a
-      compliance evidence store. Shipped Q2 2026 as "Audit Log Accessibility".
-    humanURL: https://developers.cybelangel.com/docs/audit-logs-api/72b66de24898e-cybel-angel-audit-logs-api
-    baseURL: https://api.cybelangel.com
-    tags:
-      - Audit Logs
-      - Compliance
-      - Observability
-      - Cybersecurity
-    tags_raw:
-      - audit-logs
-      - compliance
-      - observability
-      - cybersecurity
-    properties:
-      - type: OpenAPI
-        url: openapi/cybelangel-audit-logs-openapi.yml
-      - type: Documentation
-        url: https://developers.cybelangel.com/docs/audit-logs-api/72b66de24898e-cybel-angel-audit-logs-api
-      - type: GettingStarted
-        url: https://developers.cybelangel.com/docs/audit-logs-api/f9723159f94ff-getting-started-guide-audit-logs-api
-      - type: Authentication
-        url: https://developers.cybelangel.com/docs/audit-logs-api/b87d37ae48a0d-authentication
-      - type: Sandbox
-        url: https://stoplight.io/mocks/cybelangel/audit-logs-api/182542
-      - type: Overlay
-        url: overlays/cybelangel-audit-logs-overlay.yaml
-  - name: CybelAngel Partner API
-    description: >-
-      The MSSP/reseller surface. Mirrors the ADM Inventory, Keywords and Workspaces
-      operations but scoped to a client organization via an {organization_id} path
-      parameter, so a partner can manage assets, threats and keywords across the client
-      organizations it administers.
-    humanURL: https://developers.cybelangel.com/docs/partner-api/72b66de24898e-cybel-angel-partners-api
-    baseURL: https://api.cybelangel.com
-    tags:
-      - Partner API
-      - MSSP
-      - Asset Inventory
-      - keyword-monitoring
-      - Multi-Tenant
-    tags_raw:
-      - partner-api
-      - mssp
-      - asset-inventory
-      - keyword-monitoring
-      - multi-tenant
-    properties:
-      - type: OpenAPI
-        url: openapi/cybelangel-partner-openapi.yml
-      - type: Documentation
-        url: https://developers.cybelangel.com/docs/partner-api/72b66de24898e-cybel-angel-partners-api
-      - type: Sandbox
-        url: https://stoplight.io/mocks/cybelangel/partner-api/133714
-      - type: Overlay
-        url: overlays/cybelangel-partner-overlay.yaml
+- aid: cybelangel:cybelangel-adm-inventory-api
+  name: CybelAngel ADM Inventory API
+  description: Manipulate ADM inventory assets and threats.
+  humanURL: >-
+    https://developers.cybelangel.com/docs/cybelangel-platform-api/39d4926befc14-what-can-i-do-with-this-api
+  baseURL: https://platform.cybelangel.com/api
+  tags:
+  - ADM Inventory
+  properties:
+  - type: OpenAPI
+    url: openapi/cybelangel-adm-inventory-api-openapi.yml
+  - type: Documentation
+    url: >-
+      https://developers.cybelangel.com/docs/cybelangel-platform-api/39d4926befc14-what-can-i-do-with-this-api
+  - type: APIReference
+    url: https://developers.cybelangel.com/docs/cybelangel-platform-api/68a341c676710-references
+  - type: GettingStarted
+    url: >-
+      https://developers.cybelangel.com/docs/cybelangel-platform-api/05d245301ecc5-get-your-api-credentials
+  - type: Authentication
+    url: >-
+      https://developers.cybelangel.com/docs/cybelangel-platform-api/b6b6c2d4906e9-authentication
+  - type: OAuthScopes
+    url: scopes/cybelangel-scopes.yml
+  - type: Sandbox
+    url: https://stoplight.io/mocks/cybelangel/cybelangel-platform-api/84330
+  - type: Documentation
+    url: >-
+      https://developers.cybelangel.com/docs/alerts-api/72b66de24898e-cybel-angel-alerts-api-real-time-threat-intelligence
+  - type: APIReference
+    url: https://developers.cybelangel.com/docs/alerts-api/a3ab024122156-search-alerts
+  - type: GettingStarted
+    url: https://developers.cybelangel.com/docs/alerts-api/c53add3c8b16f-getting-started
+  - type: RateLimits
+    url: https://developers.cybelangel.com/docs/alerts-api/304dab003eb13-limitations
+  - type: Sandbox
+    url: https://stoplight.io/mocks/cybelangel/alerts-api/133714
+  - type: Documentation
+    url: >-
+      https://developers.cybelangel.com/docs/adm-inventory-api/7e88d945427a4-fetch-assets-details-from-adm-inventory
+  - type: Sandbox
+    url: https://stoplight.io/mocks/cybelangel/adm-inventory-api/133714
+  - type: Documentation
+    url: >-
+      https://developers.cybelangel.com/docs/keywords-api/c812fc6b544b0-manipulate-your-keywords
+  - type: Sandbox
+    url: https://stoplight.io/mocks/cybelangel/keywords-api/133714
+  - type: Documentation
+    url: >-
+      https://developers.cybelangel.com/docs/threat-intelligence-api/38e63ab3d5c42-fetch-threat-intelligence-claimed-attacks
+  - type: Sandbox
+    url: https://stoplight.io/mocks/cybelangel/threat-intelligence-api/133714
+  - type: Documentation
+    url: >-
+      https://developers.cybelangel.com/docs/audit-logs-api/72b66de24898e-cybel-angel-audit-logs-api
+  - type: GettingStarted
+    url: >-
+      https://developers.cybelangel.com/docs/audit-logs-api/f9723159f94ff-getting-started-guide-audit-logs-api
+  - type: Authentication
+    url: https://developers.cybelangel.com/docs/audit-logs-api/b87d37ae48a0d-authentication
+  - type: Sandbox
+    url: https://stoplight.io/mocks/cybelangel/audit-logs-api/182542
+  - type: Documentation
+    url: >-
+      https://developers.cybelangel.com/docs/partner-api/72b66de24898e-cybel-angel-partners-api
+  - type: Sandbox
+    url: https://stoplight.io/mocks/cybelangel/partner-api/133714
+- aid: cybelangel:cybelangel-alerts-api
+  name: CybelAngel Alerts API
+  description: Alerts
+  humanURL: >-
+    https://developers.cybelangel.com/docs/cybelangel-platform-api/39d4926befc14-what-can-i-do-with-this-api
+  baseURL: https://platform.cybelangel.com/api
+  tags:
+  - alerts
+  properties:
+  - type: OpenAPI
+    url: openapi/cybelangel-alerts-api-openapi.yml
+  - type: Documentation
+    url: >-
+      https://developers.cybelangel.com/docs/cybelangel-platform-api/39d4926befc14-what-can-i-do-with-this-api
+  - type: APIReference
+    url: https://developers.cybelangel.com/docs/cybelangel-platform-api/68a341c676710-references
+  - type: GettingStarted
+    url: >-
+      https://developers.cybelangel.com/docs/cybelangel-platform-api/05d245301ecc5-get-your-api-credentials
+  - type: Authentication
+    url: >-
+      https://developers.cybelangel.com/docs/cybelangel-platform-api/b6b6c2d4906e9-authentication
+  - type: OAuthScopes
+    url: scopes/cybelangel-scopes.yml
+  - type: Sandbox
+    url: https://stoplight.io/mocks/cybelangel/cybelangel-platform-api/84330
+  - type: Documentation
+    url: >-
+      https://developers.cybelangel.com/docs/alerts-api/72b66de24898e-cybel-angel-alerts-api-real-time-threat-intelligence
+  - type: APIReference
+    url: https://developers.cybelangel.com/docs/alerts-api/a3ab024122156-search-alerts
+  - type: GettingStarted
+    url: https://developers.cybelangel.com/docs/alerts-api/c53add3c8b16f-getting-started
+  - type: RateLimits
+    url: https://developers.cybelangel.com/docs/alerts-api/304dab003eb13-limitations
+  - type: Sandbox
+    url: https://stoplight.io/mocks/cybelangel/alerts-api/133714
+  - type: Documentation
+    url: >-
+      https://developers.cybelangel.com/docs/adm-inventory-api/7e88d945427a4-fetch-assets-details-from-adm-inventory
+  - type: Sandbox
+    url: https://stoplight.io/mocks/cybelangel/adm-inventory-api/133714
+  - type: Documentation
+    url: >-
+      https://developers.cybelangel.com/docs/keywords-api/c812fc6b544b0-manipulate-your-keywords
+  - type: Sandbox
+    url: https://stoplight.io/mocks/cybelangel/keywords-api/133714
+  - type: Documentation
+    url: >-
+      https://developers.cybelangel.com/docs/threat-intelligence-api/38e63ab3d5c42-fetch-threat-intelligence-claimed-attacks
+  - type: Sandbox
+    url: https://stoplight.io/mocks/cybelangel/threat-intelligence-api/133714
+  - type: Documentation
+    url: >-
+      https://developers.cybelangel.com/docs/audit-logs-api/72b66de24898e-cybel-angel-audit-logs-api
+  - type: GettingStarted
+    url: >-
+      https://developers.cybelangel.com/docs/audit-logs-api/f9723159f94ff-getting-started-guide-audit-logs-api
+  - type: Authentication
+    url: https://developers.cybelangel.com/docs/audit-logs-api/b87d37ae48a0d-authentication
+  - type: Sandbox
+    url: https://stoplight.io/mocks/cybelangel/audit-logs-api/182542
+  - type: Documentation
+    url: >-
+      https://developers.cybelangel.com/docs/partner-api/72b66de24898e-cybel-angel-partners-api
+  - type: Sandbox
+    url: https://stoplight.io/mocks/cybelangel/partner-api/133714
+- aid: cybelangel:cybelangel-asset-api
+  name: CybelAngel Asset API
+  description: Accessing the application assets
+  humanURL: >-
+    https://developers.cybelangel.com/docs/cybelangel-platform-api/39d4926befc14-what-can-i-do-with-this-api
+  baseURL: https://platform.cybelangel.com/api
+  tags:
+  - Asset
+  properties:
+  - type: OpenAPI
+    url: openapi/cybelangel-asset-api-openapi.yml
+  - type: Documentation
+    url: >-
+      https://developers.cybelangel.com/docs/cybelangel-platform-api/39d4926befc14-what-can-i-do-with-this-api
+  - type: APIReference
+    url: https://developers.cybelangel.com/docs/cybelangel-platform-api/68a341c676710-references
+  - type: GettingStarted
+    url: >-
+      https://developers.cybelangel.com/docs/cybelangel-platform-api/05d245301ecc5-get-your-api-credentials
+  - type: Authentication
+    url: >-
+      https://developers.cybelangel.com/docs/cybelangel-platform-api/b6b6c2d4906e9-authentication
+  - type: OAuthScopes
+    url: scopes/cybelangel-scopes.yml
+  - type: Sandbox
+    url: https://stoplight.io/mocks/cybelangel/cybelangel-platform-api/84330
+  - type: Documentation
+    url: >-
+      https://developers.cybelangel.com/docs/alerts-api/72b66de24898e-cybel-angel-alerts-api-real-time-threat-intelligence
+  - type: APIReference
+    url: https://developers.cybelangel.com/docs/alerts-api/a3ab024122156-search-alerts
+  - type: GettingStarted
+    url: https://developers.cybelangel.com/docs/alerts-api/c53add3c8b16f-getting-started
+  - type: RateLimits
+    url: https://developers.cybelangel.com/docs/alerts-api/304dab003eb13-limitations
+  - type: Sandbox
+    url: https://stoplight.io/mocks/cybelangel/alerts-api/133714
+  - type: Documentation
+    url: >-
+      https://developers.cybelangel.com/docs/adm-inventory-api/7e88d945427a4-fetch-assets-details-from-adm-inventory
+  - type: Sandbox
+    url: https://stoplight.io/mocks/cybelangel/adm-inventory-api/133714
+  - type: Documentation
+    url: >-
+      https://developers.cybelangel.com/docs/keywords-api/c812fc6b544b0-manipulate-your-keywords
+  - type: Sandbox
+    url: https://stoplight.io/mocks/cybelangel/keywords-api/133714
+  - type: Documentation
+    url: >-
+      https://developers.cybelangel.com/docs/threat-intelligence-api/38e63ab3d5c42-fetch-threat-intelligence-claimed-attacks
+  - type: Sandbox
+    url: https://stoplight.io/mocks/cybelangel/threat-intelligence-api/133714
+  - type: Documentation
+    url: >-
+      https://developers.cybelangel.com/docs/audit-logs-api/72b66de24898e-cybel-angel-audit-logs-api
+  - type: GettingStarted
+    url: >-
+      https://developers.cybelangel.com/docs/audit-logs-api/f9723159f94ff-getting-started-guide-audit-logs-api
+  - type: Authentication
+    url: https://developers.cybelangel.com/docs/audit-logs-api/b87d37ae48a0d-authentication
+  - type: Sandbox
+    url: https://stoplight.io/mocks/cybelangel/audit-logs-api/182542
+  - type: Documentation
+    url: >-
+      https://developers.cybelangel.com/docs/partner-api/72b66de24898e-cybel-angel-partners-api
+  - type: Sandbox
+    url: https://stoplight.io/mocks/cybelangel/partner-api/133714
+- aid: cybelangel:cybelangel-audit-logs-api
+  name: CybelAngel audit logs API
+  description: Audit Logs Public API
+  humanURL: >-
+    https://developers.cybelangel.com/docs/cybelangel-platform-api/39d4926befc14-what-can-i-do-with-this-api
+  baseURL: https://platform.cybelangel.com/api
+  tags:
+  - audit logs
+  properties:
+  - type: OpenAPI
+    url: openapi/cybelangel-audit-logs-api-openapi.yml
+  - type: Documentation
+    url: >-
+      https://developers.cybelangel.com/docs/cybelangel-platform-api/39d4926befc14-what-can-i-do-with-this-api
+  - type: APIReference
+    url: https://developers.cybelangel.com/docs/cybelangel-platform-api/68a341c676710-references
+  - type: GettingStarted
+    url: >-
+      https://developers.cybelangel.com/docs/cybelangel-platform-api/05d245301ecc5-get-your-api-credentials
+  - type: Authentication
+    url: >-
+      https://developers.cybelangel.com/docs/cybelangel-platform-api/b6b6c2d4906e9-authentication
+  - type: OAuthScopes
+    url: scopes/cybelangel-scopes.yml
+  - type: Sandbox
+    url: https://stoplight.io/mocks/cybelangel/cybelangel-platform-api/84330
+  - type: Documentation
+    url: >-
+      https://developers.cybelangel.com/docs/alerts-api/72b66de24898e-cybel-angel-alerts-api-real-time-threat-intelligence
+  - type: APIReference
+    url: https://developers.cybelangel.com/docs/alerts-api/a3ab024122156-search-alerts
+  - type: GettingStarted
+    url: https://developers.cybelangel.com/docs/alerts-api/c53add3c8b16f-getting-started
+  - type: RateLimits
+    url: https://developers.cybelangel.com/docs/alerts-api/304dab003eb13-limitations
+  - type: Sandbox
+    url: https://stoplight.io/mocks/cybelangel/alerts-api/133714
+  - type: Documentation
+    url: >-
+      https://developers.cybelangel.com/docs/adm-inventory-api/7e88d945427a4-fetch-assets-details-from-adm-inventory
+  - type: Sandbox
+    url: https://stoplight.io/mocks/cybelangel/adm-inventory-api/133714
+  - type: Documentation
+    url: >-
+      https://developers.cybelangel.com/docs/keywords-api/c812fc6b544b0-manipulate-your-keywords
+  - type: Sandbox
+    url: https://stoplight.io/mocks/cybelangel/keywords-api/133714
+  - type: Documentation
+    url: >-
+      https://developers.cybelangel.com/docs/threat-intelligence-api/38e63ab3d5c42-fetch-threat-intelligence-claimed-attacks
+  - type: Sandbox
+    url: https://stoplight.io/mocks/cybelangel/threat-intelligence-api/133714
+  - type: Documentation
+    url: >-
+      https://developers.cybelangel.com/docs/audit-logs-api/72b66de24898e-cybel-angel-audit-logs-api
+  - type: GettingStarted
+    url: >-
+      https://developers.cybelangel.com/docs/audit-logs-api/f9723159f94ff-getting-started-guide-audit-logs-api
+  - type: Authentication
+    url: https://developers.cybelangel.com/docs/audit-logs-api/b87d37ae48a0d-authentication
+  - type: Sandbox
+    url: https://stoplight.io/mocks/cybelangel/audit-logs-api/182542
+  - type: Documentation
+    url: >-
+      https://developers.cybelangel.com/docs/partner-api/72b66de24898e-cybel-angel-partners-api
+  - type: Sandbox
+    url: https://stoplight.io/mocks/cybelangel/partner-api/133714
+- aid: cybelangel:cybelangel-credential-watchlist-api
+  name: CybelAngel Credential watchlist API
+  description: Credentials incident reports and credentials
+  humanURL: >-
+    https://developers.cybelangel.com/docs/cybelangel-platform-api/39d4926befc14-what-can-i-do-with-this-api
+  baseURL: https://platform.cybelangel.com/api
+  tags:
+  - Credential watchlist
+  properties:
+  - type: OpenAPI
+    url: openapi/cybelangel-credential-watchlist-api-openapi.yml
+  - type: Documentation
+    url: >-
+      https://developers.cybelangel.com/docs/cybelangel-platform-api/39d4926befc14-what-can-i-do-with-this-api
+  - type: APIReference
+    url: https://developers.cybelangel.com/docs/cybelangel-platform-api/68a341c676710-references
+  - type: GettingStarted
+    url: >-
+      https://developers.cybelangel.com/docs/cybelangel-platform-api/05d245301ecc5-get-your-api-credentials
+  - type: Authentication
+    url: >-
+      https://developers.cybelangel.com/docs/cybelangel-platform-api/b6b6c2d4906e9-authentication
+  - type: OAuthScopes
+    url: scopes/cybelangel-scopes.yml
+  - type: Sandbox
+    url: https://stoplight.io/mocks/cybelangel/cybelangel-platform-api/84330
+  - type: Documentation
+    url: >-
+      https://developers.cybelangel.com/docs/alerts-api/72b66de24898e-cybel-angel-alerts-api-real-time-threat-intelligence
+  - type: APIReference
+    url: https://developers.cybelangel.com/docs/alerts-api/a3ab024122156-search-alerts
+  - type: GettingStarted
+    url: https://developers.cybelangel.com/docs/alerts-api/c53add3c8b16f-getting-started
+  - type: RateLimits
+    url: https://developers.cybelangel.com/docs/alerts-api/304dab003eb13-limitations
+  - type: Sandbox
+    url: https://stoplight.io/mocks/cybelangel/alerts-api/133714
+  - type: Documentation
+    url: >-
+      https://developers.cybelangel.com/docs/adm-inventory-api/7e88d945427a4-fetch-assets-details-from-adm-inventory
+  - type: Sandbox
+    url: https://stoplight.io/mocks/cybelangel/adm-inventory-api/133714
+  - type: Documentation
+    url: >-
+      https://developers.cybelangel.com/docs/keywords-api/c812fc6b544b0-manipulate-your-keywords
+  - type: Sandbox
+    url: https://stoplight.io/mocks/cybelangel/keywords-api/133714
+  - type: Documentation
+    url: >-
+      https://developers.cybelangel.com/docs/threat-intelligence-api/38e63ab3d5c42-fetch-threat-intelligence-claimed-attacks
+  - type: Sandbox
+    url: https://stoplight.io/mocks/cybelangel/threat-intelligence-api/133714
+  - type: Documentation
+    url: >-
+      https://developers.cybelangel.com/docs/audit-logs-api/72b66de24898e-cybel-angel-audit-logs-api
+  - type: GettingStarted
+    url: >-
+      https://developers.cybelangel.com/docs/audit-logs-api/f9723159f94ff-getting-started-guide-audit-logs-api
+  - type: Authentication
+    url: https://developers.cybelangel.com/docs/audit-logs-api/b87d37ae48a0d-authentication
+  - type: Sandbox
+    url: https://stoplight.io/mocks/cybelangel/audit-logs-api/182542
+  - type: Documentation
+    url: >-
+      https://developers.cybelangel.com/docs/partner-api/72b66de24898e-cybel-angel-partners-api
+  - type: Sandbox
+    url: https://stoplight.io/mocks/cybelangel/partner-api/133714
+- aid: cybelangel:cybelangel-domain-watchlist-api
+  name: CybelAngel Domain watchlist API
+  description: Domain Protection
+  humanURL: >-
+    https://developers.cybelangel.com/docs/cybelangel-platform-api/39d4926befc14-what-can-i-do-with-this-api
+  baseURL: https://platform.cybelangel.com/api
+  tags:
+  - Domain watchlist
+  properties:
+  - type: OpenAPI
+    url: openapi/cybelangel-domain-watchlist-api-openapi.yml
+  - type: Documentation
+    url: >-
+      https://developers.cybelangel.com/docs/cybelangel-platform-api/39d4926befc14-what-can-i-do-with-this-api
+  - type: APIReference
+    url: https://developers.cybelangel.com/docs/cybelangel-platform-api/68a341c676710-references
+  - type: GettingStarted
+    url: >-
+      https://developers.cybelangel.com/docs/cybelangel-platform-api/05d245301ecc5-get-your-api-credentials
+  - type: Authentication
+    url: >-
+      https://developers.cybelangel.com/docs/cybelangel-platform-api/b6b6c2d4906e9-authentication
+  - type: OAuthScopes
+    url: scopes/cybelangel-scopes.yml
+  - type: Sandbox
+    url: https://stoplight.io/mocks/cybelangel/cybelangel-platform-api/84330
+  - type: Documentation
+    url: >-
+      https://developers.cybelangel.com/docs/alerts-api/72b66de24898e-cybel-angel-alerts-api-real-time-threat-intelligence
+  - type: APIReference
+    url: https://developers.cybelangel.com/docs/alerts-api/a3ab024122156-search-alerts
+  - type: GettingStarted
+    url: https://developers.cybelangel.com/docs/alerts-api/c53add3c8b16f-getting-started
+  - type: RateLimits
+    url: https://developers.cybelangel.com/docs/alerts-api/304dab003eb13-limitations
+  - type: Sandbox
+    url: https://stoplight.io/mocks/cybelangel/alerts-api/133714
+  - type: Documentation
+    url: >-
+      https://developers.cybelangel.com/docs/adm-inventory-api/7e88d945427a4-fetch-assets-details-from-adm-inventory
+  - type: Sandbox
+    url: https://stoplight.io/mocks/cybelangel/adm-inventory-api/133714
+  - type: Documentation
+    url: >-
+      https://developers.cybelangel.com/docs/keywords-api/c812fc6b544b0-manipulate-your-keywords
+  - type: Sandbox
+    url: https://stoplight.io/mocks/cybelangel/keywords-api/133714
+  - type: Documentation
+    url: >-
+      https://developers.cybelangel.com/docs/threat-intelligence-api/38e63ab3d5c42-fetch-threat-intelligence-claimed-attacks
+  - type: Sandbox
+    url: https://stoplight.io/mocks/cybelangel/threat-intelligence-api/133714
+  - type: Documentation
+    url: >-
+      https://developers.cybelangel.com/docs/audit-logs-api/72b66de24898e-cybel-angel-audit-logs-api
+  - type: GettingStarted
+    url: >-
+      https://developers.cybelangel.com/docs/audit-logs-api/f9723159f94ff-getting-started-guide-audit-logs-api
+  - type: Authentication
+    url: https://developers.cybelangel.com/docs/audit-logs-api/b87d37ae48a0d-authentication
+  - type: Sandbox
+    url: https://stoplight.io/mocks/cybelangel/audit-logs-api/182542
+  - type: Documentation
+    url: >-
+      https://developers.cybelangel.com/docs/partner-api/72b66de24898e-cybel-angel-partners-api
+  - type: Sandbox
+    url: https://stoplight.io/mocks/cybelangel/partner-api/133714
+- aid: cybelangel:cybelangel-incident-reports-api
+  name: CybelAngel Incident reports API
+  description: Manipulate incident reports.
+  humanURL: >-
+    https://developers.cybelangel.com/docs/cybelangel-platform-api/39d4926befc14-what-can-i-do-with-this-api
+  baseURL: https://platform.cybelangel.com/api
+  tags:
+  - Incident reports
+  properties:
+  - type: OpenAPI
+    url: openapi/cybelangel-incident-reports-api-openapi.yml
+  - type: Documentation
+    url: >-
+      https://developers.cybelangel.com/docs/cybelangel-platform-api/39d4926befc14-what-can-i-do-with-this-api
+  - type: APIReference
+    url: https://developers.cybelangel.com/docs/cybelangel-platform-api/68a341c676710-references
+  - type: GettingStarted
+    url: >-
+      https://developers.cybelangel.com/docs/cybelangel-platform-api/05d245301ecc5-get-your-api-credentials
+  - type: Authentication
+    url: >-
+      https://developers.cybelangel.com/docs/cybelangel-platform-api/b6b6c2d4906e9-authentication
+  - type: OAuthScopes
+    url: scopes/cybelangel-scopes.yml
+  - type: Sandbox
+    url: https://stoplight.io/mocks/cybelangel/cybelangel-platform-api/84330
+  - type: Documentation
+    url: >-
+      https://developers.cybelangel.com/docs/alerts-api/72b66de24898e-cybel-angel-alerts-api-real-time-threat-intelligence
+  - type: APIReference
+    url: https://developers.cybelangel.com/docs/alerts-api/a3ab024122156-search-alerts
+  - type: GettingStarted
+    url: https://developers.cybelangel.com/docs/alerts-api/c53add3c8b16f-getting-started
+  - type: RateLimits
+    url: https://developers.cybelangel.com/docs/alerts-api/304dab003eb13-limitations
+  - type: Sandbox
+    url: https://stoplight.io/mocks/cybelangel/alerts-api/133714
+  - type: Documentation
+    url: >-
+      https://developers.cybelangel.com/docs/adm-inventory-api/7e88d945427a4-fetch-assets-details-from-adm-inventory
+  - type: Sandbox
+    url: https://stoplight.io/mocks/cybelangel/adm-inventory-api/133714
+  - type: Documentation
+    url: >-
+      https://developers.cybelangel.com/docs/keywords-api/c812fc6b544b0-manipulate-your-keywords
+  - type: Sandbox
+    url: https://stoplight.io/mocks/cybelangel/keywords-api/133714
+  - type: Documentation
+    url: >-
+      https://developers.cybelangel.com/docs/threat-intelligence-api/38e63ab3d5c42-fetch-threat-intelligence-claimed-attacks
+  - type: Sandbox
+    url: https://stoplight.io/mocks/cybelangel/threat-intelligence-api/133714
+  - type: Documentation
+    url: >-
+      https://developers.cybelangel.com/docs/audit-logs-api/72b66de24898e-cybel-angel-audit-logs-api
+  - type: GettingStarted
+    url: >-
+      https://developers.cybelangel.com/docs/audit-logs-api/f9723159f94ff-getting-started-guide-audit-logs-api
+  - type: Authentication
+    url: https://developers.cybelangel.com/docs/audit-logs-api/b87d37ae48a0d-authentication
+  - type: Sandbox
+    url: https://stoplight.io/mocks/cybelangel/audit-logs-api/182542
+  - type: Documentation
+    url: >-
+      https://developers.cybelangel.com/docs/partner-api/72b66de24898e-cybel-angel-partners-api
+  - type: Sandbox
+    url: https://stoplight.io/mocks/cybelangel/partner-api/133714
+- aid: cybelangel:cybelangel-keywords-api
+  name: CybelAngel Keywords API
+  description: Manipulate keywords.
+  humanURL: >-
+    https://developers.cybelangel.com/docs/cybelangel-platform-api/39d4926befc14-what-can-i-do-with-this-api
+  baseURL: https://platform.cybelangel.com/api
+  tags:
+  - Keywords
+  properties:
+  - type: OpenAPI
+    url: openapi/cybelangel-keywords-api-openapi.yml
+  - type: Documentation
+    url: >-
+      https://developers.cybelangel.com/docs/cybelangel-platform-api/39d4926befc14-what-can-i-do-with-this-api
+  - type: APIReference
+    url: https://developers.cybelangel.com/docs/cybelangel-platform-api/68a341c676710-references
+  - type: GettingStarted
+    url: >-
+      https://developers.cybelangel.com/docs/cybelangel-platform-api/05d245301ecc5-get-your-api-credentials
+  - type: Authentication
+    url: >-
+      https://developers.cybelangel.com/docs/cybelangel-platform-api/b6b6c2d4906e9-authentication
+  - type: OAuthScopes
+    url: scopes/cybelangel-scopes.yml
+  - type: Sandbox
+    url: https://stoplight.io/mocks/cybelangel/cybelangel-platform-api/84330
+  - type: Documentation
+    url: >-
+      https://developers.cybelangel.com/docs/alerts-api/72b66de24898e-cybel-angel-alerts-api-real-time-threat-intelligence
+  - type: APIReference
+    url: https://developers.cybelangel.com/docs/alerts-api/a3ab024122156-search-alerts
+  - type: GettingStarted
+    url: https://developers.cybelangel.com/docs/alerts-api/c53add3c8b16f-getting-started
+  - type: RateLimits
+    url: https://developers.cybelangel.com/docs/alerts-api/304dab003eb13-limitations
+  - type: Sandbox
+    url: https://stoplight.io/mocks/cybelangel/alerts-api/133714
+  - type: Documentation
+    url: >-
+      https://developers.cybelangel.com/docs/adm-inventory-api/7e88d945427a4-fetch-assets-details-from-adm-inventory
+  - type: Sandbox
+    url: https://stoplight.io/mocks/cybelangel/adm-inventory-api/133714
+  - type: Documentation
+    url: >-
+      https://developers.cybelangel.com/docs/keywords-api/c812fc6b544b0-manipulate-your-keywords
+  - type: Sandbox
+    url: https://stoplight.io/mocks/cybelangel/keywords-api/133714
+  - type: Documentation
+    url: >-
+      https://developers.cybelangel.com/docs/threat-intelligence-api/38e63ab3d5c42-fetch-threat-intelligence-claimed-attacks
+  - type: Sandbox
+    url: https://stoplight.io/mocks/cybelangel/threat-intelligence-api/133714
+  - type: Documentation
+    url: >-
+      https://developers.cybelangel.com/docs/audit-logs-api/72b66de24898e-cybel-angel-audit-logs-api
+  - type: GettingStarted
+    url: >-
+      https://developers.cybelangel.com/docs/audit-logs-api/f9723159f94ff-getting-started-guide-audit-logs-api
+  - type: Authentication
+    url: https://developers.cybelangel.com/docs/audit-logs-api/b87d37ae48a0d-authentication
+  - type: Sandbox
+    url: https://stoplight.io/mocks/cybelangel/audit-logs-api/182542
+  - type: Documentation
+    url: >-
+      https://developers.cybelangel.com/docs/partner-api/72b66de24898e-cybel-angel-partners-api
+  - type: Sandbox
+    url: https://stoplight.io/mocks/cybelangel/partner-api/133714
+- aid: cybelangel:cybelangel-reports-api
+  name: CybelAngel Reports API
+  description: The Reports API from CybelAngel — 1 operation(s) for reports.
+  humanURL: >-
+    https://developers.cybelangel.com/docs/cybelangel-platform-api/39d4926befc14-what-can-i-do-with-this-api
+  baseURL: https://platform.cybelangel.com/api
+  tags:
+  - Reports
+  properties:
+  - type: OpenAPI
+    url: openapi/cybelangel-reports-api-openapi.yml
+  - type: Documentation
+    url: >-
+      https://developers.cybelangel.com/docs/cybelangel-platform-api/39d4926befc14-what-can-i-do-with-this-api
+  - type: APIReference
+    url: https://developers.cybelangel.com/docs/cybelangel-platform-api/68a341c676710-references
+  - type: GettingStarted
+    url: >-
+      https://developers.cybelangel.com/docs/cybelangel-platform-api/05d245301ecc5-get-your-api-credentials
+  - type: Authentication
+    url: >-
+      https://developers.cybelangel.com/docs/cybelangel-platform-api/b6b6c2d4906e9-authentication
+  - type: OAuthScopes
+    url: scopes/cybelangel-scopes.yml
+  - type: Sandbox
+    url: https://stoplight.io/mocks/cybelangel/cybelangel-platform-api/84330
+  - type: Documentation
+    url: >-
+      https://developers.cybelangel.com/docs/alerts-api/72b66de24898e-cybel-angel-alerts-api-real-time-threat-intelligence
+  - type: APIReference
+    url: https://developers.cybelangel.com/docs/alerts-api/a3ab024122156-search-alerts
+  - type: GettingStarted
+    url: https://developers.cybelangel.com/docs/alerts-api/c53add3c8b16f-getting-started
+  - type: RateLimits
+    url: https://developers.cybelangel.com/docs/alerts-api/304dab003eb13-limitations
+  - type: Sandbox
+    url: https://stoplight.io/mocks/cybelangel/alerts-api/133714
+  - type: Documentation
+    url: >-
+      https://developers.cybelangel.com/docs/adm-inventory-api/7e88d945427a4-fetch-assets-details-from-adm-inventory
+  - type: Sandbox
+    url: https://stoplight.io/mocks/cybelangel/adm-inventory-api/133714
+  - type: Documentation
+    url: >-
+      https://developers.cybelangel.com/docs/keywords-api/c812fc6b544b0-manipulate-your-keywords
+  - type: Sandbox
+    url: https://stoplight.io/mocks/cybelangel/keywords-api/133714
+  - type: Documentation
+    url: >-
+      https://developers.cybelangel.com/docs/threat-intelligence-api/38e63ab3d5c42-fetch-threat-intelligence-claimed-attacks
+  - type: Sandbox
+    url: https://stoplight.io/mocks/cybelangel/threat-intelligence-api/133714
+  - type: Documentation
+    url: >-
+      https://developers.cybelangel.com/docs/audit-logs-api/72b66de24898e-cybel-angel-audit-logs-api
+  - type: GettingStarted
+    url: >-
+      https://developers.cybelangel.com/docs/audit-logs-api/f9723159f94ff-getting-started-guide-audit-logs-api
+  - type: Authentication
+    url: https://developers.cybelangel.com/docs/audit-logs-api/b87d37ae48a0d-authentication
+  - type: Sandbox
+    url: https://stoplight.io/mocks/cybelangel/audit-logs-api/182542
+  - type: Documentation
+    url: >-
+      https://developers.cybelangel.com/docs/partner-api/72b66de24898e-cybel-angel-partners-api
+  - type: Sandbox
+    url: https://stoplight.io/mocks/cybelangel/partner-api/133714
+- aid: cybelangel:cybelangel-stats-api
+  name: CybelAngel Stats API
+  description: Statistics on the reports, keywords, etc.
+  humanURL: >-
+    https://developers.cybelangel.com/docs/cybelangel-platform-api/39d4926befc14-what-can-i-do-with-this-api
+  baseURL: https://platform.cybelangel.com/api
+  tags:
+  - Stats
+  properties:
+  - type: OpenAPI
+    url: openapi/cybelangel-stats-api-openapi.yml
+  - type: Documentation
+    url: >-
+      https://developers.cybelangel.com/docs/cybelangel-platform-api/39d4926befc14-what-can-i-do-with-this-api
+  - type: APIReference
+    url: https://developers.cybelangel.com/docs/cybelangel-platform-api/68a341c676710-references
+  - type: GettingStarted
+    url: >-
+      https://developers.cybelangel.com/docs/cybelangel-platform-api/05d245301ecc5-get-your-api-credentials
+  - type: Authentication
+    url: >-
+      https://developers.cybelangel.com/docs/cybelangel-platform-api/b6b6c2d4906e9-authentication
+  - type: OAuthScopes
+    url: scopes/cybelangel-scopes.yml
+  - type: Sandbox
+    url: https://stoplight.io/mocks/cybelangel/cybelangel-platform-api/84330
+  - type: Documentation
+    url: >-
+      https://developers.cybelangel.com/docs/alerts-api/72b66de24898e-cybel-angel-alerts-api-real-time-threat-intelligence
+  - type: APIReference
+    url: https://developers.cybelangel.com/docs/alerts-api/a3ab024122156-search-alerts
+  - type: GettingStarted
+    url: https://developers.cybelangel.com/docs/alerts-api/c53add3c8b16f-getting-started
+  - type: RateLimits
+    url: https://developers.cybelangel.com/docs/alerts-api/304dab003eb13-limitations
+  - type: Sandbox
+    url: https://stoplight.io/mocks/cybelangel/alerts-api/133714
+  - type: Documentation
+    url: >-
+      https://developers.cybelangel.com/docs/adm-inventory-api/7e88d945427a4-fetch-assets-details-from-adm-inventory
+  - type: Sandbox
+    url: https://stoplight.io/mocks/cybelangel/adm-inventory-api/133714
+  - type: Documentation
+    url: >-
+      https://developers.cybelangel.com/docs/keywords-api/c812fc6b544b0-manipulate-your-keywords
+  - type: Sandbox
+    url: https://stoplight.io/mocks/cybelangel/keywords-api/133714
+  - type: Documentation
+    url: >-
+      https://developers.cybelangel.com/docs/threat-intelligence-api/38e63ab3d5c42-fetch-threat-intelligence-claimed-attacks
+  - type: Sandbox
+    url: https://stoplight.io/mocks/cybelangel/threat-intelligence-api/133714
+  - type: Documentation
+    url: >-
+      https://developers.cybelangel.com/docs/audit-logs-api/72b66de24898e-cybel-angel-audit-logs-api
+  - type: GettingStarted
+    url: >-
+      https://developers.cybelangel.com/docs/audit-logs-api/f9723159f94ff-getting-started-guide-audit-logs-api
+  - type: Authentication
+    url: https://developers.cybelangel.com/docs/audit-logs-api/b87d37ae48a0d-authentication
+  - type: Sandbox
+    url: https://stoplight.io/mocks/cybelangel/audit-logs-api/182542
+  - type: Documentation
+    url: >-
+      https://developers.cybelangel.com/docs/partner-api/72b66de24898e-cybel-angel-partners-api
+  - type: Sandbox
+    url: https://stoplight.io/mocks/cybelangel/partner-api/133714
+- aid: cybelangel:cybelangel-stix-api
+  name: CybelAngel Stix API
+  description: Alerts - Stix
+  humanURL: >-
+    https://developers.cybelangel.com/docs/cybelangel-platform-api/39d4926befc14-what-can-i-do-with-this-api
+  baseURL: https://platform.cybelangel.com/api
+  tags:
+  - stix
+  properties:
+  - type: OpenAPI
+    url: openapi/cybelangel-stix-api-openapi.yml
+  - type: Documentation
+    url: >-
+      https://developers.cybelangel.com/docs/cybelangel-platform-api/39d4926befc14-what-can-i-do-with-this-api
+  - type: APIReference
+    url: https://developers.cybelangel.com/docs/cybelangel-platform-api/68a341c676710-references
+  - type: GettingStarted
+    url: >-
+      https://developers.cybelangel.com/docs/cybelangel-platform-api/05d245301ecc5-get-your-api-credentials
+  - type: Authentication
+    url: >-
+      https://developers.cybelangel.com/docs/cybelangel-platform-api/b6b6c2d4906e9-authentication
+  - type: OAuthScopes
+    url: scopes/cybelangel-scopes.yml
+  - type: Sandbox
+    url: https://stoplight.io/mocks/cybelangel/cybelangel-platform-api/84330
+  - type: Documentation
+    url: >-
+      https://developers.cybelangel.com/docs/alerts-api/72b66de24898e-cybel-angel-alerts-api-real-time-threat-intelligence
+  - type: APIReference
+    url: https://developers.cybelangel.com/docs/alerts-api/a3ab024122156-search-alerts
+  - type: GettingStarted
+    url: https://developers.cybelangel.com/docs/alerts-api/c53add3c8b16f-getting-started
+  - type: RateLimits
+    url: https://developers.cybelangel.com/docs/alerts-api/304dab003eb13-limitations
+  - type: Sandbox
+    url: https://stoplight.io/mocks/cybelangel/alerts-api/133714
+  - type: Documentation
+    url: >-
+      https://developers.cybelangel.com/docs/adm-inventory-api/7e88d945427a4-fetch-assets-details-from-adm-inventory
+  - type: Sandbox
+    url: https://stoplight.io/mocks/cybelangel/adm-inventory-api/133714
+  - type: Documentation
+    url: >-
+      https://developers.cybelangel.com/docs/keywords-api/c812fc6b544b0-manipulate-your-keywords
+  - type: Sandbox
+    url: https://stoplight.io/mocks/cybelangel/keywords-api/133714
+  - type: Documentation
+    url: >-
+      https://developers.cybelangel.com/docs/threat-intelligence-api/38e63ab3d5c42-fetch-threat-intelligence-claimed-attacks
+  - type: Sandbox
+    url: https://stoplight.io/mocks/cybelangel/threat-intelligence-api/133714
+  - type: Documentation
+    url: >-
+      https://developers.cybelangel.com/docs/audit-logs-api/72b66de24898e-cybel-angel-audit-logs-api
+  - type: GettingStarted
+    url: >-
+      https://developers.cybelangel.com/docs/audit-logs-api/f9723159f94ff-getting-started-guide-audit-logs-api
+  - type: Authentication
+    url: https://developers.cybelangel.com/docs/audit-logs-api/b87d37ae48a0d-authentication
+  - type: Sandbox
+    url: https://stoplight.io/mocks/cybelangel/audit-logs-api/182542
+  - type: Documentation
+    url: >-
+      https://developers.cybelangel.com/docs/partner-api/72b66de24898e-cybel-angel-partners-api
+  - type: Sandbox
+    url: https://stoplight.io/mocks/cybelangel/partner-api/133714
+- aid: cybelangel:cybelangel-threat-intelligence-api
+  name: CybelAngel Threat Intelligence API
+  description: Fetch threat intelligence data from the CybelAngel platform.
+  humanURL: >-
+    https://developers.cybelangel.com/docs/cybelangel-platform-api/39d4926befc14-what-can-i-do-with-this-api
+  baseURL: https://platform.cybelangel.com/api
+  tags:
+  - Threat Intelligence
+  properties:
+  - type: OpenAPI
+    url: openapi/cybelangel-threat-intelligence-api-openapi.yml
+  - type: Documentation
+    url: >-
+      https://developers.cybelangel.com/docs/cybelangel-platform-api/39d4926befc14-what-can-i-do-with-this-api
+  - type: APIReference
+    url: https://developers.cybelangel.com/docs/cybelangel-platform-api/68a341c676710-references
+  - type: GettingStarted
+    url: >-
+      https://developers.cybelangel.com/docs/cybelangel-platform-api/05d245301ecc5-get-your-api-credentials
+  - type: Authentication
+    url: >-
+      https://developers.cybelangel.com/docs/cybelangel-platform-api/b6b6c2d4906e9-authentication
+  - type: OAuthScopes
+    url: scopes/cybelangel-scopes.yml
+  - type: Sandbox
+    url: https://stoplight.io/mocks/cybelangel/cybelangel-platform-api/84330
+  - type: Documentation
+    url: >-
+      https://developers.cybelangel.com/docs/alerts-api/72b66de24898e-cybel-angel-alerts-api-real-time-threat-intelligence
+  - type: APIReference
+    url: https://developers.cybelangel.com/docs/alerts-api/a3ab024122156-search-alerts
+  - type: GettingStarted
+    url: https://developers.cybelangel.com/docs/alerts-api/c53add3c8b16f-getting-started
+  - type: RateLimits
+    url: https://developers.cybelangel.com/docs/alerts-api/304dab003eb13-limitations
+  - type: Sandbox
+    url: https://stoplight.io/mocks/cybelangel/alerts-api/133714
+  - type: Documentation
+    url: >-
+      https://developers.cybelangel.com/docs/adm-inventory-api/7e88d945427a4-fetch-assets-details-from-adm-inventory
+  - type: Sandbox
+    url: https://stoplight.io/mocks/cybelangel/adm-inventory-api/133714
+  - type: Documentation
+    url: >-
+      https://developers.cybelangel.com/docs/keywords-api/c812fc6b544b0-manipulate-your-keywords
+  - type: Sandbox
+    url: https://stoplight.io/mocks/cybelangel/keywords-api/133714
+  - type: Documentation
+    url: >-
+      https://developers.cybelangel.com/docs/threat-intelligence-api/38e63ab3d5c42-fetch-threat-intelligence-claimed-attacks
+  - type: Sandbox
+    url: https://stoplight.io/mocks/cybelangel/threat-intelligence-api/133714
+  - type: Documentation
+    url: >-
+      https://developers.cybelangel.com/docs/audit-logs-api/72b66de24898e-cybel-angel-audit-logs-api
+  - type: GettingStarted
+    url: >-
+      https://developers.cybelangel.com/docs/audit-logs-api/f9723159f94ff-getting-started-guide-audit-logs-api
+  - type: Authentication
+    url: https://developers.cybelangel.com/docs/audit-logs-api/b87d37ae48a0d-authentication
+  - type: Sandbox
+    url: https://stoplight.io/mocks/cybelangel/audit-logs-api/182542
+  - type: Documentation
+    url: >-
+      https://developers.cybelangel.com/docs/partner-api/72b66de24898e-cybel-angel-partners-api
+  - type: Sandbox
+    url: https://stoplight.io/mocks/cybelangel/partner-api/133714
+- aid: cybelangel:cybelangel-workspaces-api
+  name: CybelAngel Workspaces API
+  description: List workspaces.
+  humanURL: >-
+    https://developers.cybelangel.com/docs/cybelangel-platform-api/39d4926befc14-what-can-i-do-with-this-api
+  baseURL: https://platform.cybelangel.com/api
+  tags:
+  - Workspaces
+  properties:
+  - type: OpenAPI
+    url: openapi/cybelangel-workspaces-api-openapi.yml
+  - type: Documentation
+    url: >-
+      https://developers.cybelangel.com/docs/cybelangel-platform-api/39d4926befc14-what-can-i-do-with-this-api
+  - type: APIReference
+    url: https://developers.cybelangel.com/docs/cybelangel-platform-api/68a341c676710-references
+  - type: GettingStarted
+    url: >-
+      https://developers.cybelangel.com/docs/cybelangel-platform-api/05d245301ecc5-get-your-api-credentials
+  - type: Authentication
+    url: >-
+      https://developers.cybelangel.com/docs/cybelangel-platform-api/b6b6c2d4906e9-authentication
+  - type: OAuthScopes
+    url: scopes/cybelangel-scopes.yml
+  - type: Sandbox
+    url: https://stoplight.io/mocks/cybelangel/cybelangel-platform-api/84330
+  - type: Documentation
+    url: >-
+      https://developers.cybelangel.com/docs/alerts-api/72b66de24898e-cybel-angel-alerts-api-real-time-threat-intelligence
+  - type: APIReference
+    url: https://developers.cybelangel.com/docs/alerts-api/a3ab024122156-search-alerts
+  - type: GettingStarted
+    url: https://developers.cybelangel.com/docs/alerts-api/c53add3c8b16f-getting-started
+  - type: RateLimits
+    url: https://developers.cybelangel.com/docs/alerts-api/304dab003eb13-limitations
+  - type: Sandbox
+    url: https://stoplight.io/mocks/cybelangel/alerts-api/133714
+  - type: Documentation
+    url: >-
+      https://developers.cybelangel.com/docs/adm-inventory-api/7e88d945427a4-fetch-assets-details-from-adm-inventory
+  - type: Sandbox
+    url: https://stoplight.io/mocks/cybelangel/adm-inventory-api/133714
+  - type: Documentation
+    url: >-
+      https://developers.cybelangel.com/docs/keywords-api/c812fc6b544b0-manipulate-your-keywords
+  - type: Sandbox
+    url: https://stoplight.io/mocks/cybelangel/keywords-api/133714
+  - type: Documentation
+    url: >-
+      https://developers.cybelangel.com/docs/threat-intelligence-api/38e63ab3d5c42-fetch-threat-intelligence-claimed-attacks
+  - type: Sandbox
+    url: https://stoplight.io/mocks/cybelangel/threat-intelligence-api/133714
+  - type: Documentation
+    url: >-
+      https://developers.cybelangel.com/docs/audit-logs-api/72b66de24898e-cybel-angel-audit-logs-api
+  - type: GettingStarted
+    url: >-
+      https://developers.cybelangel.com/docs/audit-logs-api/f9723159f94ff-getting-started-guide-audit-logs-api
+  - type: Authentication
+    url: https://developers.cybelangel.com/docs/audit-logs-api/b87d37ae48a0d-authentication
+  - type: Sandbox
+    url: https://stoplight.io/mocks/cybelangel/audit-logs-api/182542
+  - type: Documentation
+    url: >-
+      https://developers.cybelangel.com/docs/partner-api/72b66de24898e-cybel-angel-partners-api
+  - type: Sandbox
+    url: https://stoplight.io/mocks/cybelangel/partner-api/133714
 maintainers:
   - FN: Kin Lane
     email: kin@apievangelist.com
   - FN: APIs.json
     email: info@apis.io
 common:
+  - type: Overlay
+    url: overlays/cybelangel-platform-reports-overlay.yaml
+  - type: Overlay
+    url: overlays/cybelangel-alerts-overlay.yaml
+  - type: Overlay
+    url: overlays/cybelangel-adm-inventory-overlay.yaml
+  - type: Overlay
+    url: overlays/cybelangel-keywords-overlay.yaml
+  - type: Overlay
+    url: overlays/cybelangel-threat-intelligence-overlay.yaml
+  - type: Overlay
+    url: overlays/cybelangel-audit-logs-overlay.yaml
+  - type: Overlay
+    url: overlays/cybelangel-partner-overlay.yaml
   - type: Website
     url: https://www.cybelangel.com/
   - type: DeveloperPortal
