@@ -14,6 +14,18 @@ description: >-
   client-credentials bearer tokens minted by an Auth0 tenant, plus CybelAngel Connect, a
   no-code automation studio for ServiceNow, Jira, Splunk, Slack, Cortex XSOAR, IBM Security
   SOAR and Azure Sentinel.
+deliveryModel:
+  model: saas
+  open_source: false
+  commercial: true
+  callable_host: true
+  label: Hosted service · you call their endpoint
+  confidence: high
+  source:
+  - openapi
+  - pricing
+  generated: '2026-08-28'
+  method: derived
 image: https://cybelangel.com/wp-content/uploads/2026/08/langEN-1-90764-1280x460.avif
 url: https://raw.githubusercontent.com/api-evangelist/cybelangel/refs/heads/main/apis.yml
 x-type: company
