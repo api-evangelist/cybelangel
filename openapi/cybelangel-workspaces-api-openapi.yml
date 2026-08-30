@@ -1,0 +1,237 @@
+openapi: 3.2.0
+info:
+  title: Cybelangel Workspaces API
+  version: 1.0.0
+  contact:
+    email: support@cybelangel.com
+  license:
+    url: https://cybelangel.com/
+    name: Proprietary
+  description: 'Operations tagged Workspaces across 2 of this provider''s published API definitions: cybelangel-keywords-openapi.yml, cybelangel-partner-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.cybelangel.com
+tags:
+- name: Workspaces
+  description: List workspaces.
+paths:
+  /v1/workspaces:
+    get:
+      tags:
+      - Workspaces
+      summary: Get Workspaces
+      description: Get all workspaces for the organization of the authenticated OAuth client token.
+      operationId: get-workspaces
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkspaceListDTO'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_BadRequestError_'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_UnauthorizedError_'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_ForbiddenAccessError_'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_UnknownError_'
+      security:
+      - jwt: []
+      servers:
+      - url: https://api.cybelangel.com
+    servers:
+    - url: https://api.cybelangel.com
+  /v1/{organization_id}/workspaces:
+    get:
+      tags:
+      - Workspaces
+      summary: Get Organization Workspaces
+      description: Get all workspaces for one of your client organizations.
+      operationId: get-organization-workspaces
+      parameters:
+      - name: organization_id
+        in: path
+        description: ID of the organization to manage resources for
+        required: true
+        schema:
+          type: string
+          title: Organization Id
+          description: ID of the organization to manage resources for
+          format: uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkspaceListDTO'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_BadRequestError_'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_UnauthorizedError_'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_ForbiddenAccessError_'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_UnknownError_'
+      security:
+      - jwt: []
+      servers:
+      - url: https://api.cybelangel.com
+    servers:
+    - url: https://api.cybelangel.com
+components:
+  schemas:
+    APIErrorResponse_UnauthorizedError_:
+      type: object
+      title: APIErrorResponse[UnauthorizedError]
+      properties:
+        error:
+          $ref: '#/components/schemas/UnauthorizedError'
+      required:
+      - error
+    WorkspaceDTO:
+      type: object
+      title: WorkspaceDTO
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+          title: Id
+          description: Unique identifier of the workspace.
+          format: uuid
+        name:
+          type: string
+          title: Name
+          description: Name of the workspace.
+        description:
+          title: Description
+          description: Description of the workspace.
+          anyOf:
+          - type: string
+      required:
+      - id
+      - name
+    APIErrorResponse_BadRequestError_:
+      type: object
+      title: APIErrorResponse[BadRequestError]
+      properties:
+        error:
+          $ref: '#/components/schemas/BadRequestError'
+      required:
+      - error
+    APIErrorResponse_UnknownError_:
+      type: object
+      title: APIErrorResponse[UnknownError]
+      properties:
+        error:
+          $ref: '#/components/schemas/UnknownError'
+      required:
+      - error
+    ForbiddenAccessError:
+      type: object
+      title: ForbiddenAccessError
+      description: User cannot access some resource.
+      properties:
+        message:
+          type: string
+          title: Message
+      required:
+      - message
+    WorkspaceListDTO:
+      type: object
+      title: WorkspaceListDTO
+      additionalProperties: false
+      properties:
+        items:
+          type: array
+          title: Items
+          description: List of workspaces matching the request
+          items:
+            $ref: '#/components/schemas/WorkspaceDTO'
+        total:
+          type: integer
+          title: Total
+          description: Total number of workspaces
+          minimum: 0
+      required:
+      - items
+      - total
+    BadRequestError:
+      type: object
+      title: BadRequestError
+      description: User sent a bad request.
+      properties:
+        message:
+          type: string
+          title: Message
+      required:
+      - message
+    APIErrorResponse_ForbiddenAccessError_:
+      type: object
+      title: APIErrorResponse[ForbiddenAccessError]
+      properties:
+        error:
+          $ref: '#/components/schemas/ForbiddenAccessError'
+      required:
+      - error
+    UnknownError:
+      type: object
+      title: UnknownError
+      description: Unknown error on server-side, please contact support.
+      properties:
+        message:
+          type: string
+          title: Message
+      required:
+      - message
+    UnauthorizedError:
+      type: object
+      title: UnauthorizedError
+      description: User cannot access some resource.
+      properties:
+        message:
+          type: string
+          title: Message
+      required:
+      - message
+  securitySchemes:
+    jwt:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+x-refined-from:
+- cybelangel-keywords-openapi.yml
+- cybelangel-partner-openapi.yml

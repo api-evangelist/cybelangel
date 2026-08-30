@@ -1,0 +1,302 @@
+openapi: 3.2.0
+info:
+  version: 0.1.0
+  title: References Domain watchlist API
+  description: 'API for CybelAngel''s Platform.
+
+    Authentication uses standard [OAuth2 Bearer Tokens](https://tools.ietf.org/html/rfc6750).
+
+    [Activate your API access](docs/Activate-API-service.md) to obtain your credentials.
+
+    You will be communicated a client `client_id` and a `client_secret` that will allow you to fetch tokens for our API.
+
+    These tokens expire 24 hours.
+
+
+    Here is a simple example of how to fetch such a token with curl:
+
+
+    ```shell
+
+    curl -XPOST https://auth.cybelangel.com/oauth/token -H ''content-type: application/json'' -d ''{"client_id": "client_id", "client_secret": "client_secret", "audience": "https://platform.cybelangel.com/", "grant_type": "client_credentials"}''
+
+    ```
+
+
+    The received access token can then be used as a Bearer token to request our API.
+
+    '
+  contact:
+    email: support@cybelangel.com
+  license:
+    url: https://cybelangel.com/
+    name: Proprietary
+servers:
+- url: https://platform.cybelangel.com/api
+security:
+- bearer_token: []
+tags:
+- name: Domain watchlist
+  description: Domain Protection
+paths:
+  /v1/domains:
+    get:
+      tags:
+      - Domain watchlist
+      summary: Get Domain watchlist
+      description: 'Return the list of the monitored domains (domain watchlist), in descending order.
+
+
+        ⚠️ **Domain Protection module is required**
+
+        '
+      operationId: get-domain-watchlist
+      parameters:
+      - name: status
+        in: query
+        style: form
+        explode: false
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/DomainStatus'
+      - name: min-date
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: max-date
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: query
+        in: query
+        description: A text to look up in the domains.
+        schema:
+          type: string
+      - name: skip
+        in: query
+        description: The number of results that are skipped.
+        schema:
+          type: integer
+          default: 0
+      - name: limit
+        in: query
+        description: The number of results that are returned.
+        schema:
+          type: integer
+          default: 100
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total:
+                    type: integer
+                    description: Total number of domains matching these criteria
+                    examples:
+                    - 42
+                  results:
+                    type: array
+                    description: A list of domains (in desc order)
+                    items:
+                      $ref: '#/components/schemas/Domain'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '500':
+          $ref: '#/components/responses/Error500'
+      security:
+      - bearer_token:
+        - reports.read
+      servers:
+      - url: https://platform.cybelangel.com/api
+components:
+  responses:
+    Error403:
+      description: '**Forbidden**
+
+
+        Access to requested resource is forbidden with current credentials.
+
+        '
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: number
+                description: internal error code
+              msg:
+                type: string
+                description: internal error message
+              type:
+                description: internal error type
+                examples:
+                - error
+    Error401:
+      description: '**Unauthorized**
+
+
+        Authentication is required
+
+        '
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: number
+                description: internal error code
+              msg:
+                type: string
+                description: internal error message
+              type:
+                description: internal error type
+                examples:
+                - error
+    Error400:
+      description: '**Bad request**
+
+
+        Check query parameters
+
+        '
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: number
+                description: internal error code
+              msg:
+                type: string
+                description: internal error message
+              type:
+                description: internal error type
+                examples:
+                - error
+    Error500:
+      description: '**Internal server error**
+
+
+        An unexpected error occurred during request
+
+        '
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: number
+                description: internal error code
+              msg:
+                type: string
+                description: internal error message
+              type:
+                description: internal error type
+                examples:
+                - error
+  schemas:
+    Domain:
+      type: object
+      properties:
+        abuse_email:
+          type: string
+          description: The abuse email
+          examples:
+          - abuse@acme.com
+        country:
+          type: string
+          description: The country
+          examples:
+          - France
+        creation_date:
+          type: string
+          description: The date at which this domain has been created
+          examples:
+          - Tue, 28 Jan 2020 19:23:41 GMT
+        detection_date:
+          type: string
+          description: The date at which this domain has been detected
+          examples:
+          - Wed, 19 Aug 2020 19:52:15 GMT
+        domain:
+          type: string
+          description: The full domain
+          examples:
+          - acme.com
+        ip:
+          type: string
+          description: The list of IP addresses
+          examples:
+          - 33.102.136.170
+        mx:
+          type: string
+          description: The list of MX servers
+          examples:
+          - 5 alt1.aspmx.l.google.com.;5 alt2.aspmx.l.google.com.
+        ns:
+          type: string
+          description: The list of name servers
+          examples:
+          - ns26.domaincontrol.com.;ns25.domaincontrol.com.
+        registrant_name:
+          type: string
+          description: The registrant name
+          examples:
+          - Domain Administrator
+        registrant_organisation:
+          type: string
+          description: The registrant organization
+          examples:
+          - Acme Inc
+        report_id:
+          type: string
+          description: The report id
+          format: uuid
+          examples:
+          - e5f30260-4104-4742-babe-195b20867db9
+        status:
+          $ref: '#/components/schemas/DomainStatus'
+        stream:
+          type: string
+          description: The stream id
+          format: uuid
+          examples:
+          - 77f50671-e723-47ce-85e0-5749f82b96da
+    DomainStatus:
+      type: string
+      enum:
+      - monitored
+      - reported
+      examples:
+      - monitored
+  securitySchemes:
+    bearer_token:
+      type: oauth2
+      flows:
+        clientCredentials:
+          scopes:
+            assets.download: Downloading an asset
+            reports.move: Resolve or reopen an incident report
+            reports.read: Read incident reports
+            reports_global_comments.read: Read comments of a incident report
+            reports_global_comments.write: Write comments on a incident report (Endpoint not accessible, yet)
+            usergroups.admin: Read and manage usergroups
+            usergroups.read: Read subscribed usergroups
+            credentials.read: Read list of leaked monitored credentials
+            credentials.move: Resolve or reopen a credential
+            credentials.export: Export list of credentials
+          tokenUrl: https://auth.cybelangel.com/oauth/token

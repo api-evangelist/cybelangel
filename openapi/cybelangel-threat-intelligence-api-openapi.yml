@@ -1,0 +1,524 @@
+openapi: 3.2.0
+info:
+  version: 1.0.0
+  title: References Threat Intelligence API
+  description: 'API for CybelAngel''s Threat Intelligence.
+
+    Authentication uses standard [OAuth2 Bearer Tokens](https://tools.ietf.org/html/rfc6750).
+
+
+    Here is a simple example of how to fetch such a token with curl:
+
+
+    ```shell
+
+    curl -X POST https://auth.cybelangel.com/oauth/token -H ''content-type: application/json -d ''{"client_id": "client_id", "client_secret": "client_secret", "audience": "https://platform.cybelangel.com/", "grant_type": "client_credentials"}
+
+    ```
+
+
+    The received access token can then be used as a Bearer token to request our API.'
+  contact:
+    email: support@cybelangel.com
+  license:
+    url: https://cybelangel.com/
+    name: Proprietary
+servers:
+- url: https://api.cybelangel.com
+tags:
+- name: Threat Intelligence
+  description: Fetch threat intelligence data from the CybelAngel platform.
+paths:
+  /v1/threat-intelligence/claimed-attacks:
+    get:
+      tags:
+      - Threat Intelligence
+      summary: Get claimed attacks
+      description: Return a filtered paginated list of claimed attacks.
+      operationId: get-threat-intelligence-claimed-attacks
+      parameters:
+      - name: start_date
+        in: query
+        description: '[ISO 8601] Lower (inclusive) bound of the claimed date. Use alongside ''end_date'' param to filter by date range.'
+        required: false
+        schema:
+          type: string
+          title: Start Date
+          description: '[ISO 8601] Lower (inclusive) bound of the claimed date. Use alongside ''end_date'' param to filter by date range.'
+          format: date-time
+          examples:
+          - '2023-10-05T14:48:00.000Z'
+        examples:
+          default:
+            value: '2023-10-05T14:48:00.000Z'
+      - name: end_date
+        in: query
+        description: '[ISO 8601] Upper (inclusive) bound of the claimed date. Use alongside ''start_date'' param to filter by date range'
+        required: false
+        schema:
+          type: string
+          title: End Date
+          description: '[ISO 8601] Upper (inclusive) bound of the claimed date. Use alongside ''start_date'' param to filter by date range'
+          format: date-time
+          examples:
+          - '2023-10-05T14:48:00.000Z'
+        examples:
+          default:
+            value: '2023-10-05T14:48:00.000Z'
+      - name: query
+        in: query
+        description: Full-text search across most fields (excluding date & category)
+        required: false
+        schema:
+          type: string
+          title: Query
+          description: Full-text search across most fields (excluding date & category)
+          minLength: 1
+          examples:
+          - bank+of
+        examples:
+          default:
+            value: bank+of
+      - name: categories
+        in: query
+        description: Filter by attack types
+        required: false
+        schema:
+          type: array
+          title: Categories
+          description: Filter by attack types
+          items:
+            $ref: '#/components/schemas/ClaimedAttackCategory'
+      - name: threat_actors
+        in: query
+        description: Filter by threat actor names
+        required: false
+        schema:
+          type: array
+          title: Threat Actors
+          description: Filter by threat actor names
+          examples:
+          - - CRYPTO24
+            - Nova
+          items:
+            type: string
+            minLength: 1
+        examples:
+          default:
+            value:
+            - CRYPTO24
+            - Nova
+      - name: countries
+        in: query
+        description: '[ISO 3166-2] Filter by victim countries (https://en.wikipedia.org/wiki/ISO_3166-2)'
+        required: false
+        schema:
+          type: array
+          title: Countries
+          description: '[ISO 3166-2] Filter by victim countries (https://en.wikipedia.org/wiki/ISO_3166-2)'
+          examples:
+          - - us
+            - fr
+          items:
+            type: string
+            minLength: 1
+        examples:
+          default:
+            value:
+            - us
+            - fr
+      - name: industries
+        in: query
+        description: '[Stix 2.1 Industry sectors] Filter by victim industries (https://docs.oasis-open.org/cti/stix/v2.1/csprd01/stix-v2.1-csprd01.html#_Toc16070804)'
+        required: false
+        schema:
+          type: array
+          title: Industries
+          description: '[Stix 2.1 Industry sectors] Filter by victim industries (https://docs.oasis-open.org/cti/stix/v2.1/csprd01/stix-v2.1-csprd01.html#_Toc16070804)'
+          examples:
+          - - government
+            - technology
+          items:
+            type: string
+            minLength: 1
+        examples:
+          default:
+            value:
+            - government
+            - technology
+      - name: victims
+        in: query
+        description: Filter by victim names
+        required: false
+        schema:
+          type: array
+          title: Victims
+          description: Filter by victim names
+          examples:
+          - - Google
+            - Microsoft
+          items:
+            type: string
+            minLength: 1
+        examples:
+          default:
+            value:
+            - Google
+            - Microsoft
+      - name: domains
+        in: query
+        description: Filter by victim domains
+        required: false
+        schema:
+          type: array
+          title: Domains
+          description: Filter by victim domains
+          examples:
+          - - google.com
+            - microsoft.com
+          items:
+            type: string
+            minLength: 1
+        examples:
+          default:
+            value:
+            - google.com
+            - microsoft.com
+      - name: skip
+        in: query
+        description: The number of results that are skipped.
+        required: false
+        schema:
+          type: integer
+          title: Skip
+          description: The number of results that are skipped.
+          minimum: 0
+          default: 0
+      - name: limit
+        in: query
+        description: The number of results that are returned.
+        required: false
+        schema:
+          type: integer
+          title: Limit
+          description: The number of results that are returned.
+          minimum: 1
+          maximum: 1000
+          default: 100
+      - name: sort_by
+        in: query
+        description: The field on which we sort the results.
+        required: false
+        schema:
+          $ref: '#/components/schemas/ClaimedAttacksSortByCriteriaQuery'
+          description: The field on which we sort the results.
+      - name: sort_order
+        in: query
+        description: The sort order.
+        required: false
+        schema:
+          $ref: '#/components/schemas/ClaimedAttacksSortByOrderQuery'
+          description: The sort order.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListClaimedAttacksResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_BadRequestError_'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_UnauthorizedError_'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_ForbiddenAccessError_'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_NotFoundError_'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_UnknownError_'
+      security:
+      - jwt: []
+      servers:
+      - url: https://api.cybelangel.com
+components:
+  schemas:
+    NotFoundError:
+      type: object
+      title: NotFoundError
+      description: Nothing matches the given URI
+      properties:
+        message:
+          type: string
+          title: Message
+      required:
+      - message
+    ClaimedAttacksSortByCriteriaQuery:
+      type: string
+      enum:
+      - category
+      - claimed_at
+      - threat_actors
+      - countries
+      - industries
+      - victims
+      - domains
+      title: ClaimedAttacksSortByCriteriaQuery
+    APIErrorResponse_UnauthorizedError_:
+      type: object
+      title: APIErrorResponse[UnauthorizedError]
+      properties:
+        error:
+          $ref: '#/components/schemas/UnauthorizedError'
+      required:
+      - error
+    APIErrorResponse_BadRequestError_:
+      type: object
+      title: APIErrorResponse[BadRequestError]
+      properties:
+        error:
+          $ref: '#/components/schemas/BadRequestError'
+      required:
+      - error
+    APIErrorResponse_UnknownError_:
+      type: object
+      title: APIErrorResponse[UnknownError]
+      properties:
+        error:
+          $ref: '#/components/schemas/UnknownError'
+      required:
+      - error
+    ClaimedAttackNetwork:
+      type: string
+      enum:
+      - tor
+      - openweb
+      - telegram
+      - discord
+      title: ClaimedAttackNetwork
+    ForbiddenAccessError:
+      type: object
+      title: ForbiddenAccessError
+      description: User cannot access some resource.
+      properties:
+        message:
+          type: string
+          title: Message
+      required:
+      - message
+    ClaimedAttacksSortByOrderQuery:
+      type: string
+      enum:
+      - asc
+      - desc
+      title: ClaimedAttacksSortByOrderQuery
+    APIErrorResponse_NotFoundError_:
+      type: object
+      title: APIErrorResponse[NotFoundError]
+      properties:
+        error:
+          $ref: '#/components/schemas/NotFoundError'
+      required:
+      - error
+    ClaimedAttackSourceDTO:
+      type: object
+      title: ClaimedAttackSourceDTO
+      description: Origin where a claimed attack was observed.
+      properties:
+        network:
+          description: Network/channel the source belongs to.
+          examples:
+          - tor
+          anyOf:
+          - $ref: '#/components/schemas/ClaimedAttackNetwork'
+        url:
+          title: Url
+          description: URL of the source (e.g. the onion address of the leak site).
+          examples:
+          - http://example.onion/victims/acme-corp
+          anyOf:
+          - type: string
+    APIErrorResponse_ForbiddenAccessError_:
+      type: object
+      title: APIErrorResponse[ForbiddenAccessError]
+      properties:
+        error:
+          $ref: '#/components/schemas/ForbiddenAccessError'
+      required:
+      - error
+    BadRequestError:
+      type: object
+      title: BadRequestError
+      description: User sent a bad request.
+      properties:
+        message:
+          type: string
+          title: Message
+      required:
+      - message
+    UnknownError:
+      type: object
+      title: UnknownError
+      description: Unknown error on server-side, please contact support.
+      properties:
+        message:
+          type: string
+          title: Message
+      required:
+      - message
+    UnauthorizedError:
+      type: object
+      title: UnauthorizedError
+      description: User cannot access some resource.
+      properties:
+        message:
+          type: string
+          title: Message
+      required:
+      - message
+    ListClaimedAttacksResponse:
+      type: object
+      title: ListClaimedAttacksResponse
+      description: Paginated and filterable list of claimed attacks.
+      properties:
+        claimed_attacks:
+          type: array
+          title: Claimed Attacks
+          description: List of claimed attacks (based on pagination).
+          items:
+            $ref: '#/components/schemas/ClaimedAttackDTO'
+        total:
+          type: integer
+          title: Total
+          description: Total number of claimed attacks (for configuring the pagination).
+          examples:
+          - 1000
+      required:
+      - claimed_attacks
+      - total
+    ClaimedAttackDTO:
+      type: object
+      title: ClaimedAttackDTO
+      description: API DTO for claimed attacks.
+      properties:
+        reference_id:
+          type: string
+          title: Reference Id
+          description: Internal unique ID
+          format: uuid
+          examples:
+          - 123e4567-e89b-12d3-a456-426655440000
+        claimed_at:
+          type: string
+          title: Claimed At
+          description: '[ISO 8601] Timestamp of claim (UTC)'
+          format: date-time
+          examples:
+          - '2025-01-01T00:00:00+00:00'
+        category:
+          $ref: '#/components/schemas/ClaimedAttackCategory'
+          description: Attack type
+          example: data_leak
+        title:
+          title: Title
+          description: Attack title
+          examples:
+          - Example Corp targeted in a data leak by CRYPTO24
+          anyOf:
+          - type: string
+        summary:
+          title: Summary
+          description: Descriptive summary of the claim
+          examples:
+          - CRYPTO24 claimed a data leak targeting Example Corp.
+          anyOf:
+          - type: string
+        source:
+          $ref: '#/components/schemas/ClaimedAttackSourceDTO'
+          description: Where the claim was observed.
+        threat_actors:
+          type: array
+          title: Threat Actors
+          description: Actor claiming the attack
+          examples:
+          - - CRYPTO24
+            - Nova
+          items:
+            type: string
+        countries:
+          type: array
+          title: Countries
+          description: '[ISO 3166-2] Targeted victims countries'
+          examples:
+          - - us
+            - fr
+          items:
+            type: string
+        industries:
+          type: array
+          title: Industries
+          description: '[Stix 2.1 Industry sectors] Targeted victims industries'
+          examples:
+          - - government
+            - technology
+          items:
+            type: string
+        victims:
+          type: array
+          title: Victims
+          description: Targeted victims organizations name
+          examples:
+          - - Google
+            - Microsoft
+          items:
+            type: string
+        domains:
+          type: array
+          title: Domains
+          description: Targeted victims domains
+          examples:
+          - - google.com
+            - microsoft.com
+          items:
+            type: string
+      required:
+      - reference_id
+      - claimed_at
+      - category
+      - threat_actors
+      - countries
+      - industries
+      - victims
+      - domains
+    ClaimedAttackCategory:
+      type: string
+      enum:
+      - data_leak
+      - ddos
+      - defacement
+      - ransomware
+      title: ClaimedAttackCategory
+  securitySchemes:
+    jwt:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

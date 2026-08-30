@@ -1,0 +1,1490 @@
+openapi: 3.2.0
+info:
+  title: Cybelangel Keywords API
+  version: 1.0.0
+  contact:
+    email: support@cybelangel.com
+  license:
+    url: https://cybelangel.com/
+    name: Proprietary
+  description: 'Operations tagged Keywords across 2 of this provider''s published API definitions: cybelangel-keywords-openapi.yml, cybelangel-partner-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.cybelangel.com
+tags:
+- name: Keywords
+  description: Manipulate keywords.
+paths:
+  /v1/keywords:
+    get:
+      tags:
+      - Keywords
+      summary: Get Keywords
+      description: Get all keywords for organization of authenticated OAuth client token.<br/><br/>Results are sorted alphabetically by the keyword name.
+      operationId: get-keywords
+      parameters:
+      - name: ids
+        in: query
+        description: Filter keywords by ID. Accepts multiple values (`?ids=<uuid>&ids=<uuid>`).
+        required: false
+        schema:
+          type: array
+          title: Ids
+          description: Filter keywords by ID. Accepts multiple values (`?ids=<uuid>&ids=<uuid>`).
+          default: []
+          items:
+            type: string
+            format: uuid
+      - name: name
+        in: query
+        description: Filter keywords by name.
+        required: false
+        schema:
+          type: string
+          title: Name
+          description: Filter keywords by name.
+      - name: status
+        in: query
+        description: Filter keywords by status. Accepts multiple values (`?status=pending&status=active`).
+        required: false
+        schema:
+          type: array
+          title: Status
+          description: Filter keywords by status. Accepts multiple values (`?status=pending&status=active`).
+          default: []
+          items:
+            $ref: '#/components/schemas/KeywordStatus'
+      - name: creation_start_date
+        in: query
+        description: Filter keywords created on or after this date.
+        required: false
+        schema:
+          type: string
+          title: Creation Start Date
+          description: Filter keywords created on or after this date.
+          format: date-time
+          examples:
+          - '2023-10-05T14:48:00.000Z'
+        examples:
+          default:
+            value: '2023-10-05T14:48:00.000Z'
+      - name: creation_end_date
+        in: query
+        description: Filter keywords created on or before this date.
+        required: false
+        schema:
+          type: string
+          title: Creation End Date
+          description: Filter keywords created on or before this date.
+          format: date-time
+          examples:
+          - '2023-10-05T14:48:00.000Z'
+        examples:
+          default:
+            value: '2023-10-05T14:48:00.000Z'
+      - name: last_modification_start_date
+        in: query
+        description: Filter keywords last modified on or after this date.
+        required: false
+        schema:
+          type: string
+          title: Last Modification Start Date
+          description: Filter keywords last modified on or after this date.
+          format: date-time
+          examples:
+          - '2023-10-05T14:48:00.000Z'
+        examples:
+          default:
+            value: '2023-10-05T14:48:00.000Z'
+      - name: last_modification_end_date
+        in: query
+        description: Filter keywords last modified on or before this date.
+        required: false
+        schema:
+          type: string
+          title: Last Modification End Date
+          description: Filter keywords last modified on or before this date.
+          format: date-time
+          examples:
+          - '2023-10-05T14:48:00.000Z'
+        examples:
+          default:
+            value: '2023-10-05T14:48:00.000Z'
+      - name: cursor
+        in: query
+        description: Cursor returned by a previous call to this endpoint. If it is not set, you will get the first page.
+        required: false
+        schema:
+          type: string
+          title: Cursor
+          description: Cursor returned by a previous call to this endpoint. If it is not set, you will get the first page.
+      - name: workspaces
+        in: query
+        description: Filter keywords by workspace. Accepts multiple values (`?workspaces=<uuid>&workspaces=<uuid>`).
+        required: false
+        schema:
+          type: array
+          title: Workspaces
+          description: Filter keywords by workspace. Accepts multiple values (`?workspaces=<uuid>&workspaces=<uuid>`).
+          default: []
+          items:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClientKeywordListDTO'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_BadRequestError_'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_UnauthorizedError_'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_ForbiddenAccessError_'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_UnknownError_'
+      security:
+      - jwt: []
+      servers:
+      - url: https://api.cybelangel.com
+    post:
+      tags:
+      - Keywords
+      summary: Create Keywords
+      description: Create a batch of keywords for the organization of the authenticated OAuth client token.<br/><br/>Maximum 10 keywords per request. Keywords are created in "pending" status.
+      operationId: create-keywords
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClientCreateKeywordsBodyDTO'
+      responses:
+        '201':
+          description: All the keywords were created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClientCreateKeywords201ResponseDTO'
+        '207':
+          description: One or more keywords failed to be created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClientCreateKeywords207ResponseDTO'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_BadRequestError_'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_UnauthorizedError_'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_ForbiddenAccessError_'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_UnknownError_'
+      security:
+      - jwt: []
+      servers:
+      - url: https://api.cybelangel.com
+    patch:
+      tags:
+      - Keywords
+      summary: Update Keywords
+      description: Update a batch of keywords for the organization of the authenticated OAuth client token.<br/><br/>Maximum 10 keywords per request. Omitted fields are left unchanged.
+      operationId: update-keywords
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClientUpdateKeywordsBodyDTO'
+      responses:
+        '200':
+          description: All the keywords were updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClientUpdateKeywords200ResponseDTO'
+        '207':
+          description: One or more keywords failed to be updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClientUpdateKeywords207ResponseDTO'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_BadRequestError_'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_UnauthorizedError_'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_ForbiddenAccessError_'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_UnknownError_'
+      security:
+      - jwt: []
+      servers:
+      - url: https://api.cybelangel.com
+    servers:
+    - url: https://api.cybelangel.com
+  /v1/keywords/status:
+    put:
+      tags:
+      - Keywords
+      summary: Update Keywords Status
+      description: Update the status of a batch of keywords for the organization of the authenticated OAuth client token.<br/><br/>Only deactivation ("inactive") is supported. Maximum 10 keywords per request.
+      operationId: update-keywords-status
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateKeywordsStatusBodyDTO'
+      responses:
+        '200':
+          description: All the keywords were updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClientUpdateKeywords200ResponseDTO'
+        '207':
+          description: One or more keywords failed to be updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClientUpdateKeywords207ResponseDTO'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_BadRequestError_'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_UnauthorizedError_'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_ForbiddenAccessError_'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_UnknownError_'
+      security:
+      - jwt: []
+      servers:
+      - url: https://api.cybelangel.com
+    servers:
+    - url: https://api.cybelangel.com
+  /v1/{organization_id}/keywords:
+    get:
+      tags:
+      - Keywords
+      summary: Get Organization Keywords
+      description: Get all keywords for one of your client organizations. Results are sorted alphabetically by the keyword name.
+      operationId: get-organization-keywords
+      parameters:
+      - name: ids
+        in: query
+        description: Filter keywords by ID. Accepts multiple values (`?ids=<uuid>&ids=<uuid>`).
+        required: false
+        schema:
+          type: array
+          title: Ids
+          description: Filter keywords by ID. Accepts multiple values (`?ids=<uuid>&ids=<uuid>`).
+          default: []
+          items:
+            type: string
+            format: uuid
+      - name: name
+        in: query
+        description: Filter keywords by name.
+        required: false
+        schema:
+          type: string
+          title: Name
+          description: Filter keywords by name.
+      - name: status
+        in: query
+        description: Filter keywords by status. Accepts multiple values (`?status=pending&status=active`).
+        required: false
+        schema:
+          type: array
+          title: Status
+          description: Filter keywords by status. Accepts multiple values (`?status=pending&status=active`).
+          default: []
+          items:
+            $ref: '#/components/schemas/KeywordStatus'
+      - name: creation_start_date
+        in: query
+        description: Filter keywords created on or after this date.
+        required: false
+        schema:
+          type: string
+          title: Creation Start Date
+          description: Filter keywords created on or after this date.
+          format: date-time
+          examples:
+          - '2023-10-05T14:48:00.000Z'
+        examples:
+          default:
+            value: '2023-10-05T14:48:00.000Z'
+      - name: creation_end_date
+        in: query
+        description: Filter keywords created on or before this date.
+        required: false
+        schema:
+          type: string
+          title: Creation End Date
+          description: Filter keywords created on or before this date.
+          format: date-time
+          examples:
+          - '2023-10-05T14:48:00.000Z'
+        examples:
+          default:
+            value: '2023-10-05T14:48:00.000Z'
+      - name: last_modification_start_date
+        in: query
+        description: Filter keywords last modified on or after this date.
+        required: false
+        schema:
+          type: string
+          title: Last Modification Start Date
+          description: Filter keywords last modified on or after this date.
+          format: date-time
+          examples:
+          - '2023-10-05T14:48:00.000Z'
+        examples:
+          default:
+            value: '2023-10-05T14:48:00.000Z'
+      - name: last_modification_end_date
+        in: query
+        description: Filter keywords last modified on or before this date.
+        required: false
+        schema:
+          type: string
+          title: Last Modification End Date
+          description: Filter keywords last modified on or before this date.
+          format: date-time
+          examples:
+          - '2023-10-05T14:48:00.000Z'
+        examples:
+          default:
+            value: '2023-10-05T14:48:00.000Z'
+      - name: cursor
+        in: query
+        description: Cursor returned by a previous call to this endpoint. If it is not set, you will get the first page.
+        required: false
+        schema:
+          type: string
+          title: Cursor
+          description: Cursor returned by a previous call to this endpoint. If it is not set, you will get the first page.
+      - name: workspaces
+        in: query
+        description: Filter keywords by workspace. Accepts multiple values (`?workspaces=<uuid>&workspaces=<uuid>`).
+        required: false
+        schema:
+          type: array
+          title: Workspaces
+          description: Filter keywords by workspace. Accepts multiple values (`?workspaces=<uuid>&workspaces=<uuid>`).
+          default: []
+          items:
+            type: string
+            format: uuid
+      - name: organization_id
+        in: path
+        description: ID of the organization to manage resources for
+        required: true
+        schema:
+          type: string
+          title: Organization Id
+          description: ID of the organization to manage resources for
+          format: uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PartnerKeywordListDTO'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_BadRequestError_'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_UnauthorizedError_'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_ForbiddenAccessError_'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_UnknownError_'
+      security:
+      - jwt: []
+      servers:
+      - url: https://api.cybelangel.com
+    post:
+      tags:
+      - Keywords
+      summary: Create Organization Keywords
+      description: Create a batch of keywords for one of your client organizations. Maximum 10 keywords per request.<br/><br/>Keywords are created in "pending" status.
+      operationId: create-organization-keywords
+      parameters:
+      - name: organization_id
+        in: path
+        description: ID of the organization to manage resources for
+        required: true
+        schema:
+          type: string
+          title: Organization Id
+          description: ID of the organization to manage resources for
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PartnerCreateKeywordsBodyDTO'
+      responses:
+        '201':
+          description: All the keywords were created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PartnerCreateKeywords201ResponseDTO'
+        '207':
+          description: One of more keywords failed to be created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PartnerCreateKeywords207ResponseDTO'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_BadRequestError_'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_UnauthorizedError_'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_ForbiddenAccessError_'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_UnknownError_'
+      security:
+      - jwt: []
+      servers:
+      - url: https://api.cybelangel.com
+    delete:
+      tags:
+      - Keywords
+      summary: Delete Organization Keywords
+      description: Delete a batch of keywords for one of your client organizations. Maximum 50 keywords per request.
+      operationId: delete-organization-keywords
+      parameters:
+      - name: organization_id
+        in: path
+        description: ID of the organization to manage resources for
+        required: true
+        schema:
+          type: string
+          title: Organization Id
+          description: ID of the organization to manage resources for
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeleteKeywordBodyDTO'
+      responses:
+        '200':
+          description: All the keywords were deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteKeywords200ResponseDTO'
+        '207':
+          description: One or more keywords failed to be deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteKeywords207ResponseDTO'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_BadRequestError_'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_UnauthorizedError_'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_ForbiddenAccessError_'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_UnknownError_'
+      security:
+      - jwt: []
+      servers:
+      - url: https://api.cybelangel.com
+    servers:
+    - url: https://api.cybelangel.com
+  /v1/{organization_id}/keywords/status:
+    put:
+      tags:
+      - Keywords
+      summary: Update Organization Keywords Status
+      description: Update the status of a batch of keywords for one of your client organizations.<br/><br/>Only deactivation ("inactive") is supported. Maximum 10 keywords per request.
+      operationId: update-organization-keywords-status
+      parameters:
+      - name: organization_id
+        in: path
+        description: ID of the organization to manage resources for
+        required: true
+        schema:
+          type: string
+          title: Organization Id
+          description: ID of the organization to manage resources for
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateKeywordsStatusBodyDTO'
+      responses:
+        '200':
+          description: All the keywords were updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PartnerUpdateKeywords200ResponseDTO'
+        '207':
+          description: One or more keywords failed to be updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PartnerUpdateKeywords207ResponseDTO'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_BadRequestError_'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_UnauthorizedError_'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_ForbiddenAccessError_'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_UnknownError_'
+      security:
+      - jwt: []
+      servers:
+      - url: https://api.cybelangel.com
+    servers:
+    - url: https://api.cybelangel.com
+components:
+  schemas:
+    APIErrorResponse_UnauthorizedError_:
+      type: object
+      title: APIErrorResponse[UnauthorizedError]
+      properties:
+        error:
+          $ref: '#/components/schemas/UnauthorizedError'
+      required:
+      - error
+    ClientCreateKeywordsBodyDTO:
+      type: object
+      title: ClientCreateKeywordsBodyDTO
+      additionalProperties: false
+      properties:
+        keywords:
+          type: array
+          title: Keywords
+          description: List of keywords to create. Maximum 10 items.
+          minItems: 1
+          maxItems: 10
+          items:
+            $ref: '#/components/schemas/ClientCreateKeywordInputDTO'
+      required:
+      - keywords
+    ClientUpdateKeywords207ResponseDTO:
+      type: object
+      title: ClientUpdateKeywords207ResponseDTO
+      additionalProperties: false
+      properties:
+        updated_keywords:
+          type: array
+          title: Updated Keywords
+          description: List of successfully updated keywords
+          items:
+            $ref: '#/components/schemas/ClientKeywordDTO'
+        failed_keywords:
+          type: array
+          title: Failed Keywords
+          description: List of keywords that could not be updated
+          items:
+            $ref: '#/components/schemas/FailedToUpdateKeywordDTO'
+      required:
+      - updated_keywords
+      - failed_keywords
+    ClientUpdateKeywordsBodyDTO:
+      type: object
+      title: ClientUpdateKeywordsBodyDTO
+      additionalProperties: false
+      properties:
+        keywords:
+          type: array
+          title: Keywords
+          description: List of keywords to update. Maximum 10 items.
+          minItems: 1
+          maxItems: 10
+          items:
+            $ref: '#/components/schemas/ClientUpdateKeywordInputDTO'
+      required:
+      - keywords
+    ClientUpdateKeywordInputDTO:
+      type: object
+      title: ClientUpdateKeywordInputDTO
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+          title: Id
+          description: Unique identifier of the keyword to update.
+          format: uuid
+        type:
+          description: Type of the keyword.
+          anyOf:
+          - $ref: '#/components/schemas/KeywordType'
+        description:
+          title: Description
+          description: Description of the keyword.
+          anyOf:
+          - type: string
+        workspaces:
+          title: Workspaces
+          description: Workspaces the keyword belongs to. Required if the organization has workspaces enabled; otherwise defaults to the organization's workspace.
+          anyOf:
+          - type: array
+            minItems: 1
+            items:
+              type: string
+              format: uuid
+      required:
+      - id
+    ClientKeywordListDTO:
+      type: object
+      title: ClientKeywordListDTO
+      additionalProperties: false
+      properties:
+        items:
+          type: array
+          title: Items
+          description: List of keywords matching the request
+          items:
+            $ref: '#/components/schemas/ClientKeywordDTO'
+        total:
+          type: integer
+          title: Total
+          description: Total number of keywords through all pages
+          minimum: 0
+        next_cursor:
+          title: Next Cursor
+          description: Cursor to the next page. You should use this cursor in the "cursor" query parameter to retrieve the next page.
+          anyOf:
+          - type: string
+      required:
+      - items
+      - total
+    UpdateKeywordStatusInputDTO:
+      type: object
+      title: UpdateKeywordStatusInputDTO
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+          title: Id
+          description: Unique identifier of the keyword to update.
+          format: uuid
+        status:
+          const: inactive
+          title: Status
+          description: New status of the keyword. Only "inactive" (deactivation) is accepted.
+      required:
+      - id
+      - status
+    WorkspaceDTO:
+      type: object
+      title: WorkspaceDTO
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+          title: Id
+          description: Unique identifier of the workspace.
+          format: uuid
+        name:
+          type: string
+          title: Name
+          description: Name of the workspace.
+        description:
+          title: Description
+          description: Description of the workspace.
+          anyOf:
+          - type: string
+      required:
+      - id
+      - name
+    APIErrorResponse_BadRequestError_:
+      type: object
+      title: APIErrorResponse[BadRequestError]
+      properties:
+        error:
+          $ref: '#/components/schemas/BadRequestError'
+      required:
+      - error
+    ClientCreateKeywordInputDTO:
+      type: object
+      title: ClientCreateKeywordInputDTO
+      additionalProperties: false
+      properties:
+        name:
+          type: string
+          title: Name
+          description: Name of the keyword.
+          minLength: 1
+          maxLength: 500
+        type:
+          $ref: '#/components/schemas/KeywordType'
+          description: Type of the keyword.
+        description:
+          type: string
+          title: Description
+          description: Description of the keyword.
+          default: ''
+        workspaces:
+          type: array
+          title: Workspaces
+          description: Workspaces the keyword belongs to. Required if the organization has workspaces enabled; otherwise defaults to the organization's workspace.
+          default: []
+          items:
+            type: string
+            format: uuid
+      required:
+      - name
+    BadRequestError:
+      type: object
+      title: BadRequestError
+      description: User sent a bad request.
+      properties:
+        message:
+          type: string
+          title: Message
+      required:
+      - message
+    APIErrorResponse_ForbiddenAccessError_:
+      type: object
+      title: APIErrorResponse[ForbiddenAccessError]
+      properties:
+        error:
+          $ref: '#/components/schemas/ForbiddenAccessError'
+      required:
+      - error
+    FailedToUpdateKeywordDTO:
+      type: object
+      title: FailedToUpdateKeywordDTO
+      properties:
+        id:
+          type: string
+          title: Id
+          format: uuid
+        error_code:
+          $ref: '#/components/schemas/UpdateKeywordErrorCode'
+        error_details:
+          title: Error Details
+          anyOf:
+          - type: string
+      required:
+      - id
+      - error_code
+    UnknownError:
+      type: object
+      title: UnknownError
+      description: Unknown error on server-side, please contact support.
+      properties:
+        message:
+          type: string
+          title: Message
+      required:
+      - message
+    ClientKeywordDTO:
+      type: object
+      title: ClientKeywordDTO
+      properties:
+        id:
+          type: string
+          title: Id
+          description: Unique identifier of the keyword.
+          format: uuid
+        name:
+          type: string
+          title: Name
+          description: Name of the keyword.
+        type:
+          $ref: '#/components/schemas/KeywordType'
+          description: Type of the keyword.
+        status:
+          $ref: '#/components/schemas/KeywordStatus'
+          description: Current status of the keyword.
+        description:
+          type: string
+          title: Description
+          description: Description of the keyword.
+        workspaces:
+          type: array
+          title: Workspaces
+          description: Workspaces the keyword belongs to.
+          default: []
+          items:
+            $ref: '#/components/schemas/WorkspaceDTO'
+        creation_date:
+          type: string
+          title: Creation Date
+          description: Date of creation.
+          format: date-time
+          examples:
+          - '2023-10-05T14:48:00.000Z'
+        last_modification_date:
+          type: string
+          title: Last Modification Date
+          description: Date of the last modification.
+          format: date-time
+          examples:
+          - '2023-10-05T14:48:00.000Z'
+      required:
+      - id
+      - name
+      - type
+      - status
+      - description
+      - creation_date
+      - last_modification_date
+    ClientCreateKeywords207ResponseDTO:
+      type: object
+      title: ClientCreateKeywords207ResponseDTO
+      additionalProperties: false
+      properties:
+        created_keywords:
+          type: array
+          title: Created Keywords
+          description: List of successfully created keywords
+          items:
+            $ref: '#/components/schemas/ClientKeywordDTO'
+        failed_keywords:
+          type: array
+          title: Failed Keywords
+          description: List of keywords that could not be created
+          items:
+            $ref: '#/components/schemas/FailedToCreateKeywordDTO'
+      required:
+      - created_keywords
+      - failed_keywords
+    UpdateKeywordErrorCode:
+      type: string
+      enum:
+      - NOT_FOUND
+      - NAME_ALREADY_EXISTS
+      - INVALID_NAME
+      - INVALID_RULE
+      - INFOSTEALER_NOT_AVAILABLE_FOR_TYPE
+      - INFOSTEALER_NOT_ACTIVATED
+      - INTERNAL_ERROR
+      title: UpdateKeywordErrorCode
+    APIErrorResponse_UnknownError_:
+      type: object
+      title: APIErrorResponse[UnknownError]
+      properties:
+        error:
+          $ref: '#/components/schemas/UnknownError'
+      required:
+      - error
+    ForbiddenAccessError:
+      type: object
+      title: ForbiddenAccessError
+      description: User cannot access some resource.
+      properties:
+        message:
+          type: string
+          title: Message
+      required:
+      - message
+    UpdateKeywordsStatusBodyDTO:
+      type: object
+      title: UpdateKeywordsStatusBodyDTO
+      additionalProperties: false
+      properties:
+        keywords:
+          type: array
+          title: Keywords
+          description: List of keywords whose status to update. Maximum 10 items.
+          minItems: 1
+          maxItems: 10
+          items:
+            $ref: '#/components/schemas/UpdateKeywordStatusInputDTO'
+      required:
+      - keywords
+    UnauthorizedError:
+      type: object
+      title: UnauthorizedError
+      description: User cannot access some resource.
+      properties:
+        message:
+          type: string
+          title: Message
+      required:
+      - message
+    ClientUpdateKeywords200ResponseDTO:
+      type: object
+      title: ClientUpdateKeywords200ResponseDTO
+      additionalProperties: false
+      properties:
+        updated_keywords:
+          type: array
+          title: Updated Keywords
+          description: List of successfully updated keywords
+          items:
+            $ref: '#/components/schemas/ClientKeywordDTO'
+        failed_keywords:
+          type: array
+          title: Failed Keywords
+          description: List of keywords that could not be updated
+          items:
+            $ref: '#/components/schemas/FailedToUpdateKeywordDTO'
+      required:
+      - updated_keywords
+      - failed_keywords
+    KeywordType:
+      type: string
+      enum:
+      - subsidiaries
+      - projects
+      - domain
+      - ip
+      - bin
+      - vip
+      - product
+      - misc
+      title: KeywordType
+    ClientCreateKeywords201ResponseDTO:
+      type: object
+      title: ClientCreateKeywords201ResponseDTO
+      additionalProperties: false
+      properties:
+        created_keywords:
+          type: array
+          title: Created Keywords
+          description: List of successfully created keywords
+          items:
+            $ref: '#/components/schemas/ClientKeywordDTO'
+        failed_keywords:
+          type: array
+          title: Failed Keywords
+          description: List of keywords that could not be created
+          items:
+            $ref: '#/components/schemas/FailedToCreateKeywordDTO'
+      required:
+      - created_keywords
+      - failed_keywords
+    KeywordStatus:
+      type: string
+      enum:
+      - pending
+      - active
+      - inactive
+      title: KeywordStatus
+    CreateKeywordErrorCode:
+      type: string
+      enum:
+      - NAME_ALREADY_EXISTS
+      - INVALID_NAME
+      - INVALID_RULE
+      - INFOSTEALER_NOT_AVAILABLE_FOR_TYPE
+      - INFOSTEALER_NOT_ACTIVATED
+      - INTERNAL_ERROR
+      title: CreateKeywordErrorCode
+    FailedToCreateKeywordDTO:
+      type: object
+      title: FailedToCreateKeywordDTO
+      properties:
+        name:
+          type: string
+          title: Name
+        error_code:
+          $ref: '#/components/schemas/CreateKeywordErrorCode'
+        error_details:
+          title: Error Details
+          anyOf:
+          - type: string
+      required:
+      - name
+      - error_code
+    KeywordSource:
+      type: string
+      enum:
+      - board
+      - codeshare
+      - database
+      - dns
+      - docshare
+      - fileserver
+      - iot
+      - leak
+      - paste
+      - rss
+      - social
+      - clouddrive
+      title: KeywordSource
+    PartnerCreateKeywordsBodyDTO:
+      type: object
+      title: PartnerCreateKeywordsBodyDTO
+      additionalProperties: false
+      properties:
+        keywords:
+          type: array
+          title: Keywords
+          description: List of keywords to create. Maximum 10 items.
+          minItems: 1
+          maxItems: 10
+          items:
+            $ref: '#/components/schemas/PartnerCreateKeywordInputDTO'
+      required:
+      - keywords
+    DeleteKeywordBodyDTO:
+      type: object
+      title: DeleteKeywordBodyDTO
+      additionalProperties: false
+      properties:
+        keyword_ids:
+          type: array
+          title: Keyword Ids
+          description: List of keyword IDs to delete. Maximum 50 items.
+          minItems: 1
+          maxItems: 50
+          items:
+            type: string
+            format: uuid
+      required:
+      - keyword_ids
+    PartnerKeywordDTO:
+      type: object
+      title: PartnerKeywordDTO
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+          title: Id
+          description: Unique identifier of the keyword.
+          format: uuid
+        name:
+          type: string
+          title: Name
+          description: Name of the keyword.
+        type:
+          $ref: '#/components/schemas/KeywordType'
+          description: Type of the keyword.
+        status:
+          $ref: '#/components/schemas/KeywordStatus'
+          description: Current status of the keyword.
+        description:
+          type: string
+          title: Description
+          description: Description of the keyword.
+        workspaces:
+          type: array
+          title: Workspaces
+          description: Workspaces the keyword belongs to.
+          default: []
+          items:
+            $ref: '#/components/schemas/WorkspaceDTO'
+        creation_date:
+          type: string
+          title: Creation Date
+          description: Date of creation.
+          format: date-time
+          examples:
+          - '2023-10-05T14:48:00.000Z'
+        last_modification_date:
+          type: string
+          title: Last Modification Date
+          description: Date of the last modification.
+          format: date-time
+          examples:
+          - '2023-10-05T14:48:00.000Z'
+        rule:
+          title: Rule
+          description: Rule associated with the keyword.
+          anyOf:
+          - type: string
+        sources:
+          title: Sources
+          description: List of sources associated with the keyword.
+          anyOf:
+          - type: array
+            items:
+              $ref: '#/components/schemas/KeywordSource'
+        active_search:
+          title: Active Search
+          description: Whether active search is enabled for this keyword.
+          anyOf:
+          - type: boolean
+        infostealer_search:
+          title: Infostealer Search
+          description: Whether infostealer search is enabled for this keyword.
+          anyOf:
+          - type: boolean
+      required:
+      - id
+      - name
+      - type
+      - status
+      - description
+      - creation_date
+      - last_modification_date
+    PartnerUpdateKeywords207ResponseDTO:
+      type: object
+      title: PartnerUpdateKeywords207ResponseDTO
+      additionalProperties: false
+      properties:
+        updated_keywords:
+          type: array
+          title: Updated Keywords
+          description: List of successfully updated keywords
+          items:
+            $ref: '#/components/schemas/PartnerKeywordDTO'
+        failed_keywords:
+          type: array
+          title: Failed Keywords
+          description: List of keywords that could not be updated
+          items:
+            $ref: '#/components/schemas/FailedToUpdateKeywordDTO'
+      required:
+      - updated_keywords
+      - failed_keywords
+    FailedKeywordDTO:
+      type: object
+      title: FailedKeywordDTO
+      properties:
+        id:
+          type: string
+          title: Id
+          format: uuid
+        error_code:
+          $ref: '#/components/schemas/DeleteKeywordErrorCode'
+      required:
+      - id
+      - error_code
+    DeleteKeywordErrorCode:
+      type: string
+      enum:
+      - NOT_FOUND
+      - INTERNAL_ERROR
+      title: DeleteKeywordErrorCode
+    DeletedKeywordDTO:
+      type: object
+      title: DeletedKeywordDTO
+      properties:
+        id:
+          type: string
+          title: Id
+          format: uuid
+        name:
+          type: string
+          title: Name
+      required:
+      - id
+      - name
+    PartnerUpdateKeywords200ResponseDTO:
+      type: object
+      title: PartnerUpdateKeywords200ResponseDTO
+      additionalProperties: false
+      properties:
+        updated_keywords:
+          type: array
+          title: Updated Keywords
+          description: List of successfully updated keywords
+          items:
+            $ref: '#/components/schemas/PartnerKeywordDTO'
+        failed_keywords:
+          type: array
+          title: Failed Keywords
+          description: List of keywords that could not be updated
+          items:
+            $ref: '#/components/schemas/FailedToUpdateKeywordDTO'
+      required:
+      - updated_keywords
+      - failed_keywords
+    DeleteKeywords200ResponseDTO:
+      type: object
+      title: DeleteKeywords200ResponseDTO
+      additionalProperties: false
+      properties:
+        deleted_keywords:
+          type: array
+          title: Deleted Keywords
+          description: List of successfully deleted keywords
+          items:
+            $ref: '#/components/schemas/DeletedKeywordDTO'
+        failed_keywords:
+          type: array
+          title: Failed Keywords
+          description: List of keywords that could not be deleted
+          items:
+            $ref: '#/components/schemas/FailedKeywordDTO'
+      required:
+      - deleted_keywords
+      - failed_keywords
+    PartnerCreateKeywords201ResponseDTO:
+      type: object
+      title: PartnerCreateKeywords201ResponseDTO
+      additionalProperties: false
+      properties:
+        created_keywords:
+          type: array
+          title: Created Keywords
+          description: List of successfully created keywords
+          items:
+            $ref: '#/components/schemas/PartnerKeywordDTO'
+        failed_keywords:
+          type: array
+          title: Failed Keywords
+          description: List of keywords that could not be created
+          items:
+            $ref: '#/components/schemas/FailedToCreateKeywordDTO'
+      required:
+      - created_keywords
+      - failed_keywords
+    PartnerCreateKeywordInputDTO:
+      type: object
+      title: PartnerCreateKeywordInputDTO
+      additionalProperties: false
+      properties:
+        name:
+          type: string
+          title: Name
+          description: Name of the keyword.
+          minLength: 1
+          maxLength: 500
+        description:
+          type: string
+          title: Description
+          description: Description of the keyword.
+        type:
+          $ref: '#/components/schemas/KeywordType'
+          description: Type of the keyword.
+        sources:
+          type: array
+          title: Sources
+          description: List of sources associated with the keyword.
+          items:
+            $ref: '#/components/schemas/KeywordSource'
+        rule:
+          type: string
+          title: Rule
+          description: Rule associated with the keyword.
+          minLength: 1
+          maxLength: 10000
+        infostealer_search:
+          type: boolean
+          title: Infostealer Search
+          description: Whether infostealer search is enabled for this keyword.
+        active_search:
+          type: boolean
+          title: Active Search
+          description: Whether active search is enabled for this keyword.
+        workspaces:
+          type: array
+          title: Workspaces
+          description: Workspaces the keyword belongs to. Required if the organization has workspaces enabled; otherwise defaults to the organization's workspace.
+          default: []
+          items:
+            type: string
+            format: uuid
+      required:
+      - name
+      - description
+      - type
+      - sources
+      - rule
+      - infostealer_search
+      - active_search
+    PartnerKeywordListDTO:
+      type: object
+      title: PartnerKeywordListDTO
+      additionalProperties: false
+      properties:
+        items:
+          type: array
+          title: Items
+          description: List of keywords matching the request
+          items:
+            $ref: '#/components/schemas/PartnerKeywordDTO'
+        total:
+          type: integer
+          title: Total
+          description: Total number of keywords through all pages
+          minimum: 0
+        next_cursor:
+          title: Next Cursor
+          description: Cursor to the next page. You should use this cursor in the "cursor" query parameter to retrieve the next page.
+          anyOf:
+          - type: string
+      required:
+      - items
+      - total
+    DeleteKeywords207ResponseDTO:
+      type: object
+      title: DeleteKeywords207ResponseDTO
+      additionalProperties: false
+      properties:
+        deleted_keywords:
+          type: array
+          title: Deleted Keywords
+          description: List of successfully deleted keywords
+          items:
+            $ref: '#/components/schemas/DeletedKeywordDTO'
+        failed_keywords:
+          type: array
+          title: Failed Keywords
+          description: List of keywords that could not be deleted
+          items:
+            $ref: '#/components/schemas/FailedKeywordDTO'
+      required:
+      - deleted_keywords
+      - failed_keywords
+    PartnerCreateKeywords207ResponseDTO:
+      type: object
+      title: PartnerCreateKeywords207ResponseDTO
+      additionalProperties: false
+      properties:
+        created_keywords:
+          type: array
+          title: Created Keywords
+          description: List of successfully created keywords
+          items:
+            $ref: '#/components/schemas/PartnerKeywordDTO'
+        failed_keywords:
+          type: array
+          title: Failed Keywords
+          description: List of keywords that could not be created
+          items:
+            $ref: '#/components/schemas/FailedToCreateKeywordDTO'
+      required:
+      - created_keywords
+      - failed_keywords
+  securitySchemes:
+    jwt:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+x-refined-from:
+- cybelangel-keywords-openapi.yml
+- cybelangel-partner-openapi.yml

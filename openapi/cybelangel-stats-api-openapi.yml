@@ -1,0 +1,207 @@
+openapi: 3.2.0
+info:
+  version: 0.1.0
+  title: References Stats API
+  description: 'API for CybelAngel''s Platform.
+
+    Authentication uses standard [OAuth2 Bearer Tokens](https://tools.ietf.org/html/rfc6750).
+
+    [Activate your API access](docs/Activate-API-service.md) to obtain your credentials.
+
+    You will be communicated a client `client_id` and a `client_secret` that will allow you to fetch tokens for our API.
+
+    These tokens expire 24 hours.
+
+
+    Here is a simple example of how to fetch such a token with curl:
+
+
+    ```shell
+
+    curl -XPOST https://auth.cybelangel.com/oauth/token -H ''content-type: application/json'' -d ''{"client_id": "client_id", "client_secret": "client_secret", "audience": "https://platform.cybelangel.com/", "grant_type": "client_credentials"}''
+
+    ```
+
+
+    The received access token can then be used as a Bearer token to request our API.
+
+    '
+  contact:
+    email: support@cybelangel.com
+  license:
+    url: https://cybelangel.com/
+    name: Proprietary
+servers:
+- url: https://platform.cybelangel.com/api
+security:
+- bearer_token: []
+tags:
+- name: Stats
+  description: Statistics on the reports, keywords, etc.
+paths:
+  /v2/stats/reports:
+    get:
+      tags:
+      - Stats
+      summary: Get volume of reports (stats)
+      description: Return the volume of reports received over a specified period
+      operationId: get-v2-stats-reports
+      parameters:
+      - name: start
+        in: query
+        description: Start date in ISO format
+        schema:
+          type: string
+          format: date
+      - name: end
+        in: query
+        description: End date in ISO format, default to the current date
+        schema:
+          type: string
+          format: date
+      - name: limit
+        in: query
+        description: Limit the number of results, no effect when `split_by` equals `month`
+        schema:
+          type: integer
+      - name: split_by
+        in: query
+        description: Aggregate results by the given property
+        schema:
+          type: string
+          enum:
+          - severity
+          - top_keywords
+          - use_case
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total:
+                    type: integer
+                    examples:
+                    - 42
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '500':
+          $ref: '#/components/responses/Error500'
+      security:
+      - bearer_token:
+        - reports.read
+      servers:
+      - url: https://platform.cybelangel.com/api
+components:
+  responses:
+    Error400:
+      description: '**Bad request**
+
+
+        Check query parameters
+
+        '
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: number
+                description: internal error code
+              msg:
+                type: string
+                description: internal error message
+              type:
+                description: internal error type
+                examples:
+                - error
+    Error403:
+      description: '**Forbidden**
+
+
+        Access to requested resource is forbidden with current credentials.
+
+        '
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: number
+                description: internal error code
+              msg:
+                type: string
+                description: internal error message
+              type:
+                description: internal error type
+                examples:
+                - error
+    Error500:
+      description: '**Internal server error**
+
+
+        An unexpected error occurred during request
+
+        '
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: number
+                description: internal error code
+              msg:
+                type: string
+                description: internal error message
+              type:
+                description: internal error type
+                examples:
+                - error
+    Error401:
+      description: '**Unauthorized**
+
+
+        Authentication is required
+
+        '
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: number
+                description: internal error code
+              msg:
+                type: string
+                description: internal error message
+              type:
+                description: internal error type
+                examples:
+                - error
+  securitySchemes:
+    bearer_token:
+      type: oauth2
+      flows:
+        clientCredentials:
+          scopes:
+            assets.download: Downloading an asset
+            reports.move: Resolve or reopen an incident report
+            reports.read: Read incident reports
+            reports_global_comments.read: Read comments of a incident report
+            reports_global_comments.write: Write comments on a incident report (Endpoint not accessible, yet)
+            usergroups.admin: Read and manage usergroups
+            usergroups.read: Read subscribed usergroups
+            credentials.read: Read list of leaked monitored credentials
+            credentials.move: Resolve or reopen a credential
+            credentials.export: Export list of credentials
+          tokenUrl: https://auth.cybelangel.com/oauth/token

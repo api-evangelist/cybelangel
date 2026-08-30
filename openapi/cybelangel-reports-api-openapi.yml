@@ -1,0 +1,203 @@
+openapi: 3.2.0
+info:
+  version: 0.1.0
+  title: References Reports API
+  description: 'API for CybelAngel''s Platform.
+
+    Authentication uses standard [OAuth2 Bearer Tokens](https://tools.ietf.org/html/rfc6750).
+
+    [Activate your API access](docs/Activate-API-service.md) to obtain your credentials.
+
+    You will be communicated a client `client_id` and a `client_secret` that will allow you to fetch tokens for our API.
+
+    These tokens expire 24 hours.
+
+
+    Here is a simple example of how to fetch such a token with curl:
+
+
+    ```shell
+
+    curl -XPOST https://auth.cybelangel.com/oauth/token -H ''content-type: application/json'' -d ''{"client_id": "client_id", "client_secret": "client_secret", "audience": "https://platform.cybelangel.com/", "grant_type": "client_credentials"}''
+
+    ```
+
+
+    The received access token can then be used as a Bearer token to request our API.
+
+    '
+  contact:
+    email: support@cybelangel.com
+  license:
+    url: https://cybelangel.com/
+    name: Proprietary
+servers:
+- url: https://platform.cybelangel.com/api
+security:
+- bearer_token: []
+tags:
+- name: Reports
+paths:
+  /v1/reports/permissions:
+    get:
+      tags:
+      - Reports
+      summary: Get user permissions for reports
+      description: 'Retrieves the list of permissions that the authenticated user has for reports.
+
+        This endpoint requires user authentication.
+
+        '
+      operationId: getReportPermissions
+      responses:
+        '200':
+          description: Successfully retrieved user permissions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '500':
+          $ref: '#/components/responses/Error500'
+      security:
+      - bearer_token: []
+      servers:
+      - url: https://platform.cybelangel.com/api
+components:
+  responses:
+    Error403:
+      description: '**Forbidden**
+
+
+        Access to requested resource is forbidden with current credentials.
+
+        '
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: number
+                description: internal error code
+              msg:
+                type: string
+                description: internal error message
+              type:
+                description: internal error type
+                examples:
+                - error
+    Error401:
+      description: '**Unauthorized**
+
+
+        Authentication is required
+
+        '
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: number
+                description: internal error code
+              msg:
+                type: string
+                description: internal error message
+              type:
+                description: internal error type
+                examples:
+                - error
+    Error404:
+      description: '**Not Found**
+
+
+        Requested resource was not found. Please check parameters or spelling and try again.
+
+        '
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: number
+                description: internal error code
+              msg:
+                type: string
+                description: internal error message
+              type:
+                description: internal error type
+                examples:
+                - error
+    Error400:
+      description: '**Bad request**
+
+
+        Check query parameters
+
+        '
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: number
+                description: internal error code
+              msg:
+                type: string
+                description: internal error message
+              type:
+                description: internal error type
+                examples:
+                - error
+    Error500:
+      description: '**Internal server error**
+
+
+        An unexpected error occurred during request
+
+        '
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: number
+                description: internal error code
+              msg:
+                type: string
+                description: internal error message
+              type:
+                description: internal error type
+                examples:
+                - error
+  securitySchemes:
+    bearer_token:
+      type: oauth2
+      flows:
+        clientCredentials:
+          scopes:
+            assets.download: Downloading an asset
+            reports.move: Resolve or reopen an incident report
+            reports.read: Read incident reports
+            reports_global_comments.read: Read comments of a incident report
+            reports_global_comments.write: Write comments on a incident report (Endpoint not accessible, yet)
+            usergroups.admin: Read and manage usergroups
+            usergroups.read: Read subscribed usergroups
+            credentials.read: Read list of leaked monitored credentials
+            credentials.move: Resolve or reopen a credential
+            credentials.export: Export list of credentials
+          tokenUrl: https://auth.cybelangel.com/oauth/token

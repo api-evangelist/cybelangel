@@ -1,0 +1,456 @@
+openapi: 3.2.0
+info:
+  version: 1.0.0
+  title: References Stix API
+  description: 'API for CybelAngel''s Alerts.
+
+    Authentication uses standard [OAuth2 Bearer Tokens](https://tools.ietf.org/html/rfc6750).
+
+
+    Here is a simple example of how to fetch such a token with curl:
+
+
+    ```shell
+
+    curl -X POST https://auth.cybelangel.com/oauth/token -H ''content-type: application/json -d ''{"client_id": "client_id", "client_secret": "client_secret", "audience": "https://platform.cybelangel.com/", "grant_type": "client_credentials"}
+
+    ```
+
+
+    The received access token can then be used as a Bearer token to request our API.'
+  contact:
+    email: support@cybelangel.com
+  license:
+    url: https://cybelangel.com/
+    name: Proprietary
+servers:
+- url: https://api.cybelangel.com
+tags:
+- name: stix
+  description: Alerts - Stix
+paths:
+  /v1/stix/alerts:
+    get:
+      tags:
+      - stix
+      summary: Search alerts in STIX 2.1 format
+      description: 'Search alerts according to user filters and return them as a Bundle in STIX 2.1 format.<br/>See https://oasis-open.github.io/cti-documentation/stix/intro for more information on this format.<br/><br/>Note: Historical data is only available starting from January 1, 2024, and is retained for a maximum of 12 months.<br/>Requests for data outside of this range will not return any results.'
+      operationId: stix_search_stix_alerts_stix_alerts_get
+      parameters:
+      - name: cursor
+        in: query
+        description: 'Set it to the the ''cursor'' value received from previous search request to iterate on the following alerts, beyond the limit set per request.
+
+          Searching from a cursor does not impact the total number of results.
+
+          Behavior is undefined if the filters and sort are changed between successive requests.
+
+
+          Note: with big datasets, iterating on cursor can be much slower than iterating on ''start_date'' filter.'
+        required: false
+        schema:
+          title: Cursor
+          description: 'Set it to the the ''cursor'' value received from previous search request to iterate on the following alerts, beyond the limit set per request.
+
+            Searching from a cursor does not impact the total number of results.
+
+            Behavior is undefined if the filters and sort are changed between successive requests.
+
+
+            Note: with big datasets, iterating on cursor can be much slower than iterating on ''start_date'' filter.'
+          anyOf: []
+      - name: order_by
+        in: query
+        description: 'Can be multiple fields with +/- for ascending/descending sort.
+
+          Fields can be ingestion_date, detection_date, ml_score.'
+        required: false
+        schema:
+          type: array
+          title: Order By
+          description: 'Can be multiple fields with +/- for ascending/descending sort.
+
+            Fields can be ingestion_date, detection_date, ml_score.'
+          default:
+          - +ingestion_date
+          - +detection_date
+          items:
+            type: string
+            pattern: '[+-]?(ingestion_date|detection_date|ml_score)'
+            minLength: 1
+      - name: stream_id
+        in: query
+        description: 'Stream id used to filter alerts belonging to some organization.
+
+          A client can only query alerts for its allowed streams.'
+        required: true
+        schema:
+          type: string
+          title: Stream Id
+          description: 'Stream id used to filter alerts belonging to some organization.
+
+            A client can only query alerts for its allowed streams.'
+          minLength: 1
+          examples:
+          - 90b18fad-b9ca-41db-bae1-b4964c1a4e84
+        examples:
+          default:
+            value: 90b18fad-b9ca-41db-bae1-b4964c1a4e84
+      - name: start_date
+        in: query
+        description: 'Minimal ingestion date. Expects a date with timezone information.
+
+
+          Note: Historical data is only available starting from January 1, 2024, and is retained for a maximum of 12 months.
+
+          Requests for data outside of this range will not return any results.'
+        required: true
+        schema:
+          type: string
+          title: Start Date
+          description: 'Minimal ingestion date. Expects a date with timezone information.
+
+
+            Note: Historical data is only available starting from January 1, 2024, and is retained for a maximum of 12 months.
+
+            Requests for data outside of this range will not return any results.'
+          format: date-time
+          examples:
+          - '2024-09-01T10:00:00.000Z'
+        examples:
+          default:
+            value: '2024-09-01T10:00:00.000Z'
+      - name: end_date
+        in: query
+        description: 'Maximal ingestion date. Expects a date with timezone information.
+
+
+          Note: Historical data is only available starting from January 1, 2024, and is retained for a maximum of 12 months.
+
+          Requests for data outside of this range will not return any results.'
+        required: false
+        schema:
+          title: End Date
+          description: 'Maximal ingestion date. Expects a date with timezone information.
+
+
+            Note: Historical data is only available starting from January 1, 2024, and is retained for a maximum of 12 months.
+
+            Requests for data outside of this range will not return any results.'
+          anyOf: []
+      - name: status
+        in: query
+        description: 'Select only alerts having one of the requested statuses.
+
+          By default selects only ''new'' alerts to exclude alerts automatically discarded by our ML tools or already processed by analysts.'
+        required: false
+        schema:
+          type: array
+          title: Status
+          description: 'Select only alerts having one of the requested statuses.
+
+            By default selects only ''new'' alerts to exclude alerts automatically discarded by our ML tools or already processed by analysts.'
+          default:
+          - new
+          items:
+            $ref: '#/components/schemas/AlertStatus'
+      - name: category
+        in: query
+        description: If set, select alerts with specified categories.
+        required: false
+        schema:
+          type: array
+          title: Category
+          description: If set, select alerts with specified categories.
+          default: []
+          items:
+            $ref: '#/components/schemas/AlertCategory'
+      - name: customer_assessment
+        in: query
+        description: 'If set, select only alerts having one of the requested customer assessments.
+
+          This is the **customer.assessment** field that may be set by clients using the API.'
+        required: false
+        schema:
+          type: array
+          title: Customer Assessment
+          description: 'If set, select only alerts having one of the requested customer assessments.
+
+            This is the **customer.assessment** field that may be set by clients using the API.'
+          default: []
+          items:
+            $ref: '#/components/schemas/CustomerAssessment'
+      - name: keyword
+        in: query
+        description: If set, select alerts matching specified keywords aliases.
+        required: false
+        schema:
+          type: array
+          title: Keyword
+          description: If set, select alerts matching specified keywords aliases.
+          default: []
+          items:
+            type: string
+            minLength: 1
+      - name: keyword_id
+        in: query
+        description: If set, select alerts matching specified keyword identifiers.
+        required: false
+        schema:
+          type: array
+          title: Keyword Id
+          description: If set, select alerts matching specified keyword identifiers.
+          default: []
+          items:
+            type: string
+            minLength: 1
+      - name: min_ml_score
+        in: query
+        description: If set, select alerts with equal or higher 'ml.score'.
+        required: false
+        schema:
+          type: integer
+          title: Min Ml Score
+          description: If set, select alerts with equal or higher 'ml.score'.
+          minimum: 0
+          maximum: 100
+          default: 0
+      - name: hostname
+        in: query
+        description: If set, select alerts with any specified hostname value.
+        required: false
+        schema:
+          type: array
+          title: Hostname
+          description: If set, select alerts with any specified hostname value.
+          default: []
+          items:
+            type: string
+            minLength: 1
+      - name: ip
+        in: query
+        description: If set, select alerts with specified IP address among 'ip', 'server_ip' or 'victim_ip' fields.
+        required: false
+        schema:
+          type: array
+          title: Ip
+          description: If set, select alerts with specified IP address among 'ip', 'server_ip' or 'victim_ip' fields.
+          default: []
+          items:
+            type: string
+            minLength: 1
+      - name: search_query
+        in: query
+        description: Words to search in alerts text fields.
+        required: false
+        schema:
+          title: Search Query
+          description: Words to search in alerts text fields.
+          anyOf: []
+      - name: alerts_limit
+        in: query
+        description: 'Max number of considered alerts. Increasing it will also increase the payload.
+
+
+          Note: it limits the number of alert considered by the query, but one alert can generate from zero to dozens of STIX objects.'
+        required: false
+        schema:
+          type: integer
+          title: Alerts Limit
+          description: 'Max number of considered alerts. Increasing it will also increase the payload.
+
+
+            Note: it limits the number of alert considered by the query, but one alert can generate from zero to dozens of STIX objects.'
+          minimum: 0
+          maximum: 1000
+          default: 10
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StixAlertsResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_ValidationError_'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_ForbiddenAccessError_'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse_UnknownError_'
+      security:
+      - jwt: []
+      servers:
+      - url: https://api.cybelangel.com
+components:
+  schemas:
+    CustomerAssessment:
+      type: string
+      enum:
+      - unknown
+      - true_positive
+      - false_positive
+      title: CustomerAssessment
+      description: 'Assessment of the alert quality: is it a real security threat?
+
+        Set by the API user to provide feedback to Cybelangel.
+
+
+        The default ''unknown'' value is present before user assessed the alert, or when removing that assessment.'
+    ValidationError:
+      type: object
+      title: ValidationError
+      description: Error on incorrect input fields
+      properties:
+        message:
+          type: string
+          title: Message
+        fields:
+          type: array
+          title: Fields
+          items:
+            $ref: '#/components/schemas/Field'
+      required:
+      - message
+      - fields
+    Field:
+      type: object
+      title: Field
+      description: Detail of an incorrect input field
+      properties:
+        name:
+          type: string
+          title: Name
+        msg:
+          type: string
+          title: Msg
+        input:
+          title: Input
+          anyOf:
+          - type: string
+          - type: array
+            items:
+              type: string
+        valid_input:
+          title: Valid Input
+          anyOf:
+          - type: string
+          - type: array
+            items:
+              type: string
+      required:
+      - name
+      - msg
+    APIErrorResponse_ValidationError_:
+      type: object
+      title: APIErrorResponse[ValidationError]
+      properties:
+        error:
+          $ref: '#/components/schemas/ValidationError'
+      required:
+      - error
+    APIErrorResponse_UnknownError_:
+      type: object
+      title: APIErrorResponse[UnknownError]
+      properties:
+        error:
+          $ref: '#/components/schemas/UnknownError'
+      required:
+      - error
+    ForbiddenAccessError:
+      type: object
+      title: ForbiddenAccessError
+      description: User cannot access some resource.
+      properties:
+        message:
+          type: string
+          title: Message
+      required:
+      - message
+    AlertStatus:
+      type: string
+      enum:
+      - new
+      - autodiscarded
+      - discarded
+      - interesting
+      - forwarded
+      - report_sent
+      title: AlertStatus
+      description: Status of alerts, set by cybelangel automated systems and analysts.
+    APIErrorResponse_ForbiddenAccessError_:
+      type: object
+      title: APIErrorResponse[ForbiddenAccessError]
+      properties:
+        error:
+          $ref: '#/components/schemas/ForbiddenAccessError'
+      required:
+      - error
+    UnknownError:
+      type: object
+      title: UnknownError
+      description: Unknown error on server-side, please contact support.
+      properties:
+        message:
+          type: string
+          title: Message
+      required:
+      - message
+    StixAlertsResponse:
+      type: object
+      title: StixAlertsResponse
+      description: Response to a search of STIX objects from alerts data.
+      properties:
+        stix_bundle:
+          type: object
+          title: Stix Bundle
+          description: 'STIX Bundle object used to aggregate STIX objects, both SDO, SCO and SRO.
+
+            See https://docs.oasis-open.org/cti/stix/v2.1/csprd01/stix-v2.1-csprd01.html#_Toc16070770 for more information.'
+        more:
+          type: boolean
+          title: More
+          description: Set to true when there are more alerts to retrieve with the same search request parameters and a new 'cursor'.
+          default: false
+        cursor:
+          title: Cursor
+          description: Set when there are more alerts to retrieve. It can be used in another search request, with the same parameters, to download the following alerts.
+          anyOf:
+          - type: string
+      required:
+      - stix_bundle
+    AlertCategory:
+      type: string
+      enum:
+      - adm
+      - fileserver
+      - codeshare
+      - dns
+      - database
+      - board
+      - clouddrive
+      - docshare
+      - paste
+      - leak
+      - rss
+      - social
+      title: AlertCategory
+      description: 'ADM stands for Asset Discovery and Monitoring.
+
+        DNS stands for Domain Name System.'
+  securitySchemes:
+    jwt:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
