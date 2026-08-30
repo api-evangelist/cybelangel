@@ -39,14 +39,14 @@ tags:
   - Threat Intelligence
   - external-attack-surface-management
   - data-breach-prevention
-  - Credential Intelligence
-  - Brand Protection
-  - Dark Web Monitoring
-  - Digital Risk Protection
+  - credential-intelligence
+  - brand-protection
+  - dark-web-monitoring
+  - digital-risk-protection
   - STIX
   - security-alerts
-  - Asset Inventory
-  - Audit Logs
+  - asset-inventory
+  - audit-logs
 tags_raw:
   - Company
   - cybersecurity
@@ -136,6 +136,8 @@ apis:
     https://developers.cybelangel.com/docs/cybelangel-platform-api/39d4926befc14-what-can-i-do-with-this-api
   baseURL: https://platform.cybelangel.com/api
   tags:
+  - Alerts
+  tags_raw:
   - alerts
   properties:
   - type: OpenAPI
@@ -270,6 +272,8 @@ apis:
     https://developers.cybelangel.com/docs/cybelangel-platform-api/39d4926befc14-what-can-i-do-with-this-api
   baseURL: https://platform.cybelangel.com/api
   tags:
+  - Audit Logs
+  tags_raw:
   - audit logs
   properties:
   - type: OpenAPI
@@ -471,6 +475,8 @@ apis:
     https://developers.cybelangel.com/docs/cybelangel-platform-api/39d4926befc14-what-can-i-do-with-this-api
   baseURL: https://platform.cybelangel.com/api
   tags:
+  - Incident Reports
+  tags_raw:
   - Incident reports
   properties:
   - type: OpenAPI
@@ -739,6 +745,8 @@ apis:
     https://developers.cybelangel.com/docs/cybelangel-platform-api/39d4926befc14-what-can-i-do-with-this-api
   baseURL: https://platform.cybelangel.com/api
   tags:
+  - STIX
+  tags_raw:
   - stix
   properties:
   - type: OpenAPI
