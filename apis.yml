@@ -896,6 +896,8 @@ apis:
     https://developers.cybelangel.com/docs/cybelangel-platform-api/39d4926befc14-what-can-i-do-with-this-api
   baseURL: https://platform.cybelangel.com/api
   tags:
+  - Workspace
+  tags_raw:
   - Workspaces
   properties:
   - type: OpenAPI
