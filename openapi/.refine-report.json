@@ -1,0 +1,60 @@
+{
+  "provider": "cybelangel",
+  "sources": [
+    "_original/cybelangel-adm-inventory-openapi.yml",
+    "_original/cybelangel-alerts-openapi.yml",
+    "_original/cybelangel-audit-logs-openapi.yml",
+    "_original/cybelangel-keywords-openapi.yml",
+    "_original/cybelangel-partner-openapi.yml",
+    "_original/cybelangel-platform-reports-openapi.yml",
+    "_original/cybelangel-threat-intelligence-openapi.yml"
+  ],
+  "outputs": [
+    "cybelangel-adm-inventory-api-openapi.yml",
+    "cybelangel-alerts-api-openapi.yml",
+    "cybelangel-stix-api-openapi.yml",
+    "cybelangel-audit-logs-api-openapi.yml",
+    "cybelangel-keywords-api-openapi.yml",
+    "cybelangel-workspaces-api-openapi.yml",
+    "cybelangel-asset-api-openapi.yml",
+    "cybelangel-credential-watchlist-api-openapi.yml",
+    "cybelangel-domain-watchlist-api-openapi.yml",
+    "cybelangel-incident-reports-api-openapi.yml",
+    "cybelangel-reports-api-openapi.yml",
+    "cybelangel-stats-api-openapi.yml",
+    "cybelangel-threat-intelligence-api-openapi.yml"
+  ],
+  "archived": [],
+  "errors": [],
+  "warnings": [],
+  "notes": [
+    "sourced from openapi/_original/ (7 archived document(s)); previously refined output at the top level was skipped rather than re-split",
+    "cybelangel-adm-inventory-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
+    "cybelangel-alerts-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
+    "cybelangel-audit-logs-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
+    "cybelangel-keywords-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
+    "cybelangel-partner-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
+    "cybelangel-platform-reports-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
+    "cybelangel-platform-reports-openapi.yml: declared missing tag: Reports",
+    "cybelangel-threat-intelligence-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
+    "tag 'ADM Inventory' spans 2 source specs (cybelangel-adm-inventory-openapi.yml, cybelangel-partner-openapi.yml): per-path servers applied",
+    "tag 'Keywords' spans 2 source specs (cybelangel-keywords-openapi.yml, cybelangel-partner-openapi.yml): per-path servers applied",
+    "tag 'Workspaces' spans 2 source specs (cybelangel-keywords-openapi.yml, cybelangel-partner-openapi.yml): per-path servers applied",
+    "apis.yml register: already-registered"
+  ],
+  "skipped": [
+    "cybelangel-adm-inventory-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "cybelangel-alerts-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "cybelangel-asset-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "cybelangel-audit-logs-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "cybelangel-credential-watchlist-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "cybelangel-domain-watchlist-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "cybelangel-incident-reports-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "cybelangel-keywords-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "cybelangel-reports-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "cybelangel-stats-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "cybelangel-stix-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "cybelangel-threat-intelligence-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "cybelangel-workspaces-api-openapi.yml: previously refined output, superseded by openapi/_original/"
+  ]
+}

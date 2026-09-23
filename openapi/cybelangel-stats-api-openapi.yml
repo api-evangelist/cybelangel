@@ -2,30 +2,7 @@ openapi: 3.2.0
 info:
   version: 0.1.0
   title: References Stats API
-  description: 'API for CybelAngel''s Platform.
-
-    Authentication uses standard [OAuth2 Bearer Tokens](https://tools.ietf.org/html/rfc6750).
-
-    [Activate your API access](docs/Activate-API-service.md) to obtain your credentials.
-
-    You will be communicated a client `client_id` and a `client_secret` that will allow you to fetch tokens for our API.
-
-    These tokens expire 24 hours.
-
-
-    Here is a simple example of how to fetch such a token with curl:
-
-
-    ```shell
-
-    curl -XPOST https://auth.cybelangel.com/oauth/token -H ''content-type: application/json'' -d ''{"client_id": "client_id", "client_secret": "client_secret", "audience": "https://platform.cybelangel.com/", "grant_type": "client_credentials"}''
-
-    ```
-
-
-    The received access token can then be used as a Bearer token to request our API.
-
-    '
+  description: API for CybelAngel's Platform.
   contact:
     email: support@cybelangel.com
   license:
@@ -100,28 +77,6 @@ paths:
       - url: https://platform.cybelangel.com/api
 components:
   responses:
-    Error400:
-      description: '**Bad request**
-
-
-        Check query parameters
-
-        '
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              code:
-                type: number
-                description: internal error code
-              msg:
-                type: string
-                description: internal error message
-              type:
-                description: internal error type
-                examples:
-                - error
     Error403:
       description: '**Forbidden**
 
@@ -149,6 +104,28 @@ components:
 
 
         An unexpected error occurred during request
+
+        '
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: number
+                description: internal error code
+              msg:
+                type: string
+                description: internal error message
+              type:
+                description: internal error type
+                examples:
+                - error
+    Error400:
+      description: '**Bad request**
+
+
+        Check query parameters
 
         '
       content:

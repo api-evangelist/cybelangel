@@ -114,12 +114,22 @@ paths:
     - url: https://api.cybelangel.com
 components:
   schemas:
-    APIErrorResponse_UnauthorizedError_:
+    UnauthorizedError:
       type: object
-      title: APIErrorResponse[UnauthorizedError]
+      title: UnauthorizedError
+      description: User cannot access some resource.
+      properties:
+        message:
+          type: string
+          title: Message
+      required:
+      - message
+    APIErrorResponse_UnknownError_:
+      type: object
+      title: APIErrorResponse[UnknownError]
       properties:
         error:
-          $ref: '#/components/schemas/UnauthorizedError'
+          $ref: '#/components/schemas/UnknownError'
       required:
       - error
     WorkspaceDTO:
@@ -144,32 +154,24 @@ components:
       required:
       - id
       - name
-    APIErrorResponse_BadRequestError_:
+    BadRequestError:
       type: object
-      title: APIErrorResponse[BadRequestError]
-      properties:
-        error:
-          $ref: '#/components/schemas/BadRequestError'
-      required:
-      - error
-    APIErrorResponse_UnknownError_:
-      type: object
-      title: APIErrorResponse[UnknownError]
-      properties:
-        error:
-          $ref: '#/components/schemas/UnknownError'
-      required:
-      - error
-    ForbiddenAccessError:
-      type: object
-      title: ForbiddenAccessError
-      description: User cannot access some resource.
+      title: BadRequestError
+      description: User sent a bad request.
       properties:
         message:
           type: string
           title: Message
       required:
       - message
+    APIErrorResponse_ForbiddenAccessError_:
+      type: object
+      title: APIErrorResponse[ForbiddenAccessError]
+      properties:
+        error:
+          $ref: '#/components/schemas/ForbiddenAccessError'
+      required:
+      - error
     WorkspaceListDTO:
       type: object
       title: WorkspaceListDTO
@@ -189,22 +191,12 @@ components:
       required:
       - items
       - total
-    BadRequestError:
+    APIErrorResponse_UnauthorizedError_:
       type: object
-      title: BadRequestError
-      description: User sent a bad request.
-      properties:
-        message:
-          type: string
-          title: Message
-      required:
-      - message
-    APIErrorResponse_ForbiddenAccessError_:
-      type: object
-      title: APIErrorResponse[ForbiddenAccessError]
+      title: APIErrorResponse[UnauthorizedError]
       properties:
         error:
-          $ref: '#/components/schemas/ForbiddenAccessError'
+          $ref: '#/components/schemas/UnauthorizedError'
       required:
       - error
     UnknownError:
@@ -217,9 +209,17 @@ components:
           title: Message
       required:
       - message
-    UnauthorizedError:
+    APIErrorResponse_BadRequestError_:
       type: object
-      title: UnauthorizedError
+      title: APIErrorResponse[BadRequestError]
+      properties:
+        error:
+          $ref: '#/components/schemas/BadRequestError'
+      required:
+      - error
+    ForbiddenAccessError:
+      type: object
+      title: ForbiddenAccessError
       description: User cannot access some resource.
       properties:
         message:

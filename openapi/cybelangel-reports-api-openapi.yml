@@ -2,30 +2,7 @@ openapi: 3.2.0
 info:
   version: 0.1.0
   title: References Reports API
-  description: 'API for CybelAngel''s Platform.
-
-    Authentication uses standard [OAuth2 Bearer Tokens](https://tools.ietf.org/html/rfc6750).
-
-    [Activate your API access](docs/Activate-API-service.md) to obtain your credentials.
-
-    You will be communicated a client `client_id` and a `client_secret` that will allow you to fetch tokens for our API.
-
-    These tokens expire 24 hours.
-
-
-    Here is a simple example of how to fetch such a token with curl:
-
-
-    ```shell
-
-    curl -XPOST https://auth.cybelangel.com/oauth/token -H ''content-type: application/json'' -d ''{"client_id": "client_id", "client_secret": "client_secret", "audience": "https://platform.cybelangel.com/", "grant_type": "client_credentials"}''
-
-    ```
-
-
-    The received access token can then be used as a Bearer token to request our API.
-
-    '
+  description: API for CybelAngel's Platform.
   contact:
     email: support@cybelangel.com
   license:
@@ -45,9 +22,7 @@ paths:
       summary: Get user permissions for reports
       description: 'Retrieves the list of permissions that the authenticated user has for reports.
 
-        This endpoint requires user authentication.
-
-        '
+        This endpoint requires user authentication.'
       operationId: getReportPermissions
       responses:
         '200':
@@ -74,11 +49,11 @@ paths:
       - url: https://platform.cybelangel.com/api
 components:
   responses:
-    Error403:
-      description: '**Forbidden**
+    Error500:
+      description: '**Internal server error**
 
 
-        Access to requested resource is forbidden with current credentials.
+        An unexpected error occurred during request
 
         '
       content:
@@ -96,11 +71,11 @@ components:
                 description: internal error type
                 examples:
                 - error
-    Error401:
-      description: '**Unauthorized**
+    Error403:
+      description: '**Forbidden**
 
 
-        Authentication is required
+        Access to requested resource is forbidden with current credentials.
 
         '
       content:
@@ -162,11 +137,11 @@ components:
                 description: internal error type
                 examples:
                 - error
-    Error500:
-      description: '**Internal server error**
+    Error401:
+      description: '**Unauthorized**
 
 
-        An unexpected error occurred during request
+        Authentication is required
 
         '
       content:

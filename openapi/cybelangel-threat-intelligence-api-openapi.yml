@@ -4,7 +4,7 @@ info:
   title: References Threat Intelligence API
   description: 'API for CybelAngel''s Threat Intelligence.
 
-    Authentication uses standard [OAuth2 Bearer Tokens](https://tools.ietf.org/html/rfc6750).
+    Authentication uses standard OAuth2 Bearer Tokens.
 
 
     Here is a simple example of how to fetch such a token with curl:
@@ -262,62 +262,9 @@ paths:
       - url: https://api.cybelangel.com
 components:
   schemas:
-    NotFoundError:
+    UnauthorizedError:
       type: object
-      title: NotFoundError
-      description: Nothing matches the given URI
-      properties:
-        message:
-          type: string
-          title: Message
-      required:
-      - message
-    ClaimedAttacksSortByCriteriaQuery:
-      type: string
-      enum:
-      - category
-      - claimed_at
-      - threat_actors
-      - countries
-      - industries
-      - victims
-      - domains
-      title: ClaimedAttacksSortByCriteriaQuery
-    APIErrorResponse_UnauthorizedError_:
-      type: object
-      title: APIErrorResponse[UnauthorizedError]
-      properties:
-        error:
-          $ref: '#/components/schemas/UnauthorizedError'
-      required:
-      - error
-    APIErrorResponse_BadRequestError_:
-      type: object
-      title: APIErrorResponse[BadRequestError]
-      properties:
-        error:
-          $ref: '#/components/schemas/BadRequestError'
-      required:
-      - error
-    APIErrorResponse_UnknownError_:
-      type: object
-      title: APIErrorResponse[UnknownError]
-      properties:
-        error:
-          $ref: '#/components/schemas/UnknownError'
-      required:
-      - error
-    ClaimedAttackNetwork:
-      type: string
-      enum:
-      - tor
-      - openweb
-      - telegram
-      - discord
-      title: ClaimedAttackNetwork
-    ForbiddenAccessError:
-      type: object
-      title: ForbiddenAccessError
+      title: UnauthorizedError
       description: User cannot access some resource.
       properties:
         message:
@@ -331,14 +278,6 @@ components:
       - asc
       - desc
       title: ClaimedAttacksSortByOrderQuery
-    APIErrorResponse_NotFoundError_:
-      type: object
-      title: APIErrorResponse[NotFoundError]
-      properties:
-        error:
-          $ref: '#/components/schemas/NotFoundError'
-      required:
-      - error
     ClaimedAttackSourceDTO:
       type: object
       title: ClaimedAttackSourceDTO
@@ -357,12 +296,23 @@ components:
           - http://example.onion/victims/acme-corp
           anyOf:
           - type: string
-    APIErrorResponse_ForbiddenAccessError_:
+    ClaimedAttacksSortByCriteriaQuery:
+      type: string
+      enum:
+      - category
+      - claimed_at
+      - threat_actors
+      - countries
+      - industries
+      - victims
+      - domains
+      title: ClaimedAttacksSortByCriteriaQuery
+    APIErrorResponse_UnknownError_:
       type: object
-      title: APIErrorResponse[ForbiddenAccessError]
+      title: APIErrorResponse[UnknownError]
       properties:
         error:
-          $ref: '#/components/schemas/ForbiddenAccessError'
+          $ref: '#/components/schemas/UnknownError'
       required:
       - error
     BadRequestError:
@@ -375,6 +325,30 @@ components:
           title: Message
       required:
       - message
+    APIErrorResponse_ForbiddenAccessError_:
+      type: object
+      title: APIErrorResponse[ForbiddenAccessError]
+      properties:
+        error:
+          $ref: '#/components/schemas/ForbiddenAccessError'
+      required:
+      - error
+    APIErrorResponse_UnauthorizedError_:
+      type: object
+      title: APIErrorResponse[UnauthorizedError]
+      properties:
+        error:
+          $ref: '#/components/schemas/UnauthorizedError'
+      required:
+      - error
+    APIErrorResponse_NotFoundError_:
+      type: object
+      title: APIErrorResponse[NotFoundError]
+      properties:
+        error:
+          $ref: '#/components/schemas/NotFoundError'
+      required:
+      - error
     UnknownError:
       type: object
       title: UnknownError
@@ -385,36 +359,14 @@ components:
           title: Message
       required:
       - message
-    UnauthorizedError:
-      type: object
-      title: UnauthorizedError
-      description: User cannot access some resource.
-      properties:
-        message:
-          type: string
-          title: Message
-      required:
-      - message
-    ListClaimedAttacksResponse:
-      type: object
-      title: ListClaimedAttacksResponse
-      description: Paginated and filterable list of claimed attacks.
-      properties:
-        claimed_attacks:
-          type: array
-          title: Claimed Attacks
-          description: List of claimed attacks (based on pagination).
-          items:
-            $ref: '#/components/schemas/ClaimedAttackDTO'
-        total:
-          type: integer
-          title: Total
-          description: Total number of claimed attacks (for configuring the pagination).
-          examples:
-          - 1000
-      required:
-      - claimed_attacks
-      - total
+    ClaimedAttackNetwork:
+      type: string
+      enum:
+      - tor
+      - openweb
+      - telegram
+      - discord
+      title: ClaimedAttackNetwork
     ClaimedAttackDTO:
       type: object
       title: ClaimedAttackDTO
@@ -517,6 +469,54 @@ components:
       - defacement
       - ransomware
       title: ClaimedAttackCategory
+    APIErrorResponse_BadRequestError_:
+      type: object
+      title: APIErrorResponse[BadRequestError]
+      properties:
+        error:
+          $ref: '#/components/schemas/BadRequestError'
+      required:
+      - error
+    NotFoundError:
+      type: object
+      title: NotFoundError
+      description: Nothing matches the given URI
+      properties:
+        message:
+          type: string
+          title: Message
+      required:
+      - message
+    ForbiddenAccessError:
+      type: object
+      title: ForbiddenAccessError
+      description: User cannot access some resource.
+      properties:
+        message:
+          type: string
+          title: Message
+      required:
+      - message
+    ListClaimedAttacksResponse:
+      type: object
+      title: ListClaimedAttacksResponse
+      description: Paginated and filterable list of claimed attacks.
+      properties:
+        claimed_attacks:
+          type: array
+          title: Claimed Attacks
+          description: List of claimed attacks (based on pagination).
+          items:
+            $ref: '#/components/schemas/ClaimedAttackDTO'
+        total:
+          type: integer
+          title: Total
+          description: Total number of claimed attacks (for configuring the pagination).
+          examples:
+          - 1000
+      required:
+      - claimed_attacks
+      - total
   securitySchemes:
     jwt:
       type: http

@@ -4,7 +4,7 @@ info:
   title: References Stix API
   description: 'API for CybelAngel''s Alerts.
 
-    Authentication uses standard [OAuth2 Bearer Tokens](https://tools.ietf.org/html/rfc6750).
+    Authentication uses standard OAuth2 Bearer Tokens.
 
 
     Here is a simple example of how to fetch such a token with curl:
@@ -34,7 +34,14 @@ paths:
       tags:
       - stix
       summary: Search alerts in STIX 2.1 format
-      description: 'Search alerts according to user filters and return them as a Bundle in STIX 2.1 format.<br/>See https://oasis-open.github.io/cti-documentation/stix/intro for more information on this format.<br/><br/>Note: Historical data is only available starting from January 1, 2024, and is retained for a maximum of 12 months.<br/>Requests for data outside of this range will not return any results.'
+      description: 'Search alerts according to user filters and return them as a Bundle in STIX 2.1 format.
+
+        See https://oasis-open.github.io/cti-documentation/stix/intro for more information on this format.
+
+
+        Note: Historical data is only available starting from January 1, 2024, and is retained for a maximum of 12 months.
+
+        Requests for data outside of this range will not return any results.'
       operationId: stix_search_stix_alerts_stix_alerts_get
       parameters:
       - name: cursor
@@ -308,6 +315,41 @@ components:
 
 
         The default ''unknown'' value is present before user assessed the alert, or when removing that assessment.'
+    APIErrorResponse_UnknownError_:
+      type: object
+      title: APIErrorResponse[UnknownError]
+      properties:
+        error:
+          $ref: '#/components/schemas/UnknownError'
+      required:
+      - error
+    AlertCategory:
+      type: string
+      enum:
+      - adm
+      - fileserver
+      - codeshare
+      - dns
+      - database
+      - board
+      - clouddrive
+      - docshare
+      - paste
+      - leak
+      - rss
+      - social
+      title: AlertCategory
+      description: 'ADM stands for Asset Discovery and Monitoring.
+
+        DNS stands for Domain Name System.'
+    APIErrorResponse_ForbiddenAccessError_:
+      type: object
+      title: APIErrorResponse[ForbiddenAccessError]
+      properties:
+        error:
+          $ref: '#/components/schemas/ForbiddenAccessError'
+      required:
+      - error
     ValidationError:
       type: object
       title: ValidationError
@@ -324,6 +366,45 @@ components:
       required:
       - message
       - fields
+    ForbiddenAccessError:
+      type: object
+      title: ForbiddenAccessError
+      description: User cannot access some resource.
+      properties:
+        message:
+          type: string
+          title: Message
+      required:
+      - message
+    AlertStatus:
+      type: string
+      enum:
+      - new
+      - autodiscarded
+      - discarded
+      - interesting
+      - forwarded
+      - report_sent
+      title: AlertStatus
+      description: Status of alerts, set by cybelangel automated systems and analysts.
+    UnknownError:
+      type: object
+      title: UnknownError
+      description: Unknown error on server-side, please contact support.
+      properties:
+        message:
+          type: string
+          title: Message
+      required:
+      - message
+    APIErrorResponse_ValidationError_:
+      type: object
+      title: APIErrorResponse[ValidationError]
+      properties:
+        error:
+          $ref: '#/components/schemas/ValidationError'
+      required:
+      - error
     Field:
       type: object
       title: Field
@@ -352,61 +433,6 @@ components:
       required:
       - name
       - msg
-    APIErrorResponse_ValidationError_:
-      type: object
-      title: APIErrorResponse[ValidationError]
-      properties:
-        error:
-          $ref: '#/components/schemas/ValidationError'
-      required:
-      - error
-    APIErrorResponse_UnknownError_:
-      type: object
-      title: APIErrorResponse[UnknownError]
-      properties:
-        error:
-          $ref: '#/components/schemas/UnknownError'
-      required:
-      - error
-    ForbiddenAccessError:
-      type: object
-      title: ForbiddenAccessError
-      description: User cannot access some resource.
-      properties:
-        message:
-          type: string
-          title: Message
-      required:
-      - message
-    AlertStatus:
-      type: string
-      enum:
-      - new
-      - autodiscarded
-      - discarded
-      - interesting
-      - forwarded
-      - report_sent
-      title: AlertStatus
-      description: Status of alerts, set by cybelangel automated systems and analysts.
-    APIErrorResponse_ForbiddenAccessError_:
-      type: object
-      title: APIErrorResponse[ForbiddenAccessError]
-      properties:
-        error:
-          $ref: '#/components/schemas/ForbiddenAccessError'
-      required:
-      - error
-    UnknownError:
-      type: object
-      title: UnknownError
-      description: Unknown error on server-side, please contact support.
-      properties:
-        message:
-          type: string
-          title: Message
-      required:
-      - message
     StixAlertsResponse:
       type: object
       title: StixAlertsResponse
@@ -430,25 +456,6 @@ components:
           - type: string
       required:
       - stix_bundle
-    AlertCategory:
-      type: string
-      enum:
-      - adm
-      - fileserver
-      - codeshare
-      - dns
-      - database
-      - board
-      - clouddrive
-      - docshare
-      - paste
-      - leak
-      - rss
-      - social
-      title: AlertCategory
-      description: 'ADM stands for Asset Discovery and Monitoring.
-
-        DNS stands for Domain Name System.'
   securitySchemes:
     jwt:
       type: http

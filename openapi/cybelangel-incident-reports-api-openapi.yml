@@ -2,30 +2,7 @@ openapi: 3.2.0
 info:
   version: 0.1.0
   title: References Incident reports API
-  description: 'API for CybelAngel''s Platform.
-
-    Authentication uses standard [OAuth2 Bearer Tokens](https://tools.ietf.org/html/rfc6750).
-
-    [Activate your API access](docs/Activate-API-service.md) to obtain your credentials.
-
-    You will be communicated a client `client_id` and a `client_secret` that will allow you to fetch tokens for our API.
-
-    These tokens expire 24 hours.
-
-
-    Here is a simple example of how to fetch such a token with curl:
-
-
-    ```shell
-
-    curl -XPOST https://auth.cybelangel.com/oauth/token -H ''content-type: application/json'' -d ''{"client_id": "client_id", "client_secret": "client_secret", "audience": "https://platform.cybelangel.com/", "grant_type": "client_credentials"}''
-
-    ```
-
-
-    The received access token can then be used as a Bearer token to request our API.
-
-    '
+  description: API for CybelAngel's Platform.
   contact:
     email: support@cybelangel.com
   license:
@@ -36,13 +13,13 @@ servers:
 security:
 - bearer_token: []
 tags:
-- name: Incident reports
+- name: Incident Reports
   description: Manipulate incident reports.
 paths:
   /v2/reports:
     get:
       tags:
-      - Incident reports
+      - Incident Reports
       summary: Get reports (V2)
       description: Return the list of reports between the specified dates. The range between start-date and end-date must be less than or equal to 1 year The reports are returned in ascending order by date.
       operationId: get-v2-reports
@@ -94,7 +71,7 @@ paths:
   /v2/reports/{report-id}:
     get:
       tags:
-      - Incident reports
+      - Incident Reports
       summary: Get reports by ID (V2)
       description: Return a report with a particular ID.
       operationId: get-v2-reports-by-id
@@ -132,9 +109,18 @@ paths:
   /v1/reports/{report-id}/mirror:
     get:
       tags:
-      - Incident reports
+      - Incident Reports
       summary: Get mirror details of a report (by ID)
-      description: "Get mirror details information about the report identified by `report-id`.\nYour teams can leverage this API endpoint to retrieve:\n  - **Russian Market incident report attachments**, as part of our Dark Web Monitoring module\n  - **Sensitive documents downloaded through the Access to Cache** feature of our Data Breach Prevention module\n\n**Recommendation**: Upgrade your connector to query both the \"attachments\" endpoint and this one to ensure you are always receiving all available data.\n"
+      description: 'Get mirror details information about the report identified by `report-id`.
+
+        Your teams can leverage this API endpoint to retrieve:
+
+        - **Russian Market incident report attachments**, as part of our Dark Web Monitoring module
+
+        - **Sensitive documents downloaded through the Access to Cache** feature of our Data Breach Prevention module
+
+
+        **Recommendation**: Upgrade your connector to query both the "attachments" endpoint and this one to ensure you are always receiving all available data.'
       operationId: get-mirror-by-report-id
       parameters:
       - name: report-id
@@ -168,9 +154,18 @@ paths:
   /v1/reports/{report-id}/mirror/csv:
     get:
       tags:
-      - Incident reports
+      - Incident Reports
       summary: Get mirror details in CSV of a report (by ID)
-      description: "Get a csv containing information about files related to report identified by `report-id`.\nYour teams can leverage this API endpoint to retrieve:\n  - **Russian Market incident report attachments**, as part of our Dark Web Monitoring module\n  - **Sensitive documents downloaded through the Access to Cache** feature of our Data Breach Prevention module\n\n**Recommendation**: Upgrade your connector to query both the \"attachments\" endpoint and this one to ensure you are always receiving all available data.\n"
+      description: 'Get a csv containing information about files related to report identified by `report-id`.
+
+        Your teams can leverage this API endpoint to retrieve:
+
+        - **Russian Market incident report attachments**, as part of our Dark Web Monitoring module
+
+        - **Sensitive documents downloaded through the Access to Cache** feature of our Data Breach Prevention module
+
+
+        **Recommendation**: Upgrade your connector to query both the "attachments" endpoint and this one to ensure you are always receiving all available data.'
       operationId: get-mirror-csv-by-report-id
       parameters:
       - name: report-id
@@ -200,9 +195,18 @@ paths:
   /v1/reports/{report-id}/mirror/archive:
     get:
       tags:
-      - Incident reports
+      - Incident Reports
       summary: Get archive from report (by ID)
-      description: "Get the archive containing files related to report identified by `report-id`.\nYour teams can leverage this API endpoint to retrieve:\n  - **Russian Market incident report attachments**, as part of our Dark Web Monitoring module\n  - **Sensitive documents downloaded through the Access to Cache** feature of our Data Breach Prevention module\n\n**Recommendation**: Upgrade your connector to query both the \"attachments\" endpoint and this one to ensure you are always receiving all available data.\n"
+      description: 'Get the archive containing files related to report identified by `report-id`.
+
+        Your teams can leverage this API endpoint to retrieve:
+
+        - **Russian Market incident report attachments**, as part of our Dark Web Monitoring module
+
+        - **Sensitive documents downloaded through the Access to Cache** feature of our Data Breach Prevention module
+
+
+        **Recommendation**: Upgrade your connector to query both the "attachments" endpoint and this one to ensure you are always receiving all available data.'
       operationId: get-mirror-archive-by-report-id
       parameters:
       - name: report-id
@@ -232,7 +236,7 @@ paths:
   /v1/reports/{report-id}/status:
     put:
       tags:
-      - Incident reports
+      - Incident Reports
       summary: Update status of a report
       description: Update status of a specific report identified by `report-id`
       operationId: update-report-status-by-report-id
@@ -292,7 +296,7 @@ paths:
   /v1/reports/status:
     post:
       tags:
-      - Incident reports
+      - Incident Reports
       summary: Update multiple statuses (bulk)
       description: Update multiple reports statuses
       operationId: update-multiple-reports-statuses
@@ -351,7 +355,7 @@ paths:
   /v1/reports/{report-id}/comments:
     get:
       tags:
-      - Incident reports
+      - Incident Reports
       summary: Get comments of a report
       description: Get the list of comments on a specific report
       operationId: get-report-comments
@@ -401,7 +405,7 @@ paths:
       - url: https://platform.cybelangel.com/api
     post:
       tags:
-      - Incident reports
+      - Incident Reports
       summary: Post a comment on a report
       description: Create a new comments attached to a specific report
       operationId: post-report-comments
@@ -462,7 +466,7 @@ paths:
   /v1/reports/{report-id}/attachments/{attachment-id}:
     get:
       tags:
-      - Incident reports
+      - Incident Reports
       summary: Get Attachments
       description: Get an attachment on a specific report
       operationId: get-attachments-by-report-id
@@ -505,7 +509,7 @@ paths:
   /v1/reports/{report-id}/pdf:
     get:
       tags:
-      - Incident reports
+      - Incident Reports
       summary: Get PDF version of a report (by ID)
       description: Return a specified report as a PDF file
       operationId: get-pdf-by-report-id
@@ -538,7 +542,7 @@ paths:
   /v1/reports/remediation-request:
     post:
       tags:
-      - Incident reports
+      - Incident Reports
       summary: Create a Remediation Request
       description: Create a remediation request
       operationId: create-remediation-request
@@ -598,6 +602,177 @@ paths:
       x-codegen-request-body-name: body
 components:
   schemas:
+    ReportMirrorStatus:
+      type: string
+      enum:
+      - error
+      - expired
+      - pending
+      - ready
+      examples:
+      - ready
+    ReportMirror:
+      type: object
+      properties:
+        available_files_count:
+          type: integer
+          description: The number of downloadable files in the mirror
+          examples:
+          - 1
+        created_at:
+          type: string
+          description: The mirror's creation date
+          format: date-time
+          examples:
+          - '2022-03-10T13:52:48Z'
+        files_count:
+          type: integer
+          description: The number of files that matched on the server
+          examples:
+          - 155
+        files_volume:
+          type: integer
+          description: The total volume of files in bytes
+          examples:
+          - 88726
+        report_id:
+          type: string
+          description: The id of the report to which this mirror is linked
+          format: uuid
+          examples:
+          - 2fa68ccc-005d-4033-8fcd-7d38a2370b44
+        status:
+          $ref: '#/components/schemas/ReportMirrorStatus'
+          description: The mirror status
+        stream_id:
+          type: string
+          description: The id of the mirror's stream
+          format: uuid
+          examples:
+          - c683aa1a-a029-4bcf-9333-a029f2963d2b
+        updated_at:
+          type: string
+          description: The mirror's last update date
+          format: date-time
+          examples:
+          - '2022-03-10T13:52:48Z'
+    ReportAttachment:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          examples:
+          - fe3ar92d1-1fdd-4d7b-9628-e30t7a2ce5ea
+        name:
+          type: string
+          examples:
+          - cybelangel-attachment.png
+        attached_to:
+          type: string
+          enum:
+          - investigation_id
+          - report_id
+    AddReportCommentResponse:
+      type: object
+      properties:
+        author:
+          type: string
+          description: User ID of the author
+          examples:
+          - 78006d2b-1563-4a08-9567-97879df3d2b0
+        content:
+          type: string
+          description: Body of the comment
+          examples:
+          - Body of the comment
+        created_at:
+          type: string
+          description: Creation date
+          format: date-time
+        discussion_id:
+          type: string
+          description: 'discussion id: made of report id and tenant id like uuid:uuid'
+          examples:
+          - 3500bb64-6081-4cf5-8e6f-dca82dab4982:41ce4e85-9bd0-4a4f-bab9-c3cf3d0d97da
+        id:
+          type: string
+          description: Id of comment
+          format: uuid
+          examples:
+          - 3500bb64-6081-4cf5-8e6f-dca82dab4982
+        isNew:
+          type: boolean
+          description: true if comment is a new one to the current user
+        last_updated_at:
+          type: string
+          description: Date of comment last update by its author
+          format: date-time
+        parent_id:
+          type:
+          - string
+          - 'null'
+          description: id of parent comment if this comment is a reply to another comment, null if this is a top-level comment
+          format: uuid
+          examples:
+          - 3500bb64-6081-4cf5-8e6f-dca82dab4982
+        assigned:
+          type: boolean
+          description: boolean describing if this message was assigned to the analysts
+    ReportModule:
+      type: string
+      enum:
+      - account_takeover_prevention
+      - domain_protection
+      - data_breach_prevention
+      - dark_web_monitoring
+      - asset_discovery_monitoring
+      - social_media
+      - inbox
+      - ''
+      examples:
+      - account_takeover_prevention
+    ReportType:
+      type: string
+      enum:
+      - incident_report
+      - incident_detection
+      - preliminary_report
+      - reminder
+      - communication
+      examples:
+      - incident_report
+    ReportWorkspace:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          examples:
+          - e7b5ea39-a627-4e7d-a836-abcfd4f11f01
+        name:
+          type: string
+          examples:
+          - Workspace 1
+    ReportCategoryResponse:
+      type: string
+      enum:
+      - ''
+      - board
+      - paste
+      - social
+      - codeshare
+      - docshare
+      - leak
+      - database
+      - iot
+      - dns
+      - fileserver
+      - rss
+      - openserver
+      description: The category of the report (can be empty)
+      examples:
+      - dns
     ReportComment:
       type: object
       properties:
@@ -657,15 +832,16 @@ components:
         assigned:
           type: boolean
           description: boolean describing if this message was assigned to the analysts
-    ReportMirrorStatus:
+    ReportStatus:
       type: string
       enum:
-      - error
-      - expired
-      - pending
-      - ready
+      - draft
+      - open
+      - in_progress
+      - resolved
+      - discarded
       examples:
-      - ready
+      - resolved
     Report-v2:
       type: object
       title: Report (V2)
@@ -1014,178 +1190,6 @@ components:
           - b2196357-dd51-4c9b-8e97-2c62xxxxx24f
         module:
           $ref: '#/components/schemas/ReportModule'
-    ReportCategoryResponse:
-      type: string
-      enum:
-      - ''
-      - board
-      - paste
-      - social
-      - codeshare
-      - docshare
-      - leak
-      - database
-      - iot
-      - dns
-      - fileserver
-      - rss
-      - openserver
-      description: The category of the report (can be empty)
-      examples:
-      - dns
-    ReportType:
-      type: string
-      enum:
-      - incident_report
-      - incident_detection
-      - preliminary_report
-      - reminder
-      - communication
-      examples:
-      - incident_report
-    ReportStatus:
-      type: string
-      enum:
-      - draft
-      - open
-      - in_progress
-      - resolved
-      - discarded
-      examples:
-      - resolved
-    ReportMirror:
-      type: object
-      properties:
-        available_files_count:
-          type: integer
-          description: The number of downloadable files in the mirror
-          examples:
-          - 1
-        created_at:
-          type: string
-          description: The mirror's creation date
-          format: date-time
-          examples:
-          - '2022-03-10T13:52:48Z'
-        files_count:
-          type: integer
-          description: The number of files that matched on the server
-          examples:
-          - 155
-        files_volume:
-          type: integer
-          description: The total volume of files in bytes
-          examples:
-          - 88726
-        report_id:
-          type: string
-          description: The id of the report to which this mirror is linked
-          format: uuid
-          examples:
-          - 2fa68ccc-005d-4033-8fcd-7d38a2370b44
-        status:
-          $ref: '#/components/schemas/ReportMirrorStatus'
-          description: The mirror status
-        stream_id:
-          type: string
-          description: The id of the mirror's stream
-          format: uuid
-          examples:
-          - c683aa1a-a029-4bcf-9333-a029f2963d2b
-        updated_at:
-          type: string
-          description: The mirror's last update date
-          format: date-time
-          examples:
-          - '2022-03-10T13:52:48Z'
-    ReportAttachment:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-          examples:
-          - fe3ar92d1-1fdd-4d7b-9628-e30t7a2ce5ea
-        name:
-          type: string
-          examples:
-          - cybelangel-attachment.png
-        attached_to:
-          type: string
-          enum:
-          - investigation_id
-          - report_id
-    ReportWorkspace:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-          examples:
-          - e7b5ea39-a627-4e7d-a836-abcfd4f11f01
-        name:
-          type: string
-          examples:
-          - Workspace 1
-    AddReportCommentResponse:
-      type: object
-      properties:
-        author:
-          type: string
-          description: User ID of the author
-          examples:
-          - 78006d2b-1563-4a08-9567-97879df3d2b0
-        content:
-          type: string
-          description: Body of the comment
-          examples:
-          - Body of the comment
-        created_at:
-          type: string
-          description: Creation date
-          format: date-time
-        discussion_id:
-          type: string
-          description: 'discussion id: made of report id and tenant id like uuid:uuid'
-          examples:
-          - 3500bb64-6081-4cf5-8e6f-dca82dab4982:41ce4e85-9bd0-4a4f-bab9-c3cf3d0d97da
-        id:
-          type: string
-          description: Id of comment
-          format: uuid
-          examples:
-          - 3500bb64-6081-4cf5-8e6f-dca82dab4982
-        isNew:
-          type: boolean
-          description: true if comment is a new one to the current user
-        last_updated_at:
-          type: string
-          description: Date of comment last update by its author
-          format: date-time
-        parent_id:
-          type:
-          - string
-          - 'null'
-          description: id of parent comment if this comment is a reply to another comment, null if this is a top-level comment
-          format: uuid
-          examples:
-          - 3500bb64-6081-4cf5-8e6f-dca82dab4982
-        assigned:
-          type: boolean
-          description: boolean describing if this message was assigned to the analysts
-    ReportModule:
-      type: string
-      enum:
-      - account_takeover_prevention
-      - domain_protection
-      - data_breach_prevention
-      - dark_web_monitoring
-      - asset_discovery_monitoring
-      - social_media
-      - inbox
-      - ''
-      examples:
-      - account_takeover_prevention
     ReportIncidentType:
       type: string
       enum:
@@ -1222,11 +1226,11 @@ components:
       examples:
       - computer_attack
   responses:
-    Error403:
-      description: '**Forbidden**
+    Error500:
+      description: '**Internal server error**
 
 
-        Access to requested resource is forbidden with current credentials.
+        An unexpected error occurred during request
 
         '
       content:
@@ -1244,11 +1248,11 @@ components:
                 description: internal error type
                 examples:
                 - error
-    Error401:
-      description: '**Unauthorized**
+    Error403:
+      description: '**Forbidden**
 
 
-        Authentication is required
+        Access to requested resource is forbidden with current credentials.
 
         '
       content:
@@ -1310,11 +1314,11 @@ components:
                 description: internal error type
                 examples:
                 - error
-    Error500:
-      description: '**Internal server error**
+    Error401:
+      description: '**Unauthorized**
 
 
-        An unexpected error occurred during request
+        Authentication is required
 
         '
       content:
