@@ -175,6 +175,26 @@ paths:
       - url: https://api.cybelangel.com
 components:
   schemas:
+    Field:
+      type: object
+      title: Field
+      description: Detail of an incorrect input field
+      properties:
+        name:
+          type: string
+          title: Name
+        msg:
+          type: string
+          title: Msg
+        input:
+          title: Input
+          default: null
+          anyOf:
+          - type: string
+          - type: 'null'
+      required:
+      - name
+      - msg
     KeywordMetadata:
       type: object
       title: KeywordMetadata
@@ -235,47 +255,6 @@ components:
       required:
       - total
       - events
-    ReportMetadata:
-      type: object
-      title: ReportMetadata
-      properties:
-        incident_id:
-          type: string
-          title: Incident Id
-          description: Incident ID of the report, unique within the organization.
-          examples:
-          - YG0TCU
-        incident_type:
-          type: string
-          title: Incident Type
-          description: Incident type of the report, e.g. 'malicious_website', 'sensitive_code', 'fraud_scheme', etc.
-          examples:
-          - malicious_website
-        severity:
-          type: integer
-          title: Severity
-          description: Severity of the report, from 0 (low) to 4 (high).
-          examples:
-          - 4
-        status:
-          type: string
-          title: Status
-          description: Status of the report, usually 'open', 'in_progress', 'resolved' or 'discarded'.
-          examples:
-          - open
-      required:
-      - incident_id
-      - incident_type
-      - severity
-      - status
-    APIErrorResponse_UnknownError_:
-      type: object
-      title: APIErrorResponse[UnknownError]
-      properties:
-        error:
-          $ref: '#/components/schemas/UnknownError'
-      required:
-      - error
     PublicAuditLog:
       type: object
       title: PublicAuditLog
@@ -363,29 +342,6 @@ components:
       - object_type
       - event_id
       - organization_id
-    Action:
-      type: string
-      enum:
-      - create
-      - update
-      - delete
-      - view
-      - share_externally
-      - export
-      - add_comment
-      - request_takedown
-      - login
-      - logout
-      - change_password
-      title: Action
-    APIErrorResponse_ForbiddenAccessError_:
-      type: object
-      title: APIErrorResponse[ForbiddenAccessError]
-      properties:
-        error:
-          $ref: '#/components/schemas/ForbiddenAccessError'
-      required:
-      - error
     ValidationError:
       type: object
       title: ValidationError
@@ -402,42 +358,16 @@ components:
       required:
       - message
       - fields
-    ForbiddenAccessError:
+    NotFoundError:
       type: object
-      title: ForbiddenAccessError
-      description: User cannot access some resource.
+      title: NotFoundError
+      description: Nothing matches the given URI
       properties:
         message:
           type: string
           title: Message
       required:
       - message
-    APIErrorResponse_NotFoundError_:
-      type: object
-      title: APIErrorResponse[NotFoundError]
-      properties:
-        error:
-          $ref: '#/components/schemas/NotFoundError'
-      required:
-      - error
-    UnknownError:
-      type: object
-      title: UnknownError
-      description: Unknown error on server-side, please contact support.
-      properties:
-        message:
-          type: string
-          title: Message
-      required:
-      - message
-    APIErrorResponse_ValidationError_:
-      type: object
-      title: APIErrorResponse[ValidationError]
-      properties:
-        error:
-          $ref: '#/components/schemas/ValidationError'
-      required:
-      - error
     UserMetadata:
       type: object
       title: UserMetadata
@@ -450,6 +380,37 @@ components:
           - john.doe@cybelangel.com
       required:
       - email
+    APIErrorResponse_ValidationError_:
+      type: object
+      title: APIErrorResponse[ValidationError]
+      properties:
+        error:
+          $ref: '#/components/schemas/ValidationError'
+      required:
+      - error
+    Action:
+      type: string
+      enum:
+      - create
+      - update
+      - delete
+      - view
+      - share_externally
+      - export
+      - add_comment
+      - request_takedown
+      - login
+      - logout
+      - change_password
+      title: Action
+    APIErrorResponse_NotFoundError_:
+      type: object
+      title: APIErrorResponse[NotFoundError]
+      properties:
+        error:
+          $ref: '#/components/schemas/NotFoundError'
+      required:
+      - error
     ObjectType:
       type: string
       enum:
@@ -457,36 +418,75 @@ components:
       - keyword
       - user
       title: ObjectType
-    NotFoundError:
+    ReportMetadata:
       type: object
-      title: NotFoundError
-      description: Nothing matches the given URI
+      title: ReportMetadata
+      properties:
+        incident_id:
+          type: string
+          title: Incident Id
+          description: Incident ID of the report, unique within the organization.
+          examples:
+          - YG0TCU
+        incident_type:
+          type: string
+          title: Incident Type
+          description: Incident type of the report, e.g. 'malicious_website', 'sensitive_code', 'fraud_scheme', etc.
+          examples:
+          - malicious_website
+        severity:
+          type: integer
+          title: Severity
+          description: Severity of the report, from 0 (low) to 4 (high).
+          examples:
+          - 4
+        status:
+          type: string
+          title: Status
+          description: Status of the report, usually 'open', 'in_progress', 'resolved' or 'discarded'.
+          examples:
+          - open
+      required:
+      - incident_id
+      - incident_type
+      - severity
+      - status
+    APIErrorResponse_ForbiddenAccessError_:
+      type: object
+      title: APIErrorResponse[ForbiddenAccessError]
+      properties:
+        error:
+          $ref: '#/components/schemas/ForbiddenAccessError'
+      required:
+      - error
+    APIErrorResponse_UnknownError_:
+      type: object
+      title: APIErrorResponse[UnknownError]
+      properties:
+        error:
+          $ref: '#/components/schemas/UnknownError'
+      required:
+      - error
+    ForbiddenAccessError:
+      type: object
+      title: ForbiddenAccessError
+      description: User cannot access some resource.
       properties:
         message:
           type: string
           title: Message
       required:
       - message
-    Field:
+    UnknownError:
       type: object
-      title: Field
-      description: Detail of an incorrect input field
+      title: UnknownError
+      description: Unknown error on server-side, please contact support.
       properties:
-        name:
+        message:
           type: string
-          title: Name
-        msg:
-          type: string
-          title: Msg
-        input:
-          title: Input
-          default: null
-          anyOf:
-          - type: string
-          - type: 'null'
+          title: Message
       required:
-      - name
-      - msg
+      - message
   securitySchemes:
     jwt:
       type: http

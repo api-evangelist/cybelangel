@@ -65,33 +65,11 @@ paths:
       - url: https://platform.cybelangel.com/api
 components:
   responses:
-    Error500:
-      description: '**Internal server error**
+    Error400:
+      description: '**Bad request**
 
 
-        An unexpected error occurred during request
-
-        '
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              code:
-                type: number
-                description: internal error code
-              msg:
-                type: string
-                description: internal error message
-              type:
-                description: internal error type
-                examples:
-                - error
-    Error403:
-      description: '**Forbidden**
-
-
-        Access to requested resource is forbidden with current credentials.
+        Check query parameters
 
         '
       content:
@@ -131,11 +109,33 @@ components:
                 description: internal error type
                 examples:
                 - error
-    Error400:
-      description: '**Bad request**
+    Error500:
+      description: '**Internal server error**
 
 
-        Check query parameters
+        An unexpected error occurred during request
+
+        '
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: number
+                description: internal error code
+              msg:
+                type: string
+                description: internal error message
+              type:
+                description: internal error type
+                examples:
+                - error
+    Error403:
+      description: '**Forbidden**
+
+
+        Access to requested resource is forbidden with current credentials.
 
         '
       content:

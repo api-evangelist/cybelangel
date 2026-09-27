@@ -77,28 +77,6 @@ paths:
       - url: https://platform.cybelangel.com/api
 components:
   responses:
-    Error403:
-      description: '**Forbidden**
-
-
-        Access to requested resource is forbidden with current credentials.
-
-        '
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              code:
-                type: number
-                description: internal error code
-              msg:
-                type: string
-                description: internal error message
-              type:
-                description: internal error type
-                examples:
-                - error
     Error500:
       description: '**Internal server error**
 
@@ -148,6 +126,28 @@ components:
 
 
         Authentication is required
+
+        '
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: number
+                description: internal error code
+              msg:
+                type: string
+                description: internal error message
+              type:
+                description: internal error type
+                examples:
+                - error
+    Error403:
+      description: '**Forbidden**
+
+
+        Access to requested resource is forbidden with current credentials.
 
         '
       content:

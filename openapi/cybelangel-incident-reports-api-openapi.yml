@@ -601,61 +601,118 @@ paths:
       - url: https://platform.cybelangel.com/api
       x-codegen-request-body-name: body
 components:
+  responses:
+    Error400:
+      description: '**Bad request**
+
+
+        Check query parameters
+
+        '
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: number
+                description: internal error code
+              msg:
+                type: string
+                description: internal error message
+              type:
+                description: internal error type
+                examples:
+                - error
+    Error404:
+      description: '**Not Found**
+
+
+        Requested resource was not found. Please check parameters or spelling and try again.
+
+        '
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: number
+                description: internal error code
+              msg:
+                type: string
+                description: internal error message
+              type:
+                description: internal error type
+                examples:
+                - error
+    Error500:
+      description: '**Internal server error**
+
+
+        An unexpected error occurred during request
+
+        '
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: number
+                description: internal error code
+              msg:
+                type: string
+                description: internal error message
+              type:
+                description: internal error type
+                examples:
+                - error
+    Error403:
+      description: '**Forbidden**
+
+
+        Access to requested resource is forbidden with current credentials.
+
+        '
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: number
+                description: internal error code
+              msg:
+                type: string
+                description: internal error message
+              type:
+                description: internal error type
+                examples:
+                - error
+    Error401:
+      description: '**Unauthorized**
+
+
+        Authentication is required
+
+        '
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: number
+                description: internal error code
+              msg:
+                type: string
+                description: internal error message
+              type:
+                description: internal error type
+                examples:
+                - error
   schemas:
-    ReportMirrorStatus:
-      type: string
-      enum:
-      - error
-      - expired
-      - pending
-      - ready
-      examples:
-      - ready
-    ReportMirror:
-      type: object
-      properties:
-        available_files_count:
-          type: integer
-          description: The number of downloadable files in the mirror
-          examples:
-          - 1
-        created_at:
-          type: string
-          description: The mirror's creation date
-          format: date-time
-          examples:
-          - '2022-03-10T13:52:48Z'
-        files_count:
-          type: integer
-          description: The number of files that matched on the server
-          examples:
-          - 155
-        files_volume:
-          type: integer
-          description: The total volume of files in bytes
-          examples:
-          - 88726
-        report_id:
-          type: string
-          description: The id of the report to which this mirror is linked
-          format: uuid
-          examples:
-          - 2fa68ccc-005d-4033-8fcd-7d38a2370b44
-        status:
-          $ref: '#/components/schemas/ReportMirrorStatus'
-          description: The mirror status
-        stream_id:
-          type: string
-          description: The id of the mirror's stream
-          format: uuid
-          examples:
-          - c683aa1a-a029-4bcf-9333-a029f2963d2b
-        updated_at:
-          type: string
-          description: The mirror's last update date
-          format: date-time
-          examples:
-          - '2022-03-10T13:52:48Z'
     ReportAttachment:
       type: object
       properties:
@@ -673,106 +730,6 @@ components:
           enum:
           - investigation_id
           - report_id
-    AddReportCommentResponse:
-      type: object
-      properties:
-        author:
-          type: string
-          description: User ID of the author
-          examples:
-          - 78006d2b-1563-4a08-9567-97879df3d2b0
-        content:
-          type: string
-          description: Body of the comment
-          examples:
-          - Body of the comment
-        created_at:
-          type: string
-          description: Creation date
-          format: date-time
-        discussion_id:
-          type: string
-          description: 'discussion id: made of report id and tenant id like uuid:uuid'
-          examples:
-          - 3500bb64-6081-4cf5-8e6f-dca82dab4982:41ce4e85-9bd0-4a4f-bab9-c3cf3d0d97da
-        id:
-          type: string
-          description: Id of comment
-          format: uuid
-          examples:
-          - 3500bb64-6081-4cf5-8e6f-dca82dab4982
-        isNew:
-          type: boolean
-          description: true if comment is a new one to the current user
-        last_updated_at:
-          type: string
-          description: Date of comment last update by its author
-          format: date-time
-        parent_id:
-          type:
-          - string
-          - 'null'
-          description: id of parent comment if this comment is a reply to another comment, null if this is a top-level comment
-          format: uuid
-          examples:
-          - 3500bb64-6081-4cf5-8e6f-dca82dab4982
-        assigned:
-          type: boolean
-          description: boolean describing if this message was assigned to the analysts
-    ReportModule:
-      type: string
-      enum:
-      - account_takeover_prevention
-      - domain_protection
-      - data_breach_prevention
-      - dark_web_monitoring
-      - asset_discovery_monitoring
-      - social_media
-      - inbox
-      - ''
-      examples:
-      - account_takeover_prevention
-    ReportType:
-      type: string
-      enum:
-      - incident_report
-      - incident_detection
-      - preliminary_report
-      - reminder
-      - communication
-      examples:
-      - incident_report
-    ReportWorkspace:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-          examples:
-          - e7b5ea39-a627-4e7d-a836-abcfd4f11f01
-        name:
-          type: string
-          examples:
-          - Workspace 1
-    ReportCategoryResponse:
-      type: string
-      enum:
-      - ''
-      - board
-      - paste
-      - social
-      - codeshare
-      - docshare
-      - leak
-      - database
-      - iot
-      - dns
-      - fileserver
-      - rss
-      - openserver
-      description: The category of the report (can be empty)
-      examples:
-      - dns
     ReportComment:
       type: object
       properties:
@@ -842,6 +799,52 @@ components:
       - discarded
       examples:
       - resolved
+    AddReportCommentResponse:
+      type: object
+      properties:
+        author:
+          type: string
+          description: User ID of the author
+          examples:
+          - 78006d2b-1563-4a08-9567-97879df3d2b0
+        content:
+          type: string
+          description: Body of the comment
+          examples:
+          - Body of the comment
+        created_at:
+          type: string
+          description: Creation date
+          format: date-time
+        discussion_id:
+          type: string
+          description: 'discussion id: made of report id and tenant id like uuid:uuid'
+          examples:
+          - 3500bb64-6081-4cf5-8e6f-dca82dab4982:41ce4e85-9bd0-4a4f-bab9-c3cf3d0d97da
+        id:
+          type: string
+          description: Id of comment
+          format: uuid
+          examples:
+          - 3500bb64-6081-4cf5-8e6f-dca82dab4982
+        isNew:
+          type: boolean
+          description: true if comment is a new one to the current user
+        last_updated_at:
+          type: string
+          description: Date of comment last update by its author
+          format: date-time
+        parent_id:
+          type:
+          - string
+          - 'null'
+          description: id of parent comment if this comment is a reply to another comment, null if this is a top-level comment
+          format: uuid
+          examples:
+          - 3500bb64-6081-4cf5-8e6f-dca82dab4982
+        assigned:
+          type: boolean
+          description: boolean describing if this message was assigned to the analysts
     Report-v2:
       type: object
       title: Report (V2)
@@ -1225,117 +1228,114 @@ components:
       - vulnerable_technology_to_kev
       examples:
       - computer_attack
-  responses:
-    Error500:
-      description: '**Internal server error**
-
-
-        An unexpected error occurred during request
-
-        '
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              code:
-                type: number
-                description: internal error code
-              msg:
-                type: string
-                description: internal error message
-              type:
-                description: internal error type
-                examples:
-                - error
-    Error403:
-      description: '**Forbidden**
-
-
-        Access to requested resource is forbidden with current credentials.
-
-        '
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              code:
-                type: number
-                description: internal error code
-              msg:
-                type: string
-                description: internal error message
-              type:
-                description: internal error type
-                examples:
-                - error
-    Error404:
-      description: '**Not Found**
-
-
-        Requested resource was not found. Please check parameters or spelling and try again.
-
-        '
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              code:
-                type: number
-                description: internal error code
-              msg:
-                type: string
-                description: internal error message
-              type:
-                description: internal error type
-                examples:
-                - error
-    Error400:
-      description: '**Bad request**
-
-
-        Check query parameters
-
-        '
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              code:
-                type: number
-                description: internal error code
-              msg:
-                type: string
-                description: internal error message
-              type:
-                description: internal error type
-                examples:
-                - error
-    Error401:
-      description: '**Unauthorized**
-
-
-        Authentication is required
-
-        '
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              code:
-                type: number
-                description: internal error code
-              msg:
-                type: string
-                description: internal error message
-              type:
-                description: internal error type
-                examples:
-                - error
+    ReportMirrorStatus:
+      type: string
+      enum:
+      - error
+      - expired
+      - pending
+      - ready
+      examples:
+      - ready
+    ReportWorkspace:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          examples:
+          - e7b5ea39-a627-4e7d-a836-abcfd4f11f01
+        name:
+          type: string
+          examples:
+          - Workspace 1
+    ReportMirror:
+      type: object
+      properties:
+        available_files_count:
+          type: integer
+          description: The number of downloadable files in the mirror
+          examples:
+          - 1
+        created_at:
+          type: string
+          description: The mirror's creation date
+          format: date-time
+          examples:
+          - '2022-03-10T13:52:48Z'
+        files_count:
+          type: integer
+          description: The number of files that matched on the server
+          examples:
+          - 155
+        files_volume:
+          type: integer
+          description: The total volume of files in bytes
+          examples:
+          - 88726
+        report_id:
+          type: string
+          description: The id of the report to which this mirror is linked
+          format: uuid
+          examples:
+          - 2fa68ccc-005d-4033-8fcd-7d38a2370b44
+        status:
+          $ref: '#/components/schemas/ReportMirrorStatus'
+          description: The mirror status
+        stream_id:
+          type: string
+          description: The id of the mirror's stream
+          format: uuid
+          examples:
+          - c683aa1a-a029-4bcf-9333-a029f2963d2b
+        updated_at:
+          type: string
+          description: The mirror's last update date
+          format: date-time
+          examples:
+          - '2022-03-10T13:52:48Z'
+    ReportCategoryResponse:
+      type: string
+      enum:
+      - ''
+      - board
+      - paste
+      - social
+      - codeshare
+      - docshare
+      - leak
+      - database
+      - iot
+      - dns
+      - fileserver
+      - rss
+      - openserver
+      description: The category of the report (can be empty)
+      examples:
+      - dns
+    ReportType:
+      type: string
+      enum:
+      - incident_report
+      - incident_detection
+      - preliminary_report
+      - reminder
+      - communication
+      examples:
+      - incident_report
+    ReportModule:
+      type: string
+      enum:
+      - account_takeover_prevention
+      - domain_protection
+      - data_breach_prevention
+      - dark_web_monitoring
+      - asset_discovery_monitoring
+      - social_media
+      - inbox
+      - ''
+      examples:
+      - account_takeover_prevention
   securitySchemes:
     bearer_token:
       type: oauth2

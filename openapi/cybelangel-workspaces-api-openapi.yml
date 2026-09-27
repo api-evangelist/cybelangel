@@ -114,24 +114,6 @@ paths:
     - url: https://api.cybelangel.com
 components:
   schemas:
-    UnauthorizedError:
-      type: object
-      title: UnauthorizedError
-      description: User cannot access some resource.
-      properties:
-        message:
-          type: string
-          title: Message
-      required:
-      - message
-    APIErrorResponse_UnknownError_:
-      type: object
-      title: APIErrorResponse[UnknownError]
-      properties:
-        error:
-          $ref: '#/components/schemas/UnknownError'
-      required:
-      - error
     WorkspaceDTO:
       type: object
       title: WorkspaceDTO
@@ -164,12 +146,12 @@ components:
           title: Message
       required:
       - message
-    APIErrorResponse_ForbiddenAccessError_:
+    APIErrorResponse_BadRequestError_:
       type: object
-      title: APIErrorResponse[ForbiddenAccessError]
+      title: APIErrorResponse[BadRequestError]
       properties:
         error:
-          $ref: '#/components/schemas/ForbiddenAccessError'
+          $ref: '#/components/schemas/BadRequestError'
       required:
       - error
     WorkspaceListDTO:
@@ -199,28 +181,46 @@ components:
           $ref: '#/components/schemas/UnauthorizedError'
       required:
       - error
-    UnknownError:
+    APIErrorResponse_ForbiddenAccessError_:
       type: object
-      title: UnknownError
-      description: Unknown error on server-side, please contact support.
+      title: APIErrorResponse[ForbiddenAccessError]
+      properties:
+        error:
+          $ref: '#/components/schemas/ForbiddenAccessError'
+      required:
+      - error
+    UnauthorizedError:
+      type: object
+      title: UnauthorizedError
+      description: User cannot access some resource.
       properties:
         message:
           type: string
           title: Message
       required:
       - message
-    APIErrorResponse_BadRequestError_:
+    APIErrorResponse_UnknownError_:
       type: object
-      title: APIErrorResponse[BadRequestError]
+      title: APIErrorResponse[UnknownError]
       properties:
         error:
-          $ref: '#/components/schemas/BadRequestError'
+          $ref: '#/components/schemas/UnknownError'
       required:
       - error
     ForbiddenAccessError:
       type: object
       title: ForbiddenAccessError
       description: User cannot access some resource.
+      properties:
+        message:
+          type: string
+          title: Message
+      required:
+      - message
+    UnknownError:
+      type: object
+      title: UnknownError
+      description: Unknown error on server-side, please contact support.
       properties:
         message:
           type: string
