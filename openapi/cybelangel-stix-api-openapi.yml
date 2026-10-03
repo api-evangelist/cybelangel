@@ -302,6 +302,16 @@ paths:
       - url: https://api.cybelangel.com
 components:
   schemas:
+    UnknownError:
+      type: object
+      title: UnknownError
+      description: Unknown error on server-side, please contact support.
+      properties:
+        message:
+          type: string
+          title: Message
+      required:
+      - message
     Field:
       type: object
       title: Field
@@ -330,33 +340,16 @@ components:
       required:
       - name
       - msg
-    AlertStatus:
-      type: string
-      enum:
-      - new
-      - autodiscarded
-      - discarded
-      - interesting
-      - forwarded
-      - report_sent
-      title: AlertStatus
-      description: Status of alerts, set by cybelangel automated systems and analysts.
-    ValidationError:
+    ForbiddenAccessError:
       type: object
-      title: ValidationError
-      description: Error on incorrect input fields
+      title: ForbiddenAccessError
+      description: User cannot access some resource.
       properties:
         message:
           type: string
           title: Message
-        fields:
-          type: array
-          title: Fields
-          items:
-            $ref: '#/components/schemas/Field'
       required:
       - message
-      - fields
     APIErrorResponse_ValidationError_:
       type: object
       title: APIErrorResponse[ValidationError]
@@ -378,6 +371,38 @@ components:
 
 
         The default ''unknown'' value is present before user assessed the alert, or when removing that assessment.'
+    ValidationError:
+      type: object
+      title: ValidationError
+      description: Error on incorrect input fields
+      properties:
+        message:
+          type: string
+          title: Message
+        fields:
+          type: array
+          title: Fields
+          items:
+            $ref: '#/components/schemas/Field'
+      required:
+      - message
+      - fields
+    APIErrorResponse_UnknownError_:
+      type: object
+      title: APIErrorResponse[UnknownError]
+      properties:
+        error:
+          $ref: '#/components/schemas/UnknownError'
+      required:
+      - error
+    APIErrorResponse_ForbiddenAccessError_:
+      type: object
+      title: APIErrorResponse[ForbiddenAccessError]
+      properties:
+        error:
+          $ref: '#/components/schemas/ForbiddenAccessError'
+      required:
+      - error
     AlertCategory:
       type: string
       enum:
@@ -397,22 +422,6 @@ components:
       description: 'ADM stands for Asset Discovery and Monitoring.
 
         DNS stands for Domain Name System.'
-    APIErrorResponse_ForbiddenAccessError_:
-      type: object
-      title: APIErrorResponse[ForbiddenAccessError]
-      properties:
-        error:
-          $ref: '#/components/schemas/ForbiddenAccessError'
-      required:
-      - error
-    APIErrorResponse_UnknownError_:
-      type: object
-      title: APIErrorResponse[UnknownError]
-      properties:
-        error:
-          $ref: '#/components/schemas/UnknownError'
-      required:
-      - error
     StixAlertsResponse:
       type: object
       title: StixAlertsResponse
@@ -436,26 +445,17 @@ components:
           - type: string
       required:
       - stix_bundle
-    ForbiddenAccessError:
-      type: object
-      title: ForbiddenAccessError
-      description: User cannot access some resource.
-      properties:
-        message:
-          type: string
-          title: Message
-      required:
-      - message
-    UnknownError:
-      type: object
-      title: UnknownError
-      description: Unknown error on server-side, please contact support.
-      properties:
-        message:
-          type: string
-          title: Message
-      required:
-      - message
+    AlertStatus:
+      type: string
+      enum:
+      - new
+      - autodiscarded
+      - discarded
+      - interesting
+      - forwarded
+      - report_sent
+      title: AlertStatus
+      description: Status of alerts, set by cybelangel automated systems and analysts.
   securitySchemes:
     jwt:
       type: http

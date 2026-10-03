@@ -95,6 +95,13 @@ paths:
       - url: https://platform.cybelangel.com/api
 components:
   schemas:
+    DomainStatus:
+      type: string
+      enum:
+      - monitored
+      - reported
+      examples:
+      - monitored
     Domain:
       type: object
       properties:
@@ -162,14 +169,29 @@ components:
           format: uuid
           examples:
           - 77f50671-e723-47ce-85e0-5749f82b96da
-    DomainStatus:
-      type: string
-      enum:
-      - monitored
-      - reported
-      examples:
-      - monitored
   responses:
+    Error500:
+      description: '**Internal server error**
+
+
+        An unexpected error occurred during request
+
+        '
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: number
+                description: internal error code
+              msg:
+                type: string
+                description: internal error message
+              type:
+                description: internal error type
+                examples:
+                - error
     Error400:
       description: '**Bad request**
 
@@ -197,28 +219,6 @@ components:
 
 
         Authentication is required
-
-        '
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              code:
-                type: number
-                description: internal error code
-              msg:
-                type: string
-                description: internal error message
-              type:
-                description: internal error type
-                examples:
-                - error
-    Error500:
-      description: '**Internal server error**
-
-
-        An unexpected error occurred during request
 
         '
       content:

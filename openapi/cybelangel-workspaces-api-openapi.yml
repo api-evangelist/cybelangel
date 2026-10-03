@@ -114,6 +114,26 @@ paths:
     - url: https://api.cybelangel.com
 components:
   schemas:
+    UnknownError:
+      type: object
+      title: UnknownError
+      description: Unknown error on server-side, please contact support.
+      properties:
+        message:
+          type: string
+          title: Message
+      required:
+      - message
+    ForbiddenAccessError:
+      type: object
+      title: ForbiddenAccessError
+      description: User cannot access some resource.
+      properties:
+        message:
+          type: string
+          title: Message
+      required:
+      - message
     WorkspaceDTO:
       type: object
       title: WorkspaceDTO
@@ -136,22 +156,38 @@ components:
       required:
       - id
       - name
-    BadRequestError:
+    APIErrorResponse_UnauthorizedError_:
       type: object
-      title: BadRequestError
-      description: User sent a bad request.
+      title: APIErrorResponse[UnauthorizedError]
+      properties:
+        error:
+          $ref: '#/components/schemas/UnauthorizedError'
+      required:
+      - error
+    APIErrorResponse_UnknownError_:
+      type: object
+      title: APIErrorResponse[UnknownError]
+      properties:
+        error:
+          $ref: '#/components/schemas/UnknownError'
+      required:
+      - error
+    UnauthorizedError:
+      type: object
+      title: UnauthorizedError
+      description: User cannot access some resource.
       properties:
         message:
           type: string
           title: Message
       required:
       - message
-    APIErrorResponse_BadRequestError_:
+    APIErrorResponse_ForbiddenAccessError_:
       type: object
-      title: APIErrorResponse[BadRequestError]
+      title: APIErrorResponse[ForbiddenAccessError]
       properties:
         error:
-          $ref: '#/components/schemas/BadRequestError'
+          $ref: '#/components/schemas/ForbiddenAccessError'
       required:
       - error
     WorkspaceListDTO:
@@ -173,54 +209,18 @@ components:
       required:
       - items
       - total
-    APIErrorResponse_UnauthorizedError_:
+    APIErrorResponse_BadRequestError_:
       type: object
-      title: APIErrorResponse[UnauthorizedError]
+      title: APIErrorResponse[BadRequestError]
       properties:
         error:
-          $ref: '#/components/schemas/UnauthorizedError'
+          $ref: '#/components/schemas/BadRequestError'
       required:
       - error
-    APIErrorResponse_ForbiddenAccessError_:
+    BadRequestError:
       type: object
-      title: APIErrorResponse[ForbiddenAccessError]
-      properties:
-        error:
-          $ref: '#/components/schemas/ForbiddenAccessError'
-      required:
-      - error
-    UnauthorizedError:
-      type: object
-      title: UnauthorizedError
-      description: User cannot access some resource.
-      properties:
-        message:
-          type: string
-          title: Message
-      required:
-      - message
-    APIErrorResponse_UnknownError_:
-      type: object
-      title: APIErrorResponse[UnknownError]
-      properties:
-        error:
-          $ref: '#/components/schemas/UnknownError'
-      required:
-      - error
-    ForbiddenAccessError:
-      type: object
-      title: ForbiddenAccessError
-      description: User cannot access some resource.
-      properties:
-        message:
-          type: string
-          title: Message
-      required:
-      - message
-    UnknownError:
-      type: object
-      title: UnknownError
-      description: Unknown error on server-side, please contact support.
+      title: BadRequestError
+      description: User sent a bad request.
       properties:
         message:
           type: string

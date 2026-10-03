@@ -262,52 +262,51 @@ paths:
       - url: https://api.cybelangel.com
 components:
   schemas:
-    ListClaimedAttacksResponse:
+    UnknownError:
       type: object
-      title: ListClaimedAttacksResponse
-      description: Paginated and filterable list of claimed attacks.
-      properties:
-        claimed_attacks:
-          type: array
-          title: Claimed Attacks
-          description: List of claimed attacks (based on pagination).
-          items:
-            $ref: '#/components/schemas/ClaimedAttackDTO'
-        total:
-          type: integer
-          title: Total
-          description: Total number of claimed attacks (for configuring the pagination).
-          examples:
-          - 1000
-      required:
-      - claimed_attacks
-      - total
-    BadRequestError:
-      type: object
-      title: BadRequestError
-      description: User sent a bad request.
+      title: UnknownError
+      description: Unknown error on server-side, please contact support.
       properties:
         message:
           type: string
           title: Message
       required:
       - message
-    NotFoundError:
+    ForbiddenAccessError:
       type: object
-      title: NotFoundError
-      description: Nothing matches the given URI
+      title: ForbiddenAccessError
+      description: User cannot access some resource.
       properties:
         message:
           type: string
           title: Message
       required:
       - message
-    APIErrorResponse_BadRequestError_:
+    ClaimedAttacksSortByCriteriaQuery:
+      type: string
+      enum:
+      - category
+      - claimed_at
+      - threat_actors
+      - countries
+      - industries
+      - victims
+      - domains
+      title: ClaimedAttacksSortByCriteriaQuery
+    APIErrorResponse_NotFoundError_:
       type: object
-      title: APIErrorResponse[BadRequestError]
+      title: APIErrorResponse[NotFoundError]
       properties:
         error:
-          $ref: '#/components/schemas/BadRequestError'
+          $ref: '#/components/schemas/NotFoundError'
+      required:
+      - error
+    APIErrorResponse_UnauthorizedError_:
+      type: object
+      title: APIErrorResponse[UnauthorizedError]
+      properties:
+        error:
+          $ref: '#/components/schemas/UnauthorizedError'
       required:
       - error
     ClaimedAttackDTO:
@@ -404,61 +403,12 @@ components:
       - industries
       - victims
       - domains
-    APIErrorResponse_NotFoundError_:
+    APIErrorResponse_UnknownError_:
       type: object
-      title: APIErrorResponse[NotFoundError]
+      title: APIErrorResponse[UnknownError]
       properties:
         error:
-          $ref: '#/components/schemas/NotFoundError'
-      required:
-      - error
-    APIErrorResponse_UnauthorizedError_:
-      type: object
-      title: APIErrorResponse[UnauthorizedError]
-      properties:
-        error:
-          $ref: '#/components/schemas/UnauthorizedError'
-      required:
-      - error
-    ClaimedAttacksSortByOrderQuery:
-      type: string
-      enum:
-      - asc
-      - desc
-      title: ClaimedAttacksSortByOrderQuery
-    ClaimedAttackCategory:
-      type: string
-      enum:
-      - data_leak
-      - ddos
-      - defacement
-      - ransomware
-      title: ClaimedAttackCategory
-    ClaimedAttacksSortByCriteriaQuery:
-      type: string
-      enum:
-      - category
-      - claimed_at
-      - threat_actors
-      - countries
-      - industries
-      - victims
-      - domains
-      title: ClaimedAttacksSortByCriteriaQuery
-    ClaimedAttackNetwork:
-      type: string
-      enum:
-      - tor
-      - openweb
-      - telegram
-      - discord
-      title: ClaimedAttackNetwork
-    APIErrorResponse_ForbiddenAccessError_:
-      type: object
-      title: APIErrorResponse[ForbiddenAccessError]
-      properties:
-        error:
-          $ref: '#/components/schemas/ForbiddenAccessError'
+          $ref: '#/components/schemas/UnknownError'
       required:
       - error
     UnauthorizedError:
@@ -471,12 +421,46 @@ components:
           title: Message
       required:
       - message
-    APIErrorResponse_UnknownError_:
+    NotFoundError:
       type: object
-      title: APIErrorResponse[UnknownError]
+      title: NotFoundError
+      description: Nothing matches the given URI
+      properties:
+        message:
+          type: string
+          title: Message
+      required:
+      - message
+    APIErrorResponse_ForbiddenAccessError_:
+      type: object
+      title: APIErrorResponse[ForbiddenAccessError]
       properties:
         error:
-          $ref: '#/components/schemas/UnknownError'
+          $ref: '#/components/schemas/ForbiddenAccessError'
+      required:
+      - error
+    ClaimedAttackCategory:
+      type: string
+      enum:
+      - data_leak
+      - ddos
+      - defacement
+      - ransomware
+      title: ClaimedAttackCategory
+    ClaimedAttackNetwork:
+      type: string
+      enum:
+      - tor
+      - openweb
+      - telegram
+      - discord
+      title: ClaimedAttackNetwork
+    APIErrorResponse_BadRequestError_:
+      type: object
+      title: APIErrorResponse[BadRequestError]
+      properties:
+        error:
+          $ref: '#/components/schemas/BadRequestError'
       required:
       - error
     ClaimedAttackSourceDTO:
@@ -497,20 +481,36 @@ components:
           - http://example.onion/victims/acme-corp
           anyOf:
           - type: string
-    ForbiddenAccessError:
+    ListClaimedAttacksResponse:
       type: object
-      title: ForbiddenAccessError
-      description: User cannot access some resource.
+      title: ListClaimedAttacksResponse
+      description: Paginated and filterable list of claimed attacks.
       properties:
-        message:
-          type: string
-          title: Message
+        claimed_attacks:
+          type: array
+          title: Claimed Attacks
+          description: List of claimed attacks (based on pagination).
+          items:
+            $ref: '#/components/schemas/ClaimedAttackDTO'
+        total:
+          type: integer
+          title: Total
+          description: Total number of claimed attacks (for configuring the pagination).
+          examples:
+          - 1000
       required:
-      - message
-    UnknownError:
+      - claimed_attacks
+      - total
+    ClaimedAttacksSortByOrderQuery:
+      type: string
+      enum:
+      - asc
+      - desc
+      title: ClaimedAttacksSortByOrderQuery
+    BadRequestError:
       type: object
-      title: UnknownError
-      description: Unknown error on server-side, please contact support.
+      title: BadRequestError
+      description: User sent a bad request.
       properties:
         message:
           type: string
