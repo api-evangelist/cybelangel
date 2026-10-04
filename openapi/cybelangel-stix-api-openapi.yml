@@ -302,6 +302,87 @@ paths:
       - url: https://api.cybelangel.com
 components:
   schemas:
+    ValidationError:
+      type: object
+      title: ValidationError
+      description: Error on incorrect input fields
+      properties:
+        message:
+          type: string
+          title: Message
+        fields:
+          type: array
+          title: Fields
+          items:
+            $ref: '#/components/schemas/Field'
+      required:
+      - message
+      - fields
+    AlertStatus:
+      type: string
+      enum:
+      - new
+      - autodiscarded
+      - discarded
+      - interesting
+      - forwarded
+      - report_sent
+      title: AlertStatus
+      description: Status of alerts, set by cybelangel automated systems and analysts.
+    ForbiddenAccessError:
+      type: object
+      title: ForbiddenAccessError
+      description: User cannot access some resource.
+      properties:
+        message:
+          type: string
+          title: Message
+      required:
+      - message
+    APIErrorResponse_UnknownError_:
+      type: object
+      title: APIErrorResponse[UnknownError]
+      properties:
+        error:
+          $ref: '#/components/schemas/UnknownError'
+      required:
+      - error
+    StixAlertsResponse:
+      type: object
+      title: StixAlertsResponse
+      description: Response to a search of STIX objects from alerts data.
+      properties:
+        stix_bundle:
+          type: object
+          title: Stix Bundle
+          description: 'STIX Bundle object used to aggregate STIX objects, both SDO, SCO and SRO.
+
+            See https://docs.oasis-open.org/cti/stix/v2.1/csprd01/stix-v2.1-csprd01.html#_Toc16070770 for more information.'
+        more:
+          type: boolean
+          title: More
+          description: Set to true when there are more alerts to retrieve with the same search request parameters and a new 'cursor'.
+          default: false
+        cursor:
+          title: Cursor
+          description: Set when there are more alerts to retrieve. It can be used in another search request, with the same parameters, to download the following alerts.
+          anyOf:
+          - type: string
+      required:
+      - stix_bundle
+    CustomerAssessment:
+      type: string
+      enum:
+      - unknown
+      - true_positive
+      - false_positive
+      title: CustomerAssessment
+      description: 'Assessment of the alert quality: is it a real security threat?
+
+        Set by the API user to provide feedback to Cybelangel.
+
+
+        The default ''unknown'' value is present before user assessed the alert, or when removing that assessment.'
     UnknownError:
       type: object
       title: UnknownError
@@ -312,6 +393,41 @@ components:
           title: Message
       required:
       - message
+    APIErrorResponse_ForbiddenAccessError_:
+      type: object
+      title: APIErrorResponse[ForbiddenAccessError]
+      properties:
+        error:
+          $ref: '#/components/schemas/ForbiddenAccessError'
+      required:
+      - error
+    APIErrorResponse_ValidationError_:
+      type: object
+      title: APIErrorResponse[ValidationError]
+      properties:
+        error:
+          $ref: '#/components/schemas/ValidationError'
+      required:
+      - error
+    AlertCategory:
+      type: string
+      enum:
+      - adm
+      - fileserver
+      - codeshare
+      - dns
+      - database
+      - board
+      - clouddrive
+      - docshare
+      - paste
+      - leak
+      - rss
+      - social
+      title: AlertCategory
+      description: 'ADM stands for Asset Discovery and Monitoring.
+
+        DNS stands for Domain Name System.'
     Field:
       type: object
       title: Field
@@ -340,122 +456,6 @@ components:
       required:
       - name
       - msg
-    ForbiddenAccessError:
-      type: object
-      title: ForbiddenAccessError
-      description: User cannot access some resource.
-      properties:
-        message:
-          type: string
-          title: Message
-      required:
-      - message
-    APIErrorResponse_ValidationError_:
-      type: object
-      title: APIErrorResponse[ValidationError]
-      properties:
-        error:
-          $ref: '#/components/schemas/ValidationError'
-      required:
-      - error
-    CustomerAssessment:
-      type: string
-      enum:
-      - unknown
-      - true_positive
-      - false_positive
-      title: CustomerAssessment
-      description: 'Assessment of the alert quality: is it a real security threat?
-
-        Set by the API user to provide feedback to Cybelangel.
-
-
-        The default ''unknown'' value is present before user assessed the alert, or when removing that assessment.'
-    ValidationError:
-      type: object
-      title: ValidationError
-      description: Error on incorrect input fields
-      properties:
-        message:
-          type: string
-          title: Message
-        fields:
-          type: array
-          title: Fields
-          items:
-            $ref: '#/components/schemas/Field'
-      required:
-      - message
-      - fields
-    APIErrorResponse_UnknownError_:
-      type: object
-      title: APIErrorResponse[UnknownError]
-      properties:
-        error:
-          $ref: '#/components/schemas/UnknownError'
-      required:
-      - error
-    APIErrorResponse_ForbiddenAccessError_:
-      type: object
-      title: APIErrorResponse[ForbiddenAccessError]
-      properties:
-        error:
-          $ref: '#/components/schemas/ForbiddenAccessError'
-      required:
-      - error
-    AlertCategory:
-      type: string
-      enum:
-      - adm
-      - fileserver
-      - codeshare
-      - dns
-      - database
-      - board
-      - clouddrive
-      - docshare
-      - paste
-      - leak
-      - rss
-      - social
-      title: AlertCategory
-      description: 'ADM stands for Asset Discovery and Monitoring.
-
-        DNS stands for Domain Name System.'
-    StixAlertsResponse:
-      type: object
-      title: StixAlertsResponse
-      description: Response to a search of STIX objects from alerts data.
-      properties:
-        stix_bundle:
-          type: object
-          title: Stix Bundle
-          description: 'STIX Bundle object used to aggregate STIX objects, both SDO, SCO and SRO.
-
-            See https://docs.oasis-open.org/cti/stix/v2.1/csprd01/stix-v2.1-csprd01.html#_Toc16070770 for more information.'
-        more:
-          type: boolean
-          title: More
-          description: Set to true when there are more alerts to retrieve with the same search request parameters and a new 'cursor'.
-          default: false
-        cursor:
-          title: Cursor
-          description: Set when there are more alerts to retrieve. It can be used in another search request, with the same parameters, to download the following alerts.
-          anyOf:
-          - type: string
-      required:
-      - stix_bundle
-    AlertStatus:
-      type: string
-      enum:
-      - new
-      - autodiscarded
-      - discarded
-      - interesting
-      - forwarded
-      - report_sent
-      title: AlertStatus
-      description: Status of alerts, set by cybelangel automated systems and analysts.
   securitySchemes:
     jwt:
       type: http

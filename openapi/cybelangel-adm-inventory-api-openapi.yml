@@ -1195,6 +1195,177 @@ paths:
     - url: https://api.cybelangel.com
 components:
   schemas:
+    SubDomainTakeoverThreatDataDTO:
+      type: object
+      title: SubDomainTakeoverThreatDataDTO
+      description: Metadata related to dangling subdomains (CNAME misconfiguration)
+      properties:
+        summary:
+          anyOf:
+          - $ref: '#/components/schemas/TranslationElementDTO'
+        how_we_found_it:
+          anyOf:
+          - $ref: '#/components/schemas/TranslationElementDTO'
+        risks:
+          anyOf:
+          - $ref: '#/components/schemas/TranslationElementDTO'
+        details:
+          anyOf:
+          - $ref: '#/components/schemas/TranslationElementDTO'
+        target_domain:
+          type: string
+          title: Target Domain
+      required:
+      - target_domain
+    ServiceDTO:
+      type: object
+      title: ServiceDTO
+      properties:
+        protocol:
+          type: string
+          title: Protocol
+          minLength: 1
+          examples:
+          - mysql
+        cpes:
+          type: array
+          title: Cpes
+          description: List of CPEs associated with the service
+          items:
+            $ref: '#/components/schemas/OpenServiceCpeDTO'
+      required:
+      - protocol
+      - cpes
+    InventoryGraphNodeDTO:
+      type: object
+      title: InventoryGraphNodeDTO
+      properties:
+        value:
+          type: string
+          title: Value
+        type:
+          $ref: '#/components/schemas/InventoryNodeType'
+          description: Type of the assets in graph node
+      required:
+      - value
+      - type
+    InventoryNodeType:
+      type: string
+      enum:
+      - unknown
+      - domain
+      - ip
+      - iprange
+      - email
+      title: InventoryNodeType
+    UpdateAssetThreatStatusRequestBodyDTO:
+      type: object
+      title: UpdateAssetThreatStatusRequestBodyDTO
+      additionalProperties: false
+      properties:
+        threats:
+          type: array
+          title: Threats
+          description: List of threats on which to update their status
+          minItems: 1
+          maxItems: 50
+          items:
+            $ref: '#/components/schemas/UpdateAssetThreatStatusItemDTO'
+        status:
+          $ref: '#/components/schemas/ThreatStatus'
+          description: The new status to apply to the given threats
+          example: open
+      required:
+      - threats
+      - status
+    APIErrorResponse_NotFoundError_:
+      type: object
+      title: APIErrorResponse[NotFoundError]
+      properties:
+        error:
+          $ref: '#/components/schemas/NotFoundError'
+      required:
+      - error
+    UpdateAssetsStatusRequestBodyDTO:
+      type: object
+      title: UpdateAssetsStatusRequestBodyDTO
+      additionalProperties: false
+      properties:
+        asset_values:
+          type: array
+          title: Asset Values
+          description: List of asset values to update. Cannot be used together with 'asset_ids'.
+          minItems: 1
+          maxItems: 50
+          examples:
+          - - example.com
+            - 192.168.1.1
+            - subdomain.example.com
+          items:
+            type: string
+            minLength: 1
+        asset_ids:
+          type: array
+          title: Asset Ids
+          description: List of asset IDs (UUIDs) to update. Cannot be used together with 'asset_values'.
+          minItems: 1
+          maxItems: 50
+          examples:
+          - - c683aa1a-a029-4bcf-9333-a029f2964444
+            - d794bb2b-b130-5cdf-a444-b130a3075555
+          items:
+            type: string
+            format: uuid
+        status:
+          description: '[Deprecated] The new status to apply to the assets (This field will be removed on September 4 2026, use `asset_status` instead)'
+          anyOf:
+          - $ref: '#/components/schemas/PreviousAssetStatus'
+          x-deprecated: true
+        asset_status:
+          $ref: '#/components/schemas/AssetStatus'
+          description: The new status to apply to the assets
+      required:
+      - asset_status
+    APIErrorResponse_UnknownError_:
+      type: object
+      title: APIErrorResponse[UnknownError]
+      properties:
+        error:
+          $ref: '#/components/schemas/UnknownError'
+      required:
+      - error
+    APIErrorResponse_ForbiddenAccessError_:
+      type: object
+      title: APIErrorResponse[ForbiddenAccessError]
+      properties:
+        error:
+          $ref: '#/components/schemas/ForbiddenAccessError'
+      required:
+      - error
+    ThreatType:
+      type: string
+      enum:
+      - exposed_service
+      - exposed_data_storage
+      - accessible_website
+      - forbidden_website
+      - broken_website
+      - accessible_sensitive_website
+      - inaccessible_sensitive_website
+      - subdomain_takeover
+      - belonging_dangling_subdomain
+      - dangling_subdomain
+      - tls_certificate_expired
+      - tls_certificate_soon_expired
+      - accessible_website_with_tls_certificate_expired
+      - permissive_spf_misconfiguration
+      - too_many_spf_records
+      - vulnerable_technology
+      - vulnerable_technology_to_kev
+      - exposed_sensitive_file
+      - None
+      title: ThreatType
+      description: The type of the threat
     InventoryAssetWorkspaceDTO:
       type: object
       title: InventoryAssetWorkspaceDTO
@@ -1213,17 +1384,161 @@ components:
       required:
       - id
       - name
-    GetThreatsWithAssetInfoResponseDTO:
+    OpenPortDTO:
       type: object
-      title: GetThreatsWithAssetInfoResponseDTO
+      title: OpenPortDTO
+      properties:
+        port:
+          type: integer
+          title: Port
+          examples:
+          - 3306
+        transport:
+          $ref: '#/components/schemas/OpenPortTransport'
+          example: tcp
+        service:
+          $ref: '#/components/schemas/ServiceDTO'
+      required:
+      - port
+      - transport
+      - service
+    ConflictError:
+      type: object
+      title: ConflictError
+      description: Conflict with the current state of the resource
+      properties:
+        message:
+          type: string
+          title: Message
+      required:
+      - message
+    VulnerableTechnologyCveDTO:
+      type: object
+      title: VulnerableTechnologyCveDTO
+      properties:
+        cve_id:
+          type: string
+          title: Cve Id
+          examples:
+          - CVE-2023-44981
+        description:
+          type: string
+          title: Description
+        cvss_score:
+          type: number
+          title: Cvss Score
+          examples:
+          - 7.7
+        cvss_version:
+          type: number
+          title: Cvss Version
+          examples:
+          - 3.1
+        epss_score:
+          type: number
+          title: Epss Score
+          examples:
+          - 0.2
+        have_known_exploit:
+          title: Have Known Exploit
+          anyOf:
+          - type: boolean
+        required_action:
+          title: Required Action
+          anyOf:
+          - type: string
+      required:
+      - cve_id
+      - description
+      - cvss_score
+      - cvss_version
+      - epss_score
+    TranslationElementDTO:
+      type: object
+      title: TranslationElementDTO
+      properties:
+        en:
+          title: En
+          anyOf:
+          - type: string
+        fr:
+          title: Fr
+          anyOf:
+          - type: string
+    PivotMethod:
+      type: string
+      enum:
+      - A
+      - CNAME
+      - WHOIS
+      - CIDR_ENUMERATION
+      - REVERSE_WHOIS
+      - REVERSE_DNS
+      - PASSIVE_MATCHING
+      - EXTRACT
+      title: PivotMethod
+    AssetType:
+      type: string
+      enum:
+      - domain
+      - ip
+      - iprange
+      title: AssetType
+    SpfThreatDataDTO:
+      type: object
+      title: SpfThreatDataDTO
+      description: Metadata related to SPF configuration issues
+      properties:
+        summary:
+          anyOf:
+          - $ref: '#/components/schemas/TranslationElementDTO'
+        how_we_found_it:
+          anyOf:
+          - $ref: '#/components/schemas/TranslationElementDTO'
+        risks:
+          anyOf:
+          - $ref: '#/components/schemas/TranslationElementDTO'
+        details:
+          anyOf:
+          - $ref: '#/components/schemas/TranslationElementDTO'
+        records:
+          type: array
+          title: Records
+          description: The SPF records that we found for this asset.
+          examples:
+          - - v=spf1 a mx +all
+          items:
+            type: string
+      required:
+      - records
+    PreviousAssetStatus:
+      type: string
+      enum:
+      - input
+      - discovered
+      - confirmed
+      - discarded
+      title: PreviousAssetStatus
+    ThreatSeverity:
+      type: integer
+      enum:
+      - 0
+      - 1
+      - 2
+      - 3
+      - 4
+      title: ThreatSeverity
+    GetAssetsResponseDTO:
+      type: object
+      title: GetAssetsResponseDTO
       additionalProperties: false
       properties:
         items:
           type: array
           title: Items
-          description: List of threats with asset value matching the request
+          description: List of assets matching the request
           items:
-            $ref: '#/components/schemas/InventoryThreatWithAssetInfoDTO'
+            $ref: '#/components/schemas/InventoryAssetDTO'
         next_cursor:
           title: Next Cursor
           description: Cursor to the next page. You should use this cursor in the "cursor" query parameter to retrieve the next page.
@@ -1232,21 +1547,76 @@ components:
         total:
           type: integer
           title: Total
-          description: Total number of threats through all pages
+          description: Total number of assets through all pages (or in all your inventory)
           minimum: 0
       required:
       - items
       - total
-    ForbiddenAccessError:
+    VulnerableTechnologyThreatDataDTO:
       type: object
-      title: ForbiddenAccessError
-      description: User cannot access some resource.
+      title: VulnerableTechnologyThreatDataDTO
       properties:
-        message:
+        cpe_id:
           type: string
-          title: Message
+          title: Cpe Id
+          examples:
+          - cpe:2.3:a:apache:zookeeper:3.9.0:*:*:*:*:*:*:*
+        cpe_vendor:
+          title: Cpe Vendor
+          examples:
+          - apache
+          anyOf:
+          - type: string
+        cpe_product:
+          type: string
+          title: Cpe Product
+          examples:
+          - zookeeper
+        cpe_product_version:
+          type: string
+          title: Cpe Product Version
+          examples:
+          - 3.9.0
+        cve_count:
+          type: integer
+          title: Cve Count
+          examples:
+          - 11
+        cve_in_kev_count:
+          title: Cve In Kev Count
+          examples:
+          - 2
+          anyOf:
+          - type: integer
+        highest_cvss_score:
+          type: number
+          title: Highest Cvss Score
+          examples:
+          - 7.7
+        highest_epss_score:
+          type: number
+          title: Highest Epss Score
+          examples:
+          - 0.2
+        cves:
+          type: array
+          title: Cves
+          items:
+            $ref: '#/components/schemas/VulnerableTechnologyCveDTO'
+        details:
+          $ref: '#/components/schemas/TranslationElementDTO'
+        risks:
+          $ref: '#/components/schemas/TranslationElementDTO'
       required:
-      - message
+      - cpe_id
+      - cpe_product
+      - cpe_product_version
+      - cve_count
+      - highest_cvss_score
+      - highest_epss_score
+      - cves
+      - details
+      - risks
     InventoryThreatWithAssetInfoDTO:
       type: object
       title: InventoryThreatWithAssetInfoDTO
@@ -1337,26 +1707,34 @@ components:
       - status
       - data
       - asset_value
-    UpdateAssetThreatStatusRequestBodyDTO:
+    APIErrorResponse_ConflictError_:
       type: object
-      title: UpdateAssetThreatStatusRequestBodyDTO
-      additionalProperties: false
+      title: APIErrorResponse[ConflictError]
       properties:
-        threats:
-          type: array
-          title: Threats
-          description: List of threats on which to update their status
-          minItems: 1
-          maxItems: 50
-          items:
-            $ref: '#/components/schemas/UpdateAssetThreatStatusItemDTO'
-        status:
-          $ref: '#/components/schemas/ThreatStatus'
-          description: The new status to apply to the given threats
-          example: open
+        error:
+          $ref: '#/components/schemas/ConflictError'
       required:
-      - threats
-      - status
+      - error
+    APIErrorResponse_BadRequestError_:
+      type: object
+      title: APIErrorResponse[BadRequestError]
+      properties:
+        error:
+          $ref: '#/components/schemas/BadRequestError'
+      required:
+      - error
+    FingerprintsDTO:
+      type: object
+      title: FingerprintsDTO
+      properties:
+        open_ports:
+          type: array
+          title: Open Ports
+          description: List of ports with related fingerprints
+          items:
+            $ref: '#/components/schemas/OpenPortDTO'
+      required:
+      - open_ports
     APIErrorResponse_UnauthorizedError_:
       type: object
       title: APIErrorResponse[UnauthorizedError]
@@ -1365,71 +1743,16 @@ components:
           $ref: '#/components/schemas/UnauthorizedError'
       required:
       - error
-    TLSCertificateThreatDataDTO:
-      type: object
-      title: TLSCertificateThreatDataDTO
-      description: Metadata related to certificates issues
-      properties:
-        summary:
-          anyOf:
-          - $ref: '#/components/schemas/TranslationElementDTO'
-        how_we_found_it:
-          anyOf:
-          - $ref: '#/components/schemas/TranslationElementDTO'
-        risks:
-          anyOf:
-          - $ref: '#/components/schemas/TranslationElementDTO'
-        details:
-          anyOf:
-          - $ref: '#/components/schemas/TranslationElementDTO'
-        not_before_date:
-          type: string
-          title: Not Before Date
-          format: date-time
-          examples:
-          - '2023-10-05T14:48:00.000Z'
-        not_after_date:
-          type: string
-          title: Not After Date
-          format: date-time
-          examples:
-          - '2023-10-05T14:48:00.000Z'
-      required:
-      - not_before_date
-      - not_after_date
-    OpenServiceCpeDTO:
-      type: object
-      title: OpenServiceCpeDTO
-      properties:
-        name:
-          type: string
-          title: Name
-          description: The CPE 2.3 standard identifier
-          minLength: 1
-          examples:
-          - cpe:2.3:a:apache:http_server:2.4.46
-        first_seen_at:
-          type: string
-          title: First Seen At
-          format: date-time
-          examples:
-          - '2023-10-05T14:48:00.000Z'
-        last_seen_at:
-          type: string
-          title: Last Seen At
-          format: date-time
-          examples:
-          - '2023-10-05T14:48:00.000Z'
-      required:
-      - name
-      - first_seen_at
-      - last_seen_at
-    OpenPortTransport:
+    ThreatStatus:
       type: string
       enum:
-      - tcp
-      - udp
-      title: OpenPortTransport
+      - open
+      - under_review
+      - remediated
+      - risk_accepted
+      - not_applicable
+      title: ThreatStatus
+      description: The status of the threat
     UpdateAssetThreatStatusItemDTO:
       type: object
       title: UpdateAssetThreatStatusItemDTO
@@ -1460,255 +1783,16 @@ components:
             format: uuid
       required:
       - threat_hash
-    ThreatType:
-      type: string
-      enum:
-      - exposed_service
-      - exposed_data_storage
-      - accessible_website
-      - forbidden_website
-      - broken_website
-      - accessible_sensitive_website
-      - inaccessible_sensitive_website
-      - subdomain_takeover
-      - belonging_dangling_subdomain
-      - dangling_subdomain
-      - tls_certificate_expired
-      - tls_certificate_soon_expired
-      - accessible_website_with_tls_certificate_expired
-      - permissive_spf_misconfiguration
-      - too_many_spf_records
-      - vulnerable_technology
-      - vulnerable_technology_to_kev
-      - exposed_sensitive_file
-      - None
-      title: ThreatType
-      description: The type of the threat
-    APIErrorResponse_ConflictError_:
+    ForbiddenAccessError:
       type: object
-      title: APIErrorResponse[ConflictError]
-      properties:
-        error:
-          $ref: '#/components/schemas/ConflictError'
-      required:
-      - error
-    ExposedSensitiveFileThreatDataDTO:
-      type: object
-      title: ExposedSensitiveFileThreatDataDTO
-      properties:
-        path:
-          type: string
-          title: Path
-          examples:
-          - /.env
-        url:
-          type: string
-          title: Url
-          examples:
-          - https://www.example.com/.env
-        status_code:
-          type: integer
-          title: Status Code
-          examples:
-          - 200
-        details:
-          $ref: '#/components/schemas/TranslationElementDTO'
-        risks:
-          $ref: '#/components/schemas/TranslationElementDTO'
-      required:
-      - path
-      - url
-      - status_code
-      - details
-      - risks
-    DomainThreatDataDTO:
-      type: object
-      title: DomainThreatDataDTO
-      properties:
-        summary:
-          anyOf:
-          - $ref: '#/components/schemas/TranslationElementDTO'
-        how_we_found_it:
-          anyOf:
-          - $ref: '#/components/schemas/TranslationElementDTO'
-        risks:
-          anyOf:
-          - $ref: '#/components/schemas/TranslationElementDTO'
-        details:
-          anyOf:
-          - $ref: '#/components/schemas/TranslationElementDTO'
-        protocol:
-          type: string
-          title: Protocol
-        protocol_display_name:
-          title: Protocol Display Name
-          anyOf:
-          - type: string
-        status_code:
-          type: integer
-          title: Status Code
-      required:
-      - protocol
-      - status_code
-    InventoryAssetGraphDTO:
-      type: object
-      title: InventoryAssetGraphDTO
-      properties:
-        edges:
-          type: array
-          title: Edges
-          items:
-            $ref: '#/components/schemas/InventoryGraphEdgeDTO'
-        nodes:
-          type: array
-          title: Nodes
-          items:
-            $ref: '#/components/schemas/InventoryGraphNodeDTO'
-      required:
-      - edges
-      - nodes
-    BadRequestError:
-      type: object
-      title: BadRequestError
-      description: User sent a bad request.
+      title: ForbiddenAccessError
+      description: User cannot access some resource.
       properties:
         message:
           type: string
           title: Message
       required:
       - message
-    FingerprintsDTO:
-      type: object
-      title: FingerprintsDTO
-      properties:
-        open_ports:
-          type: array
-          title: Open Ports
-          description: List of ports with related fingerprints
-          items:
-            $ref: '#/components/schemas/OpenPortDTO'
-      required:
-      - open_ports
-    SubDomainTakeoverThreatDataDTO:
-      type: object
-      title: SubDomainTakeoverThreatDataDTO
-      description: Metadata related to dangling subdomains (CNAME misconfiguration)
-      properties:
-        summary:
-          anyOf:
-          - $ref: '#/components/schemas/TranslationElementDTO'
-        how_we_found_it:
-          anyOf:
-          - $ref: '#/components/schemas/TranslationElementDTO'
-        risks:
-          anyOf:
-          - $ref: '#/components/schemas/TranslationElementDTO'
-        details:
-          anyOf:
-          - $ref: '#/components/schemas/TranslationElementDTO'
-        target_domain:
-          type: string
-          title: Target Domain
-      required:
-      - target_domain
-    OpenPortDTO:
-      type: object
-      title: OpenPortDTO
-      properties:
-        port:
-          type: integer
-          title: Port
-          examples:
-          - 3306
-        transport:
-          $ref: '#/components/schemas/OpenPortTransport'
-          example: tcp
-        service:
-          $ref: '#/components/schemas/ServiceDTO'
-      required:
-      - port
-      - transport
-      - service
-    TranslationElementDTO:
-      type: object
-      title: TranslationElementDTO
-      properties:
-        en:
-          title: En
-          anyOf:
-          - type: string
-        fr:
-          title: Fr
-          anyOf:
-          - type: string
-    PreviousAssetStatus:
-      type: string
-      enum:
-      - input
-      - discovered
-      - confirmed
-      - discarded
-      title: PreviousAssetStatus
-    SpfThreatDataDTO:
-      type: object
-      title: SpfThreatDataDTO
-      description: Metadata related to SPF configuration issues
-      properties:
-        summary:
-          anyOf:
-          - $ref: '#/components/schemas/TranslationElementDTO'
-        how_we_found_it:
-          anyOf:
-          - $ref: '#/components/schemas/TranslationElementDTO'
-        risks:
-          anyOf:
-          - $ref: '#/components/schemas/TranslationElementDTO'
-        details:
-          anyOf:
-          - $ref: '#/components/schemas/TranslationElementDTO'
-        records:
-          type: array
-          title: Records
-          description: The SPF records that we found for this asset.
-          examples:
-          - - v=spf1 a mx +all
-          items:
-            type: string
-      required:
-      - records
-    APIErrorResponse_ForbiddenAccessError_:
-      type: object
-      title: APIErrorResponse[ForbiddenAccessError]
-      properties:
-        error:
-          $ref: '#/components/schemas/ForbiddenAccessError'
-      required:
-      - error
-    OtherThreatDataDTO:
-      type: object
-      title: OtherThreatDataDTO
-      description: Metadata for all other threats
-      properties:
-        summary:
-          anyOf:
-          - $ref: '#/components/schemas/TranslationElementDTO'
-        how_we_found_it:
-          anyOf:
-          - $ref: '#/components/schemas/TranslationElementDTO'
-        risks:
-          anyOf:
-          - $ref: '#/components/schemas/TranslationElementDTO'
-        details:
-          anyOf:
-          - $ref: '#/components/schemas/TranslationElementDTO'
-        protocol:
-          title: Protocol
-          anyOf:
-          - type: string
-        protocol_display_name:
-          title: Protocol Display Name
-          anyOf:
-          - type: string
     UnknownError:
       type: object
       title: UnknownError
@@ -1719,154 +1803,16 @@ components:
           title: Message
       required:
       - message
-    InventoryGraphEdgeDTO:
+    NotFoundError:
       type: object
-      title: InventoryGraphEdgeDTO
+      title: NotFoundError
+      description: Nothing matches the given URI
       properties:
-        from_node:
+        message:
           type: string
-          title: From Node
-        to_node:
-          type: string
-          title: To Node
-        method:
-          $ref: '#/components/schemas/PivotMethod'
-        updated_at:
-          type: string
-          title: Updated At
-          format: date-time
-          examples:
-          - '2023-10-05T14:48:00.000Z'
+          title: Message
       required:
-      - from_node
-      - to_node
-      - method
-      - updated_at
-    APIErrorResponse_NotFoundError_:
-      type: object
-      title: APIErrorResponse[NotFoundError]
-      properties:
-        error:
-          $ref: '#/components/schemas/NotFoundError'
-      required:
-      - error
-    UpdateAssetsStatusRequestBodyDTO:
-      type: object
-      title: UpdateAssetsStatusRequestBodyDTO
-      additionalProperties: false
-      properties:
-        asset_values:
-          type: array
-          title: Asset Values
-          description: List of asset values to update. Cannot be used together with 'asset_ids'.
-          minItems: 1
-          maxItems: 50
-          examples:
-          - - example.com
-            - 192.168.1.1
-            - subdomain.example.com
-          items:
-            type: string
-            minLength: 1
-        asset_ids:
-          type: array
-          title: Asset Ids
-          description: List of asset IDs (UUIDs) to update. Cannot be used together with 'asset_values'.
-          minItems: 1
-          maxItems: 50
-          examples:
-          - - c683aa1a-a029-4bcf-9333-a029f2964444
-            - d794bb2b-b130-5cdf-a444-b130a3075555
-          items:
-            type: string
-            format: uuid
-        status:
-          description: '[Deprecated] The new status to apply to the assets (This field will be removed on September 4 2026, use `asset_status` instead)'
-          anyOf:
-          - $ref: '#/components/schemas/PreviousAssetStatus'
-          x-deprecated: true
-        asset_status:
-          $ref: '#/components/schemas/AssetStatus'
-          description: The new status to apply to the assets
-      required:
-      - asset_status
-    APIErrorResponse_UnknownError_:
-      type: object
-      title: APIErrorResponse[UnknownError]
-      properties:
-        error:
-          $ref: '#/components/schemas/UnknownError'
-      required:
-      - error
-    AssetType:
-      type: string
-      enum:
-      - domain
-      - ip
-      - iprange
-      title: AssetType
-    InventoryGraphNodeDTO:
-      type: object
-      title: InventoryGraphNodeDTO
-      properties:
-        value:
-          type: string
-          title: Value
-        type:
-          $ref: '#/components/schemas/InventoryNodeType'
-          description: Type of the assets in graph node
-      required:
-      - value
-      - type
-    APIErrorResponse_BadRequestError_:
-      type: object
-      title: APIErrorResponse[BadRequestError]
-      properties:
-        error:
-          $ref: '#/components/schemas/BadRequestError'
-      required:
-      - error
-    VulnerableTechnologyCveDTO:
-      type: object
-      title: VulnerableTechnologyCveDTO
-      properties:
-        cve_id:
-          type: string
-          title: Cve Id
-          examples:
-          - CVE-2023-44981
-        description:
-          type: string
-          title: Description
-        cvss_score:
-          type: number
-          title: Cvss Score
-          examples:
-          - 7.7
-        cvss_version:
-          type: number
-          title: Cvss Version
-          examples:
-          - 3.1
-        epss_score:
-          type: number
-          title: Epss Score
-          examples:
-          - 0.2
-        have_known_exploit:
-          title: Have Known Exploit
-          anyOf:
-          - type: boolean
-        required_action:
-          title: Required Action
-          anyOf:
-          - type: string
-      required:
-      - cve_id
-      - description
-      - cvss_score
-      - cvss_version
-      - epss_score
+      - message
     ThreatsInformationDTO:
       type: object
       title: ThreatsInformationDTO
@@ -1892,265 +1838,6 @@ components:
       required:
       - count
       - items
-    InventoryThreatWithReportIds:
-      type: object
-      title: InventoryThreatWithReportIds
-      description: Threat enriched with the list of reports ids created from it.
-      properties:
-        hash:
-          type: string
-          title: Hash
-          description: Hash of some attributes of a threat
-          examples:
-          - f34e5a49b1a1b1033e1c48e3f78863b3cc5be5dc1e0263cf2a13386241d0d16e
-        severity:
-          type: integer
-          title: Severity
-          description: The severity of this specific threat
-          minimum: 0
-          maximum: 4
-          examples:
-          - 3
-        port:
-          title: Port
-          description: The port where the threat is located
-          examples:
-          - 443
-          anyOf:
-          - type: integer
-            minimum: 0
-        first_seen:
-          type: string
-          title: First Seen
-          description: When we detected the threat for the first time
-          format: date-time
-          examples:
-          - '2023-10-05T14:48:00.000Z'
-        last_seen:
-          type: string
-          title: Last Seen
-          description: When we detected the threat for the last time (always less than 48 hours ago)
-          format: date-time
-          examples:
-          - '2023-10-05T14:48:00.000Z'
-        type:
-          $ref: '#/components/schemas/ThreatType'
-          description: 'What type of threat we detected. Every type is mapped to a data object:
-
-            - DomainThreatDataDTO                --> accessible_sensitive_website, inaccessible_sensitive_website, accessible_website, forbidden_website, broken_website.
-
-            - ExposedSensitiveFileThreatDataDTO  --> exposed_sensitive_file.
-
-            - SubDomainTakeoverThreatDataDTO     --> subdomain_takeover.
-
-            - TLSCertificateThreatDataDTO        --> tls_certificate_expired, tls_certificate_soon_expired, accessible_website_with_tls_certificate_expired.
-
-            - SpfThreatDataDTO                   --> permissive_spf_misconfiguration, too_many_spf_records.
-
-            - VulnerableTechnologyThreatDataDTO  --> vulnerable_technology, vulnerable_technology_to_kev.
-
-            - OtherThreatDataDTO                 --> exposed_service, exposed_data_storage.'
-        status:
-          $ref: '#/components/schemas/ThreatStatus'
-          description: The current status of the threat.
-        data:
-          title: Data
-          description: Additional metadata about a specific threat.
-          anyOf:
-          - $ref: '#/components/schemas/DomainThreatDataDTO'
-          - $ref: '#/components/schemas/SubDomainTakeoverThreatDataDTO'
-          - $ref: '#/components/schemas/ExposedSensitiveFileThreatDataDTO'
-          - $ref: '#/components/schemas/TLSCertificateThreatDataDTO'
-          - $ref: '#/components/schemas/SpfThreatDataDTO'
-          - $ref: '#/components/schemas/VulnerableTechnologyThreatDataDTO'
-          - $ref: '#/components/schemas/OtherThreatDataDTO'
-        report_ids:
-          type: array
-          title: Report Ids
-          description: List of report IDs associated created from the threat
-          items:
-            type: string
-      required:
-      - hash
-      - severity
-      - first_seen
-      - last_seen
-      - type
-      - status
-      - data
-      - report_ids
-    GetAssetsHostnamesResponseDTO:
-      type: object
-      title: GetAssetsHostnamesResponseDTO
-      additionalProperties: false
-      properties:
-        items:
-          type: object
-          title: Items
-          description: Map of assets with their corresponding hostnames. By default, the key is the asset value. But if the 'asset_ids' filter is used, the key is the asset ID.
-          additionalProperties:
-            type: array
-            items:
-              type: string
-          examples:
-          - 17.253.144.10:
-            - apple.com
-            74.125.20.138:
-            - google.com
-            - images.google.com
-        next_cursor:
-          title: Next Cursor
-          description: Cursor to the next page. You should use this cursor in the "cursor" query parameter to retrieve the next page.
-          anyOf:
-          - type: string
-        total:
-          type: integer
-          title: Total
-          description: Total number of assets with available hostnames through all pages
-          minimum: 0
-      required:
-      - items
-      - total
-    ServiceDTO:
-      type: object
-      title: ServiceDTO
-      properties:
-        protocol:
-          type: string
-          title: Protocol
-          minLength: 1
-          examples:
-          - mysql
-        cpes:
-          type: array
-          title: Cpes
-          description: List of CPEs associated with the service
-          items:
-            $ref: '#/components/schemas/OpenServiceCpeDTO'
-      required:
-      - protocol
-      - cpes
-    GetAssetsResponseDTO:
-      type: object
-      title: GetAssetsResponseDTO
-      additionalProperties: false
-      properties:
-        items:
-          type: array
-          title: Items
-          description: List of assets matching the request
-          items:
-            $ref: '#/components/schemas/InventoryAssetDTO'
-        next_cursor:
-          title: Next Cursor
-          description: Cursor to the next page. You should use this cursor in the "cursor" query parameter to retrieve the next page.
-          anyOf:
-          - type: string
-        total:
-          type: integer
-          title: Total
-          description: Total number of assets through all pages (or in all your inventory)
-          minimum: 0
-      required:
-      - items
-      - total
-    ConflictError:
-      type: object
-      title: ConflictError
-      description: Conflict with the current state of the resource
-      properties:
-        message:
-          type: string
-          title: Message
-      required:
-      - message
-    PivotMethod:
-      type: string
-      enum:
-      - A
-      - CNAME
-      - WHOIS
-      - CIDR_ENUMERATION
-      - REVERSE_WHOIS
-      - REVERSE_DNS
-      - PASSIVE_MATCHING
-      - EXTRACT
-      title: PivotMethod
-    VulnerableTechnologyThreatDataDTO:
-      type: object
-      title: VulnerableTechnologyThreatDataDTO
-      properties:
-        cpe_id:
-          type: string
-          title: Cpe Id
-          examples:
-          - cpe:2.3:a:apache:zookeeper:3.9.0:*:*:*:*:*:*:*
-        cpe_vendor:
-          title: Cpe Vendor
-          examples:
-          - apache
-          anyOf:
-          - type: string
-        cpe_product:
-          type: string
-          title: Cpe Product
-          examples:
-          - zookeeper
-        cpe_product_version:
-          type: string
-          title: Cpe Product Version
-          examples:
-          - 3.9.0
-        cve_count:
-          type: integer
-          title: Cve Count
-          examples:
-          - 11
-        cve_in_kev_count:
-          title: Cve In Kev Count
-          examples:
-          - 2
-          anyOf:
-          - type: integer
-        highest_cvss_score:
-          type: number
-          title: Highest Cvss Score
-          examples:
-          - 7.7
-        highest_epss_score:
-          type: number
-          title: Highest Epss Score
-          examples:
-          - 0.2
-        cves:
-          type: array
-          title: Cves
-          items:
-            $ref: '#/components/schemas/VulnerableTechnologyCveDTO'
-        details:
-          $ref: '#/components/schemas/TranslationElementDTO'
-        risks:
-          $ref: '#/components/schemas/TranslationElementDTO'
-      required:
-      - cpe_id
-      - cpe_product
-      - cpe_product_version
-      - cve_count
-      - highest_cvss_score
-      - highest_epss_score
-      - cves
-      - details
-      - risks
-    UnauthorizedError:
-      type: object
-      title: UnauthorizedError
-      description: User cannot access some resource.
-      properties:
-        message:
-          type: string
-          title: Message
-      required:
-      - message
     InventoryAssetDTO:
       type: object
       title: InventoryAssetDTO
@@ -2260,34 +1947,93 @@ components:
       - tags
       - fingerprints
       - threats
-    NotFoundError:
+    InventoryThreatWithReportIds:
       type: object
-      title: NotFoundError
-      description: Nothing matches the given URI
+      title: InventoryThreatWithReportIds
+      description: Threat enriched with the list of reports ids created from it.
       properties:
-        message:
+        hash:
           type: string
-          title: Message
+          title: Hash
+          description: Hash of some attributes of a threat
+          examples:
+          - f34e5a49b1a1b1033e1c48e3f78863b3cc5be5dc1e0263cf2a13386241d0d16e
+        severity:
+          type: integer
+          title: Severity
+          description: The severity of this specific threat
+          minimum: 0
+          maximum: 4
+          examples:
+          - 3
+        port:
+          title: Port
+          description: The port where the threat is located
+          examples:
+          - 443
+          anyOf:
+          - type: integer
+            minimum: 0
+        first_seen:
+          type: string
+          title: First Seen
+          description: When we detected the threat for the first time
+          format: date-time
+          examples:
+          - '2023-10-05T14:48:00.000Z'
+        last_seen:
+          type: string
+          title: Last Seen
+          description: When we detected the threat for the last time (always less than 48 hours ago)
+          format: date-time
+          examples:
+          - '2023-10-05T14:48:00.000Z'
+        type:
+          $ref: '#/components/schemas/ThreatType'
+          description: 'What type of threat we detected. Every type is mapped to a data object:
+
+            - DomainThreatDataDTO                --> accessible_sensitive_website, inaccessible_sensitive_website, accessible_website, forbidden_website, broken_website.
+
+            - ExposedSensitiveFileThreatDataDTO  --> exposed_sensitive_file.
+
+            - SubDomainTakeoverThreatDataDTO     --> subdomain_takeover.
+
+            - TLSCertificateThreatDataDTO        --> tls_certificate_expired, tls_certificate_soon_expired, accessible_website_with_tls_certificate_expired.
+
+            - SpfThreatDataDTO                   --> permissive_spf_misconfiguration, too_many_spf_records.
+
+            - VulnerableTechnologyThreatDataDTO  --> vulnerable_technology, vulnerable_technology_to_kev.
+
+            - OtherThreatDataDTO                 --> exposed_service, exposed_data_storage.'
+        status:
+          $ref: '#/components/schemas/ThreatStatus'
+          description: The current status of the threat.
+        data:
+          title: Data
+          description: Additional metadata about a specific threat.
+          anyOf:
+          - $ref: '#/components/schemas/DomainThreatDataDTO'
+          - $ref: '#/components/schemas/SubDomainTakeoverThreatDataDTO'
+          - $ref: '#/components/schemas/ExposedSensitiveFileThreatDataDTO'
+          - $ref: '#/components/schemas/TLSCertificateThreatDataDTO'
+          - $ref: '#/components/schemas/SpfThreatDataDTO'
+          - $ref: '#/components/schemas/VulnerableTechnologyThreatDataDTO'
+          - $ref: '#/components/schemas/OtherThreatDataDTO'
+        report_ids:
+          type: array
+          title: Report Ids
+          description: List of report IDs associated created from the threat
+          items:
+            type: string
       required:
-      - message
-    ThreatSeverity:
-      type: integer
-      enum:
-      - 0
-      - 1
-      - 2
-      - 3
-      - 4
-      title: ThreatSeverity
-    InventoryNodeType:
-      type: string
-      enum:
-      - unknown
-      - domain
-      - ip
-      - iprange
-      - email
-      title: InventoryNodeType
+      - hash
+      - severity
+      - first_seen
+      - last_seen
+      - type
+      - status
+      - data
+      - report_ids
     AssetStatus:
       type: string
       enum:
@@ -2296,16 +2042,270 @@ components:
       - external
       - discarded
       title: AssetStatus
-    ThreatStatus:
+    OpenServiceCpeDTO:
+      type: object
+      title: OpenServiceCpeDTO
+      properties:
+        name:
+          type: string
+          title: Name
+          description: The CPE 2.3 standard identifier
+          minLength: 1
+          examples:
+          - cpe:2.3:a:apache:http_server:2.4.46
+        first_seen_at:
+          type: string
+          title: First Seen At
+          format: date-time
+          examples:
+          - '2023-10-05T14:48:00.000Z'
+        last_seen_at:
+          type: string
+          title: Last Seen At
+          format: date-time
+          examples:
+          - '2023-10-05T14:48:00.000Z'
+      required:
+      - name
+      - first_seen_at
+      - last_seen_at
+    GetThreatsWithAssetInfoResponseDTO:
+      type: object
+      title: GetThreatsWithAssetInfoResponseDTO
+      additionalProperties: false
+      properties:
+        items:
+          type: array
+          title: Items
+          description: List of threats with asset value matching the request
+          items:
+            $ref: '#/components/schemas/InventoryThreatWithAssetInfoDTO'
+        next_cursor:
+          title: Next Cursor
+          description: Cursor to the next page. You should use this cursor in the "cursor" query parameter to retrieve the next page.
+          anyOf:
+          - type: string
+        total:
+          type: integer
+          title: Total
+          description: Total number of threats through all pages
+          minimum: 0
+      required:
+      - items
+      - total
+    TLSCertificateThreatDataDTO:
+      type: object
+      title: TLSCertificateThreatDataDTO
+      description: Metadata related to certificates issues
+      properties:
+        summary:
+          anyOf:
+          - $ref: '#/components/schemas/TranslationElementDTO'
+        how_we_found_it:
+          anyOf:
+          - $ref: '#/components/schemas/TranslationElementDTO'
+        risks:
+          anyOf:
+          - $ref: '#/components/schemas/TranslationElementDTO'
+        details:
+          anyOf:
+          - $ref: '#/components/schemas/TranslationElementDTO'
+        not_before_date:
+          type: string
+          title: Not Before Date
+          format: date-time
+          examples:
+          - '2023-10-05T14:48:00.000Z'
+        not_after_date:
+          type: string
+          title: Not After Date
+          format: date-time
+          examples:
+          - '2023-10-05T14:48:00.000Z'
+      required:
+      - not_before_date
+      - not_after_date
+    ExposedSensitiveFileThreatDataDTO:
+      type: object
+      title: ExposedSensitiveFileThreatDataDTO
+      properties:
+        path:
+          type: string
+          title: Path
+          examples:
+          - /.env
+        url:
+          type: string
+          title: Url
+          examples:
+          - https://www.example.com/.env
+        status_code:
+          type: integer
+          title: Status Code
+          examples:
+          - 200
+        details:
+          $ref: '#/components/schemas/TranslationElementDTO'
+        risks:
+          $ref: '#/components/schemas/TranslationElementDTO'
+      required:
+      - path
+      - url
+      - status_code
+      - details
+      - risks
+    InventoryGraphEdgeDTO:
+      type: object
+      title: InventoryGraphEdgeDTO
+      properties:
+        from_node:
+          type: string
+          title: From Node
+        to_node:
+          type: string
+          title: To Node
+        method:
+          $ref: '#/components/schemas/PivotMethod'
+        updated_at:
+          type: string
+          title: Updated At
+          format: date-time
+          examples:
+          - '2023-10-05T14:48:00.000Z'
+      required:
+      - from_node
+      - to_node
+      - method
+      - updated_at
+    InventoryAssetGraphDTO:
+      type: object
+      title: InventoryAssetGraphDTO
+      properties:
+        edges:
+          type: array
+          title: Edges
+          items:
+            $ref: '#/components/schemas/InventoryGraphEdgeDTO'
+        nodes:
+          type: array
+          title: Nodes
+          items:
+            $ref: '#/components/schemas/InventoryGraphNodeDTO'
+      required:
+      - edges
+      - nodes
+    UnauthorizedError:
+      type: object
+      title: UnauthorizedError
+      description: User cannot access some resource.
+      properties:
+        message:
+          type: string
+          title: Message
+      required:
+      - message
+    OpenPortTransport:
       type: string
       enum:
-      - open
-      - under_review
-      - remediated
-      - risk_accepted
-      - not_applicable
-      title: ThreatStatus
-      description: The status of the threat
+      - tcp
+      - udp
+      title: OpenPortTransport
+    DomainThreatDataDTO:
+      type: object
+      title: DomainThreatDataDTO
+      properties:
+        summary:
+          anyOf:
+          - $ref: '#/components/schemas/TranslationElementDTO'
+        how_we_found_it:
+          anyOf:
+          - $ref: '#/components/schemas/TranslationElementDTO'
+        risks:
+          anyOf:
+          - $ref: '#/components/schemas/TranslationElementDTO'
+        details:
+          anyOf:
+          - $ref: '#/components/schemas/TranslationElementDTO'
+        protocol:
+          type: string
+          title: Protocol
+        protocol_display_name:
+          title: Protocol Display Name
+          anyOf:
+          - type: string
+        status_code:
+          type: integer
+          title: Status Code
+      required:
+      - protocol
+      - status_code
+    BadRequestError:
+      type: object
+      title: BadRequestError
+      description: User sent a bad request.
+      properties:
+        message:
+          type: string
+          title: Message
+      required:
+      - message
+    GetAssetsHostnamesResponseDTO:
+      type: object
+      title: GetAssetsHostnamesResponseDTO
+      additionalProperties: false
+      properties:
+        items:
+          type: object
+          title: Items
+          description: Map of assets with their corresponding hostnames. By default, the key is the asset value. But if the 'asset_ids' filter is used, the key is the asset ID.
+          additionalProperties:
+            type: array
+            items:
+              type: string
+          examples:
+          - 17.253.144.10:
+            - apple.com
+            74.125.20.138:
+            - google.com
+            - images.google.com
+        next_cursor:
+          title: Next Cursor
+          description: Cursor to the next page. You should use this cursor in the "cursor" query parameter to retrieve the next page.
+          anyOf:
+          - type: string
+        total:
+          type: integer
+          title: Total
+          description: Total number of assets with available hostnames through all pages
+          minimum: 0
+      required:
+      - items
+      - total
+    OtherThreatDataDTO:
+      type: object
+      title: OtherThreatDataDTO
+      description: Metadata for all other threats
+      properties:
+        summary:
+          anyOf:
+          - $ref: '#/components/schemas/TranslationElementDTO'
+        how_we_found_it:
+          anyOf:
+          - $ref: '#/components/schemas/TranslationElementDTO'
+        risks:
+          anyOf:
+          - $ref: '#/components/schemas/TranslationElementDTO'
+        details:
+          anyOf:
+          - $ref: '#/components/schemas/TranslationElementDTO'
+        protocol:
+          title: Protocol
+          anyOf:
+          - type: string
+        protocol_display_name:
+          title: Protocol Display Name
+          anyOf:
+          - type: string
   securitySchemes:
     jwt:
       type: http

@@ -701,73 +701,14 @@ paths:
     - url: https://api.cybelangel.com
 components:
   schemas:
-    UpdateKeywordStatusInputDTO:
+    APIErrorResponse_UnknownError_:
       type: object
-      title: UpdateKeywordStatusInputDTO
-      additionalProperties: false
-      properties:
-        id:
-          type: string
-          title: Id
-          description: Unique identifier of the keyword to update.
-          format: uuid
-        status:
-          const: inactive
-          title: Status
-          description: New status of the keyword. Only "inactive" (deactivation) is accepted.
-      required:
-      - id
-      - status
-    ForbiddenAccessError:
-      type: object
-      title: ForbiddenAccessError
-      description: User cannot access some resource.
-      properties:
-        message:
-          type: string
-          title: Message
-      required:
-      - message
-    FailedToUpdateKeywordDTO:
-      type: object
-      title: FailedToUpdateKeywordDTO
-      properties:
-        id:
-          type: string
-          title: Id
-          format: uuid
-        error_code:
-          $ref: '#/components/schemas/UpdateKeywordErrorCode'
-        error_details:
-          title: Error Details
-          anyOf:
-          - type: string
-      required:
-      - id
-      - error_code
-    APIErrorResponse_UnauthorizedError_:
-      type: object
-      title: APIErrorResponse[UnauthorizedError]
+      title: APIErrorResponse[UnknownError]
       properties:
         error:
-          $ref: '#/components/schemas/UnauthorizedError'
+          $ref: '#/components/schemas/UnknownError'
       required:
       - error
-    ClientCreateKeywordsBodyDTO:
-      type: object
-      title: ClientCreateKeywordsBodyDTO
-      additionalProperties: false
-      properties:
-        keywords:
-          type: array
-          title: Keywords
-          description: List of keywords to create. Maximum 10 items.
-          minItems: 1
-          maxItems: 10
-          items:
-            $ref: '#/components/schemas/ClientCreateKeywordInputDTO'
-      required:
-      - keywords
     ClientCreateKeywordInputDTO:
       type: object
       title: ClientCreateKeywordInputDTO
@@ -797,6 +738,14 @@ components:
             format: uuid
       required:
       - name
+    APIErrorResponse_ForbiddenAccessError_:
+      type: object
+      title: APIErrorResponse[ForbiddenAccessError]
+      properties:
+        error:
+          $ref: '#/components/schemas/ForbiddenAccessError'
+      required:
+      - error
     FailedToCreateKeywordDTO:
       type: object
       title: FailedToCreateKeywordDTO
@@ -813,63 +762,6 @@ components:
       required:
       - name
       - error_code
-    BadRequestError:
-      type: object
-      title: BadRequestError
-      description: User sent a bad request.
-      properties:
-        message:
-          type: string
-          title: Message
-      required:
-      - message
-    CreateKeywordErrorCode:
-      type: string
-      enum:
-      - NAME_ALREADY_EXISTS
-      - INVALID_NAME
-      - INVALID_RULE
-      - INFOSTEALER_NOT_AVAILABLE_FOR_TYPE
-      - INFOSTEALER_NOT_ACTIVATED
-      - INTERNAL_ERROR
-      title: CreateKeywordErrorCode
-    WorkspaceDTO:
-      type: object
-      title: WorkspaceDTO
-      additionalProperties: false
-      properties:
-        id:
-          type: string
-          title: Id
-          description: Unique identifier of the workspace.
-          format: uuid
-        name:
-          type: string
-          title: Name
-          description: Name of the workspace.
-        description:
-          title: Description
-          description: Description of the workspace.
-          anyOf:
-          - type: string
-      required:
-      - id
-      - name
-    ClientUpdateKeywordsBodyDTO:
-      type: object
-      title: ClientUpdateKeywordsBodyDTO
-      additionalProperties: false
-      properties:
-        keywords:
-          type: array
-          title: Keywords
-          description: List of keywords to update. Maximum 10 items.
-          minItems: 1
-          maxItems: 10
-          items:
-            $ref: '#/components/schemas/ClientUpdateKeywordInputDTO'
-      required:
-      - keywords
     UpdateKeywordErrorCode:
       type: string
       enum:
@@ -881,14 +773,110 @@ components:
       - INFOSTEALER_NOT_ACTIVATED
       - INTERNAL_ERROR
       title: UpdateKeywordErrorCode
-    APIErrorResponse_ForbiddenAccessError_:
+    ClientCreateKeywordsBodyDTO:
       type: object
-      title: APIErrorResponse[ForbiddenAccessError]
+      title: ClientCreateKeywordsBodyDTO
+      additionalProperties: false
       properties:
-        error:
-          $ref: '#/components/schemas/ForbiddenAccessError'
+        keywords:
+          type: array
+          title: Keywords
+          description: List of keywords to create. Maximum 10 items.
+          minItems: 1
+          maxItems: 10
+          items:
+            $ref: '#/components/schemas/ClientCreateKeywordInputDTO'
       required:
-      - error
+      - keywords
+    ClientUpdateKeywordInputDTO:
+      type: object
+      title: ClientUpdateKeywordInputDTO
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+          title: Id
+          description: Unique identifier of the keyword to update.
+          format: uuid
+        type:
+          description: Type of the keyword.
+          anyOf:
+          - $ref: '#/components/schemas/KeywordType'
+        description:
+          title: Description
+          description: Description of the keyword.
+          anyOf:
+          - type: string
+        workspaces:
+          title: Workspaces
+          description: Workspaces the keyword belongs to. Required if the organization has workspaces enabled; otherwise defaults to the organization's workspace.
+          anyOf:
+          - type: array
+            minItems: 1
+            items:
+              type: string
+              format: uuid
+      required:
+      - id
+    ClientUpdateKeywords200ResponseDTO:
+      type: object
+      title: ClientUpdateKeywords200ResponseDTO
+      additionalProperties: false
+      properties:
+        updated_keywords:
+          type: array
+          title: Updated Keywords
+          description: List of successfully updated keywords
+          items:
+            $ref: '#/components/schemas/ClientKeywordDTO'
+        failed_keywords:
+          type: array
+          title: Failed Keywords
+          description: List of keywords that could not be updated
+          items:
+            $ref: '#/components/schemas/FailedToUpdateKeywordDTO'
+      required:
+      - updated_keywords
+      - failed_keywords
+    UpdateKeywordsStatusBodyDTO:
+      type: object
+      title: UpdateKeywordsStatusBodyDTO
+      additionalProperties: false
+      properties:
+        keywords:
+          type: array
+          title: Keywords
+          description: List of keywords whose status to update. Maximum 10 items.
+          minItems: 1
+          maxItems: 10
+          items:
+            $ref: '#/components/schemas/UpdateKeywordStatusInputDTO'
+      required:
+      - keywords
+    ClientKeywordListDTO:
+      type: object
+      title: ClientKeywordListDTO
+      additionalProperties: false
+      properties:
+        items:
+          type: array
+          title: Items
+          description: List of keywords matching the request
+          items:
+            $ref: '#/components/schemas/ClientKeywordDTO'
+        total:
+          type: integer
+          title: Total
+          description: Total number of keywords through all pages
+          minimum: 0
+        next_cursor:
+          title: Next Cursor
+          description: Cursor to the next page. You should use this cursor in the "cursor" query parameter to retrieve the next page.
+          anyOf:
+          - type: string
+      required:
+      - items
+      - total
     ClientCreateKeywords207ResponseDTO:
       type: object
       title: ClientCreateKeywords207ResponseDTO
@@ -909,18 +897,88 @@ components:
       required:
       - created_keywords
       - failed_keywords
-    KeywordType:
+    UpdateKeywordStatusInputDTO:
+      type: object
+      title: UpdateKeywordStatusInputDTO
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+          title: Id
+          description: Unique identifier of the keyword to update.
+          format: uuid
+        status:
+          const: inactive
+          title: Status
+          description: New status of the keyword. Only "inactive" (deactivation) is accepted.
+      required:
+      - id
+      - status
+    KeywordStatus:
       type: string
       enum:
-      - subsidiaries
-      - projects
-      - domain
-      - ip
-      - bin
-      - vip
-      - product
-      - misc
-      title: KeywordType
+      - pending
+      - active
+      - inactive
+      title: KeywordStatus
+    APIErrorResponse_BadRequestError_:
+      type: object
+      title: APIErrorResponse[BadRequestError]
+      properties:
+        error:
+          $ref: '#/components/schemas/BadRequestError'
+      required:
+      - error
+    APIErrorResponse_UnauthorizedError_:
+      type: object
+      title: APIErrorResponse[UnauthorizedError]
+      properties:
+        error:
+          $ref: '#/components/schemas/UnauthorizedError'
+      required:
+      - error
+    FailedToUpdateKeywordDTO:
+      type: object
+      title: FailedToUpdateKeywordDTO
+      properties:
+        id:
+          type: string
+          title: Id
+          format: uuid
+        error_code:
+          $ref: '#/components/schemas/UpdateKeywordErrorCode'
+        error_details:
+          title: Error Details
+          anyOf:
+          - type: string
+      required:
+      - id
+      - error_code
+    ForbiddenAccessError:
+      type: object
+      title: ForbiddenAccessError
+      description: User cannot access some resource.
+      properties:
+        message:
+          type: string
+          title: Message
+      required:
+      - message
+    ClientUpdateKeywordsBodyDTO:
+      type: object
+      title: ClientUpdateKeywordsBodyDTO
+      additionalProperties: false
+      properties:
+        keywords:
+          type: array
+          title: Keywords
+          description: List of keywords to update. Maximum 10 items.
+          minItems: 1
+          maxItems: 10
+          items:
+            $ref: '#/components/schemas/ClientUpdateKeywordInputDTO'
+      required:
+      - keywords
     UnknownError:
       type: object
       title: UnknownError
@@ -934,62 +992,6 @@ components:
     ClientUpdateKeywords207ResponseDTO:
       type: object
       title: ClientUpdateKeywords207ResponseDTO
-      additionalProperties: false
-      properties:
-        updated_keywords:
-          type: array
-          title: Updated Keywords
-          description: List of successfully updated keywords
-          items:
-            $ref: '#/components/schemas/ClientKeywordDTO'
-        failed_keywords:
-          type: array
-          title: Failed Keywords
-          description: List of keywords that could not be updated
-          items:
-            $ref: '#/components/schemas/FailedToUpdateKeywordDTO'
-      required:
-      - updated_keywords
-      - failed_keywords
-    APIErrorResponse_UnknownError_:
-      type: object
-      title: APIErrorResponse[UnknownError]
-      properties:
-        error:
-          $ref: '#/components/schemas/UnknownError'
-      required:
-      - error
-    ClientCreateKeywords201ResponseDTO:
-      type: object
-      title: ClientCreateKeywords201ResponseDTO
-      additionalProperties: false
-      properties:
-        created_keywords:
-          type: array
-          title: Created Keywords
-          description: List of successfully created keywords
-          items:
-            $ref: '#/components/schemas/ClientKeywordDTO'
-        failed_keywords:
-          type: array
-          title: Failed Keywords
-          description: List of keywords that could not be created
-          items:
-            $ref: '#/components/schemas/FailedToCreateKeywordDTO'
-      required:
-      - created_keywords
-      - failed_keywords
-    APIErrorResponse_BadRequestError_:
-      type: object
-      title: APIErrorResponse[BadRequestError]
-      properties:
-        error:
-          $ref: '#/components/schemas/BadRequestError'
-      required:
-      - error
-    ClientUpdateKeywords200ResponseDTO:
-      type: object
-      title: ClientUpdateKeywords200ResponseDTO
       additionalProperties: false
       properties:
         updated_keywords:
@@ -1059,36 +1061,16 @@ components:
       - description
       - creation_date
       - last_modification_date
-    ClientUpdateKeywordInputDTO:
-      type: object
-      title: ClientUpdateKeywordInputDTO
-      additionalProperties: false
-      properties:
-        id:
-          type: string
-          title: Id
-          description: Unique identifier of the keyword to update.
-          format: uuid
-        type:
-          description: Type of the keyword.
-          anyOf:
-          - $ref: '#/components/schemas/KeywordType'
-        description:
-          title: Description
-          description: Description of the keyword.
-          anyOf:
-          - type: string
-        workspaces:
-          title: Workspaces
-          description: Workspaces the keyword belongs to. Required if the organization has workspaces enabled; otherwise defaults to the organization's workspace.
-          anyOf:
-          - type: array
-            minItems: 1
-            items:
-              type: string
-              format: uuid
-      required:
-      - id
+    CreateKeywordErrorCode:
+      type: string
+      enum:
+      - NAME_ALREADY_EXISTS
+      - INVALID_NAME
+      - INVALID_RULE
+      - INFOSTEALER_NOT_AVAILABLE_FOR_TYPE
+      - INFOSTEALER_NOT_ACTIVATED
+      - INTERNAL_ERROR
+      title: CreateKeywordErrorCode
     UnauthorizedError:
       type: object
       title: UnauthorizedError
@@ -1099,70 +1081,21 @@ components:
           title: Message
       required:
       - message
-    UpdateKeywordsStatusBodyDTO:
-      type: object
-      title: UpdateKeywordsStatusBodyDTO
-      additionalProperties: false
-      properties:
-        keywords:
-          type: array
-          title: Keywords
-          description: List of keywords whose status to update. Maximum 10 items.
-          minItems: 1
-          maxItems: 10
-          items:
-            $ref: '#/components/schemas/UpdateKeywordStatusInputDTO'
-      required:
-      - keywords
-    ClientKeywordListDTO:
-      type: object
-      title: ClientKeywordListDTO
-      additionalProperties: false
-      properties:
-        items:
-          type: array
-          title: Items
-          description: List of keywords matching the request
-          items:
-            $ref: '#/components/schemas/ClientKeywordDTO'
-        total:
-          type: integer
-          title: Total
-          description: Total number of keywords through all pages
-          minimum: 0
-        next_cursor:
-          title: Next Cursor
-          description: Cursor to the next page. You should use this cursor in the "cursor" query parameter to retrieve the next page.
-          anyOf:
-          - type: string
-      required:
-      - items
-      - total
-    KeywordStatus:
+    KeywordType:
       type: string
       enum:
-      - pending
-      - active
-      - inactive
-      title: KeywordStatus
-    PartnerCreateKeywordsBodyDTO:
+      - subsidiaries
+      - projects
+      - domain
+      - ip
+      - bin
+      - vip
+      - product
+      - misc
+      title: KeywordType
+    ClientCreateKeywords201ResponseDTO:
       type: object
-      title: PartnerCreateKeywordsBodyDTO
-      additionalProperties: false
-      properties:
-        keywords:
-          type: array
-          title: Keywords
-          description: List of keywords to create. Maximum 10 items.
-          minItems: 1
-          maxItems: 10
-          items:
-            $ref: '#/components/schemas/PartnerCreateKeywordInputDTO'
-      required:
-      - keywords
-    PartnerCreateKeywords201ResponseDTO:
-      type: object
-      title: PartnerCreateKeywords201ResponseDTO
+      title: ClientCreateKeywords201ResponseDTO
       additionalProperties: false
       properties:
         created_keywords:
@@ -1170,7 +1103,7 @@ components:
           title: Created Keywords
           description: List of successfully created keywords
           items:
-            $ref: '#/components/schemas/PartnerKeywordDTO'
+            $ref: '#/components/schemas/ClientKeywordDTO'
         failed_keywords:
           type: array
           title: Failed Keywords
@@ -1180,26 +1113,38 @@ components:
       required:
       - created_keywords
       - failed_keywords
-    PartnerUpdateKeywords200ResponseDTO:
+    BadRequestError:
       type: object
-      title: PartnerUpdateKeywords200ResponseDTO
+      title: BadRequestError
+      description: User sent a bad request.
+      properties:
+        message:
+          type: string
+          title: Message
+      required:
+      - message
+    WorkspaceDTO:
+      type: object
+      title: WorkspaceDTO
       additionalProperties: false
       properties:
-        updated_keywords:
-          type: array
-          title: Updated Keywords
-          description: List of successfully updated keywords
-          items:
-            $ref: '#/components/schemas/PartnerKeywordDTO'
-        failed_keywords:
-          type: array
-          title: Failed Keywords
-          description: List of keywords that could not be updated
-          items:
-            $ref: '#/components/schemas/FailedToUpdateKeywordDTO'
+        id:
+          type: string
+          title: Id
+          description: Unique identifier of the workspace.
+          format: uuid
+        name:
+          type: string
+          title: Name
+          description: Name of the workspace.
+        description:
+          title: Description
+          description: Description of the workspace.
+          anyOf:
+          - type: string
       required:
-      - updated_keywords
-      - failed_keywords
+      - id
+      - name
     DeleteKeywordBodyDTO:
       type: object
       title: DeleteKeywordBodyDTO
@@ -1216,6 +1161,50 @@ components:
             format: uuid
       required:
       - keyword_ids
+    PartnerKeywordListDTO:
+      type: object
+      title: PartnerKeywordListDTO
+      additionalProperties: false
+      properties:
+        items:
+          type: array
+          title: Items
+          description: List of keywords matching the request
+          items:
+            $ref: '#/components/schemas/PartnerKeywordDTO'
+        total:
+          type: integer
+          title: Total
+          description: Total number of keywords through all pages
+          minimum: 0
+        next_cursor:
+          title: Next Cursor
+          description: Cursor to the next page. You should use this cursor in the "cursor" query parameter to retrieve the next page.
+          anyOf:
+          - type: string
+      required:
+      - items
+      - total
+    DeleteKeywords200ResponseDTO:
+      type: object
+      title: DeleteKeywords200ResponseDTO
+      additionalProperties: false
+      properties:
+        deleted_keywords:
+          type: array
+          title: Deleted Keywords
+          description: List of successfully deleted keywords
+          items:
+            $ref: '#/components/schemas/DeletedKeywordDTO'
+        failed_keywords:
+          type: array
+          title: Failed Keywords
+          description: List of keywords that could not be deleted
+          items:
+            $ref: '#/components/schemas/FailedKeywordDTO'
+      required:
+      - deleted_keywords
+      - failed_keywords
     PartnerUpdateKeywords207ResponseDTO:
       type: object
       title: PartnerUpdateKeywords207ResponseDTO
@@ -1290,119 +1279,12 @@ components:
       - rule
       - infostealer_search
       - active_search
-    DeleteKeywords207ResponseDTO:
-      type: object
-      title: DeleteKeywords207ResponseDTO
-      additionalProperties: false
-      properties:
-        deleted_keywords:
-          type: array
-          title: Deleted Keywords
-          description: List of successfully deleted keywords
-          items:
-            $ref: '#/components/schemas/DeletedKeywordDTO'
-        failed_keywords:
-          type: array
-          title: Failed Keywords
-          description: List of keywords that could not be deleted
-          items:
-            $ref: '#/components/schemas/FailedKeywordDTO'
-      required:
-      - deleted_keywords
-      - failed_keywords
-    DeleteKeywords200ResponseDTO:
-      type: object
-      title: DeleteKeywords200ResponseDTO
-      additionalProperties: false
-      properties:
-        deleted_keywords:
-          type: array
-          title: Deleted Keywords
-          description: List of successfully deleted keywords
-          items:
-            $ref: '#/components/schemas/DeletedKeywordDTO'
-        failed_keywords:
-          type: array
-          title: Failed Keywords
-          description: List of keywords that could not be deleted
-          items:
-            $ref: '#/components/schemas/FailedKeywordDTO'
-      required:
-      - deleted_keywords
-      - failed_keywords
     DeleteKeywordErrorCode:
       type: string
       enum:
       - NOT_FOUND
       - INTERNAL_ERROR
       title: DeleteKeywordErrorCode
-    FailedKeywordDTO:
-      type: object
-      title: FailedKeywordDTO
-      properties:
-        id:
-          type: string
-          title: Id
-          format: uuid
-        error_code:
-          $ref: '#/components/schemas/DeleteKeywordErrorCode'
-      required:
-      - id
-      - error_code
-    KeywordSource:
-      type: string
-      enum:
-      - board
-      - codeshare
-      - database
-      - dns
-      - docshare
-      - fileserver
-      - iot
-      - leak
-      - paste
-      - rss
-      - social
-      - clouddrive
-      title: KeywordSource
-    PartnerKeywordListDTO:
-      type: object
-      title: PartnerKeywordListDTO
-      additionalProperties: false
-      properties:
-        items:
-          type: array
-          title: Items
-          description: List of keywords matching the request
-          items:
-            $ref: '#/components/schemas/PartnerKeywordDTO'
-        total:
-          type: integer
-          title: Total
-          description: Total number of keywords through all pages
-          minimum: 0
-        next_cursor:
-          title: Next Cursor
-          description: Cursor to the next page. You should use this cursor in the "cursor" query parameter to retrieve the next page.
-          anyOf:
-          - type: string
-      required:
-      - items
-      - total
-    DeletedKeywordDTO:
-      type: object
-      title: DeletedKeywordDTO
-      properties:
-        id:
-          type: string
-          title: Id
-          format: uuid
-        name:
-          type: string
-          title: Name
-      required:
-      - id
-      - name
     PartnerKeywordDTO:
       type: object
       title: PartnerKeywordDTO
@@ -1478,6 +1360,88 @@ components:
       - description
       - creation_date
       - last_modification_date
+    FailedKeywordDTO:
+      type: object
+      title: FailedKeywordDTO
+      properties:
+        id:
+          type: string
+          title: Id
+          format: uuid
+        error_code:
+          $ref: '#/components/schemas/DeleteKeywordErrorCode'
+      required:
+      - id
+      - error_code
+    DeleteKeywords207ResponseDTO:
+      type: object
+      title: DeleteKeywords207ResponseDTO
+      additionalProperties: false
+      properties:
+        deleted_keywords:
+          type: array
+          title: Deleted Keywords
+          description: List of successfully deleted keywords
+          items:
+            $ref: '#/components/schemas/DeletedKeywordDTO'
+        failed_keywords:
+          type: array
+          title: Failed Keywords
+          description: List of keywords that could not be deleted
+          items:
+            $ref: '#/components/schemas/FailedKeywordDTO'
+      required:
+      - deleted_keywords
+      - failed_keywords
+    DeletedKeywordDTO:
+      type: object
+      title: DeletedKeywordDTO
+      properties:
+        id:
+          type: string
+          title: Id
+          format: uuid
+        name:
+          type: string
+          title: Name
+      required:
+      - id
+      - name
+    PartnerCreateKeywordsBodyDTO:
+      type: object
+      title: PartnerCreateKeywordsBodyDTO
+      additionalProperties: false
+      properties:
+        keywords:
+          type: array
+          title: Keywords
+          description: List of keywords to create. Maximum 10 items.
+          minItems: 1
+          maxItems: 10
+          items:
+            $ref: '#/components/schemas/PartnerCreateKeywordInputDTO'
+      required:
+      - keywords
+    PartnerUpdateKeywords200ResponseDTO:
+      type: object
+      title: PartnerUpdateKeywords200ResponseDTO
+      additionalProperties: false
+      properties:
+        updated_keywords:
+          type: array
+          title: Updated Keywords
+          description: List of successfully updated keywords
+          items:
+            $ref: '#/components/schemas/PartnerKeywordDTO'
+        failed_keywords:
+          type: array
+          title: Failed Keywords
+          description: List of keywords that could not be updated
+          items:
+            $ref: '#/components/schemas/FailedToUpdateKeywordDTO'
+      required:
+      - updated_keywords
+      - failed_keywords
     PartnerCreateKeywords207ResponseDTO:
       type: object
       title: PartnerCreateKeywords207ResponseDTO
@@ -1498,6 +1462,42 @@ components:
       required:
       - created_keywords
       - failed_keywords
+    PartnerCreateKeywords201ResponseDTO:
+      type: object
+      title: PartnerCreateKeywords201ResponseDTO
+      additionalProperties: false
+      properties:
+        created_keywords:
+          type: array
+          title: Created Keywords
+          description: List of successfully created keywords
+          items:
+            $ref: '#/components/schemas/PartnerKeywordDTO'
+        failed_keywords:
+          type: array
+          title: Failed Keywords
+          description: List of keywords that could not be created
+          items:
+            $ref: '#/components/schemas/FailedToCreateKeywordDTO'
+      required:
+      - created_keywords
+      - failed_keywords
+    KeywordSource:
+      type: string
+      enum:
+      - board
+      - codeshare
+      - database
+      - dns
+      - docshare
+      - fileserver
+      - iot
+      - leak
+      - paste
+      - rss
+      - social
+      - clouddrive
+      title: KeywordSource
   securitySchemes:
     jwt:
       type: http

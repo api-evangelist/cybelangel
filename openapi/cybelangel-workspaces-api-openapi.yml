@@ -114,6 +114,69 @@ paths:
     - url: https://api.cybelangel.com
 components:
   schemas:
+    UnauthorizedError:
+      type: object
+      title: UnauthorizedError
+      description: User cannot access some resource.
+      properties:
+        message:
+          type: string
+          title: Message
+      required:
+      - message
+    WorkspaceListDTO:
+      type: object
+      title: WorkspaceListDTO
+      additionalProperties: false
+      properties:
+        items:
+          type: array
+          title: Items
+          description: List of workspaces matching the request
+          items:
+            $ref: '#/components/schemas/WorkspaceDTO'
+        total:
+          type: integer
+          title: Total
+          description: Total number of workspaces
+          minimum: 0
+      required:
+      - items
+      - total
+    APIErrorResponse_BadRequestError_:
+      type: object
+      title: APIErrorResponse[BadRequestError]
+      properties:
+        error:
+          $ref: '#/components/schemas/BadRequestError'
+      required:
+      - error
+    APIErrorResponse_UnauthorizedError_:
+      type: object
+      title: APIErrorResponse[UnauthorizedError]
+      properties:
+        error:
+          $ref: '#/components/schemas/UnauthorizedError'
+      required:
+      - error
+    ForbiddenAccessError:
+      type: object
+      title: ForbiddenAccessError
+      description: User cannot access some resource.
+      properties:
+        message:
+          type: string
+          title: Message
+      required:
+      - message
+    APIErrorResponse_UnknownError_:
+      type: object
+      title: APIErrorResponse[UnknownError]
+      properties:
+        error:
+          $ref: '#/components/schemas/UnknownError'
+      required:
+      - error
     UnknownError:
       type: object
       title: UnknownError
@@ -124,10 +187,18 @@ components:
           title: Message
       required:
       - message
-    ForbiddenAccessError:
+    APIErrorResponse_ForbiddenAccessError_:
       type: object
-      title: ForbiddenAccessError
-      description: User cannot access some resource.
+      title: APIErrorResponse[ForbiddenAccessError]
+      properties:
+        error:
+          $ref: '#/components/schemas/ForbiddenAccessError'
+      required:
+      - error
+    BadRequestError:
+      type: object
+      title: BadRequestError
+      description: User sent a bad request.
       properties:
         message:
           type: string
@@ -156,77 +227,6 @@ components:
       required:
       - id
       - name
-    APIErrorResponse_UnauthorizedError_:
-      type: object
-      title: APIErrorResponse[UnauthorizedError]
-      properties:
-        error:
-          $ref: '#/components/schemas/UnauthorizedError'
-      required:
-      - error
-    APIErrorResponse_UnknownError_:
-      type: object
-      title: APIErrorResponse[UnknownError]
-      properties:
-        error:
-          $ref: '#/components/schemas/UnknownError'
-      required:
-      - error
-    UnauthorizedError:
-      type: object
-      title: UnauthorizedError
-      description: User cannot access some resource.
-      properties:
-        message:
-          type: string
-          title: Message
-      required:
-      - message
-    APIErrorResponse_ForbiddenAccessError_:
-      type: object
-      title: APIErrorResponse[ForbiddenAccessError]
-      properties:
-        error:
-          $ref: '#/components/schemas/ForbiddenAccessError'
-      required:
-      - error
-    WorkspaceListDTO:
-      type: object
-      title: WorkspaceListDTO
-      additionalProperties: false
-      properties:
-        items:
-          type: array
-          title: Items
-          description: List of workspaces matching the request
-          items:
-            $ref: '#/components/schemas/WorkspaceDTO'
-        total:
-          type: integer
-          title: Total
-          description: Total number of workspaces
-          minimum: 0
-      required:
-      - items
-      - total
-    APIErrorResponse_BadRequestError_:
-      type: object
-      title: APIErrorResponse[BadRequestError]
-      properties:
-        error:
-          $ref: '#/components/schemas/BadRequestError'
-      required:
-      - error
-    BadRequestError:
-      type: object
-      title: BadRequestError
-      description: User sent a bad request.
-      properties:
-        message:
-          type: string
-          title: Message
-      required:
-      - message
   securitySchemes:
     jwt:
       type: http

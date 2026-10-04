@@ -262,19 +262,17 @@ paths:
       - url: https://api.cybelangel.com
 components:
   schemas:
-    UnknownError:
+    ClaimedAttackNetwork:
+      type: string
+      enum:
+      - tor
+      - openweb
+      - telegram
+      - discord
+      title: ClaimedAttackNetwork
+    UnauthorizedError:
       type: object
-      title: UnknownError
-      description: Unknown error on server-side, please contact support.
-      properties:
-        message:
-          type: string
-          title: Message
-      required:
-      - message
-    ForbiddenAccessError:
-      type: object
-      title: ForbiddenAccessError
+      title: UnauthorizedError
       description: User cannot access some resource.
       properties:
         message:
@@ -282,17 +280,14 @@ components:
           title: Message
       required:
       - message
-    ClaimedAttacksSortByCriteriaQuery:
-      type: string
-      enum:
-      - category
-      - claimed_at
-      - threat_actors
-      - countries
-      - industries
-      - victims
-      - domains
-      title: ClaimedAttacksSortByCriteriaQuery
+    APIErrorResponse_BadRequestError_:
+      type: object
+      title: APIErrorResponse[BadRequestError]
+      properties:
+        error:
+          $ref: '#/components/schemas/BadRequestError'
+      required:
+      - error
     APIErrorResponse_NotFoundError_:
       type: object
       title: APIErrorResponse[NotFoundError]
@@ -309,6 +304,85 @@ components:
           $ref: '#/components/schemas/UnauthorizedError'
       required:
       - error
+    ForbiddenAccessError:
+      type: object
+      title: ForbiddenAccessError
+      description: User cannot access some resource.
+      properties:
+        message:
+          type: string
+          title: Message
+      required:
+      - message
+    ClaimedAttackCategory:
+      type: string
+      enum:
+      - data_leak
+      - ddos
+      - defacement
+      - ransomware
+      title: ClaimedAttackCategory
+    ClaimedAttackSourceDTO:
+      type: object
+      title: ClaimedAttackSourceDTO
+      description: Origin where a claimed attack was observed.
+      properties:
+        network:
+          description: Network/channel the source belongs to.
+          examples:
+          - tor
+          anyOf:
+          - $ref: '#/components/schemas/ClaimedAttackNetwork'
+        url:
+          title: Url
+          description: URL of the source (e.g. the onion address of the leak site).
+          examples:
+          - http://example.onion/victims/acme-corp
+          anyOf:
+          - type: string
+    ClaimedAttacksSortByOrderQuery:
+      type: string
+      enum:
+      - asc
+      - desc
+      title: ClaimedAttacksSortByOrderQuery
+    ClaimedAttacksSortByCriteriaQuery:
+      type: string
+      enum:
+      - category
+      - claimed_at
+      - threat_actors
+      - countries
+      - industries
+      - victims
+      - domains
+      title: ClaimedAttacksSortByCriteriaQuery
+    APIErrorResponse_UnknownError_:
+      type: object
+      title: APIErrorResponse[UnknownError]
+      properties:
+        error:
+          $ref: '#/components/schemas/UnknownError'
+      required:
+      - error
+    APIErrorResponse_ForbiddenAccessError_:
+      type: object
+      title: APIErrorResponse[ForbiddenAccessError]
+      properties:
+        error:
+          $ref: '#/components/schemas/ForbiddenAccessError'
+      required:
+      - error
+    UnknownError:
+      type: object
+      title: UnknownError
+      description: Unknown error on server-side, please contact support.
+      properties:
+        message:
+          type: string
+          title: Message
+      required:
+      - message
     ClaimedAttackDTO:
       type: object
       title: ClaimedAttackDTO
@@ -403,24 +477,6 @@ components:
       - industries
       - victims
       - domains
-    APIErrorResponse_UnknownError_:
-      type: object
-      title: APIErrorResponse[UnknownError]
-      properties:
-        error:
-          $ref: '#/components/schemas/UnknownError'
-      required:
-      - error
-    UnauthorizedError:
-      type: object
-      title: UnauthorizedError
-      description: User cannot access some resource.
-      properties:
-        message:
-          type: string
-          title: Message
-      required:
-      - message
     NotFoundError:
       type: object
       title: NotFoundError
@@ -431,56 +487,16 @@ components:
           title: Message
       required:
       - message
-    APIErrorResponse_ForbiddenAccessError_:
+    BadRequestError:
       type: object
-      title: APIErrorResponse[ForbiddenAccessError]
+      title: BadRequestError
+      description: User sent a bad request.
       properties:
-        error:
-          $ref: '#/components/schemas/ForbiddenAccessError'
+        message:
+          type: string
+          title: Message
       required:
-      - error
-    ClaimedAttackCategory:
-      type: string
-      enum:
-      - data_leak
-      - ddos
-      - defacement
-      - ransomware
-      title: ClaimedAttackCategory
-    ClaimedAttackNetwork:
-      type: string
-      enum:
-      - tor
-      - openweb
-      - telegram
-      - discord
-      title: ClaimedAttackNetwork
-    APIErrorResponse_BadRequestError_:
-      type: object
-      title: APIErrorResponse[BadRequestError]
-      properties:
-        error:
-          $ref: '#/components/schemas/BadRequestError'
-      required:
-      - error
-    ClaimedAttackSourceDTO:
-      type: object
-      title: ClaimedAttackSourceDTO
-      description: Origin where a claimed attack was observed.
-      properties:
-        network:
-          description: Network/channel the source belongs to.
-          examples:
-          - tor
-          anyOf:
-          - $ref: '#/components/schemas/ClaimedAttackNetwork'
-        url:
-          title: Url
-          description: URL of the source (e.g. the onion address of the leak site).
-          examples:
-          - http://example.onion/victims/acme-corp
-          anyOf:
-          - type: string
+      - message
     ListClaimedAttacksResponse:
       type: object
       title: ListClaimedAttacksResponse
@@ -501,22 +517,6 @@ components:
       required:
       - claimed_attacks
       - total
-    ClaimedAttacksSortByOrderQuery:
-      type: string
-      enum:
-      - asc
-      - desc
-      title: ClaimedAttacksSortByOrderQuery
-    BadRequestError:
-      type: object
-      title: BadRequestError
-      description: User sent a bad request.
-      properties:
-        message:
-          type: string
-          title: Message
-      required:
-      - message
   securitySchemes:
     jwt:
       type: http
