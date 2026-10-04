@@ -967,6 +967,9 @@ maintainers:
   - FN: APIs.json
     email: info@apis.io
 common:
+  - type: CapabilityMap
+    url: capabilities/cybelangel-capability-edges.yml
+    name: CybelAngel Business Capability Map
   - type: Overlay
     url: overlays/cybelangel-platform-reports-overlay.yaml
   - type: Overlay
