@@ -131,11 +131,11 @@ components:
                 description: internal error type
                 examples:
                 - error
-    Error403:
-      description: '**Forbidden**
+    Error401:
+      description: '**Unauthorized**
 
 
-        Access to requested resource is forbidden with current credentials.
+        Authentication is required
 
         '
       content:
@@ -153,11 +153,11 @@ components:
                 description: internal error type
                 examples:
                 - error
-    Error401:
-      description: '**Unauthorized**
+    Error403:
+      description: '**Forbidden**
 
 
-        Authentication is required
+        Access to requested resource is forbidden with current credentials.
 
         '
       content:

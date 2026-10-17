@@ -262,32 +262,16 @@ paths:
       - url: https://api.cybelangel.com
 components:
   schemas:
-    ClaimedAttackNetwork:
-      type: string
-      enum:
-      - tor
-      - openweb
-      - telegram
-      - discord
-      title: ClaimedAttackNetwork
-    UnauthorizedError:
+    NotFoundError:
       type: object
-      title: UnauthorizedError
-      description: User cannot access some resource.
+      title: NotFoundError
+      description: Nothing matches the given URI
       properties:
         message:
           type: string
           title: Message
       required:
       - message
-    APIErrorResponse_BadRequestError_:
-      type: object
-      title: APIErrorResponse[BadRequestError]
-      properties:
-        error:
-          $ref: '#/components/schemas/BadRequestError'
-      required:
-      - error
     APIErrorResponse_NotFoundError_:
       type: object
       title: APIErrorResponse[NotFoundError]
@@ -296,87 +280,18 @@ components:
           $ref: '#/components/schemas/NotFoundError'
       required:
       - error
-    APIErrorResponse_UnauthorizedError_:
+    APIErrorResponse_BadRequestError_:
       type: object
-      title: APIErrorResponse[UnauthorizedError]
+      title: APIErrorResponse[BadRequestError]
       properties:
         error:
-          $ref: '#/components/schemas/UnauthorizedError'
+          $ref: '#/components/schemas/BadRequestError'
       required:
       - error
     ForbiddenAccessError:
       type: object
       title: ForbiddenAccessError
       description: User cannot access some resource.
-      properties:
-        message:
-          type: string
-          title: Message
-      required:
-      - message
-    ClaimedAttackCategory:
-      type: string
-      enum:
-      - data_leak
-      - ddos
-      - defacement
-      - ransomware
-      title: ClaimedAttackCategory
-    ClaimedAttackSourceDTO:
-      type: object
-      title: ClaimedAttackSourceDTO
-      description: Origin where a claimed attack was observed.
-      properties:
-        network:
-          description: Network/channel the source belongs to.
-          examples:
-          - tor
-          anyOf:
-          - $ref: '#/components/schemas/ClaimedAttackNetwork'
-        url:
-          title: Url
-          description: URL of the source (e.g. the onion address of the leak site).
-          examples:
-          - http://example.onion/victims/acme-corp
-          anyOf:
-          - type: string
-    ClaimedAttacksSortByOrderQuery:
-      type: string
-      enum:
-      - asc
-      - desc
-      title: ClaimedAttacksSortByOrderQuery
-    ClaimedAttacksSortByCriteriaQuery:
-      type: string
-      enum:
-      - category
-      - claimed_at
-      - threat_actors
-      - countries
-      - industries
-      - victims
-      - domains
-      title: ClaimedAttacksSortByCriteriaQuery
-    APIErrorResponse_UnknownError_:
-      type: object
-      title: APIErrorResponse[UnknownError]
-      properties:
-        error:
-          $ref: '#/components/schemas/UnknownError'
-      required:
-      - error
-    APIErrorResponse_ForbiddenAccessError_:
-      type: object
-      title: APIErrorResponse[ForbiddenAccessError]
-      properties:
-        error:
-          $ref: '#/components/schemas/ForbiddenAccessError'
-      required:
-      - error
-    UnknownError:
-      type: object
-      title: UnknownError
-      description: Unknown error on server-side, please contact support.
       properties:
         message:
           type: string
@@ -477,16 +392,101 @@ components:
       - industries
       - victims
       - domains
-    NotFoundError:
+    ClaimedAttackCategory:
+      type: string
+      enum:
+      - data_leak
+      - ddos
+      - defacement
+      - ransomware
+      title: ClaimedAttackCategory
+    APIErrorResponse_UnauthorizedError_:
       type: object
-      title: NotFoundError
-      description: Nothing matches the given URI
+      title: APIErrorResponse[UnauthorizedError]
+      properties:
+        error:
+          $ref: '#/components/schemas/UnauthorizedError'
+      required:
+      - error
+    APIErrorResponse_UnknownError_:
+      type: object
+      title: APIErrorResponse[UnknownError]
+      properties:
+        error:
+          $ref: '#/components/schemas/UnknownError'
+      required:
+      - error
+    ClaimedAttacksSortByCriteriaQuery:
+      type: string
+      enum:
+      - category
+      - claimed_at
+      - threat_actors
+      - countries
+      - industries
+      - victims
+      - domains
+      title: ClaimedAttacksSortByCriteriaQuery
+    ClaimedAttacksSortByOrderQuery:
+      type: string
+      enum:
+      - asc
+      - desc
+      title: ClaimedAttacksSortByOrderQuery
+    APIErrorResponse_ForbiddenAccessError_:
+      type: object
+      title: APIErrorResponse[ForbiddenAccessError]
+      properties:
+        error:
+          $ref: '#/components/schemas/ForbiddenAccessError'
+      required:
+      - error
+    UnauthorizedError:
+      type: object
+      title: UnauthorizedError
+      description: User cannot access some resource.
       properties:
         message:
           type: string
           title: Message
       required:
       - message
+    ClaimedAttackSourceDTO:
+      type: object
+      title: ClaimedAttackSourceDTO
+      description: Origin where a claimed attack was observed.
+      properties:
+        network:
+          description: Network/channel the source belongs to.
+          examples:
+          - tor
+          anyOf:
+          - $ref: '#/components/schemas/ClaimedAttackNetwork'
+        url:
+          title: Url
+          description: URL of the source (e.g. the onion address of the leak site).
+          examples:
+          - http://example.onion/victims/acme-corp
+          anyOf:
+          - type: string
+    UnknownError:
+      type: object
+      title: UnknownError
+      description: Unknown error on server-side, please contact support.
+      properties:
+        message:
+          type: string
+          title: Message
+      required:
+      - message
+    ClaimedAttackNetwork:
+      type: string
+      enum:
+      - tor
+      - openweb
+      - telegram
+      - discord
+      title: ClaimedAttackNetwork
     BadRequestError:
       type: object
       title: BadRequestError

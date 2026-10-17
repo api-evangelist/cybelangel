@@ -175,18 +175,94 @@ paths:
       - url: https://api.cybelangel.com
 components:
   schemas:
-    UserMetadata:
+    NotFoundError:
       type: object
-      title: UserMetadata
+      title: NotFoundError
+      description: Nothing matches the given URI
       properties:
-        email:
+        message:
           type: string
-          title: Email
-          description: Email of the user.
-          examples:
-          - john.doe@cybelangel.com
+          title: Message
       required:
-      - email
+      - message
+    APIErrorResponse_NotFoundError_:
+      type: object
+      title: APIErrorResponse[NotFoundError]
+      properties:
+        error:
+          $ref: '#/components/schemas/NotFoundError'
+      required:
+      - error
+    ForbiddenAccessError:
+      type: object
+      title: ForbiddenAccessError
+      description: User cannot access some resource.
+      properties:
+        message:
+          type: string
+          title: Message
+      required:
+      - message
+    AuditLogsList:
+      type: object
+      title: AuditLogsList
+      description: List of audit logs.
+      properties:
+        total:
+          type: integer
+          title: Total
+          description: Total number of audit logs matching the request.
+          examples:
+          - 153
+        events:
+          type: array
+          title: Events
+          description: Events matching the request parameters. The number of returned events can be inferior to the total if there are more results than the requested limit.
+          items:
+            $ref: '#/components/schemas/PublicAuditLog'
+        more:
+          type: boolean
+          title: More
+          description: Set to true when there are more audit logs to retrieve with the same search request parameters and a new 'cursor'.
+          default: false
+        cursor:
+          title: Cursor
+          description: Set when there are more audit logs to retrieve. It can be used in another search request, with the same parameters, to download the following audit logs.
+          default: null
+          examples:
+          - 646q4dzHTR6521grDs654gtr1hg3652eds2005496feHKrf
+          anyOf:
+          - type: string
+          - type: 'null'
+      required:
+      - total
+      - events
+    KeywordMetadata:
+      type: object
+      title: KeywordMetadata
+      properties:
+        name:
+          type: string
+          title: Name
+          description: Name of the keyword.
+          examples:
+          - Cybelangel
+        status:
+          type: string
+          title: Status
+          description: Status of the keyword.
+          examples:
+          - active
+        type:
+          type: string
+          title: Type
+          description: Type of the keyword.
+          examples:
+          - brand
+      required:
+      - name
+      - status
+      - type
     ReportMetadata:
       type: object
       title: ReportMetadata
@@ -220,46 +296,62 @@ components:
       - incident_type
       - severity
       - status
-    ValidationError:
-      type: object
-      title: ValidationError
-      description: Error on incorrect input fields
-      properties:
-        message:
-          type: string
-          title: Message
-        fields:
-          type: array
-          title: Fields
-          items:
-            $ref: '#/components/schemas/Field'
-      required:
-      - message
-      - fields
-    APIErrorResponse_NotFoundError_:
-      type: object
-      title: APIErrorResponse[NotFoundError]
-      properties:
-        error:
-          $ref: '#/components/schemas/NotFoundError'
-      required:
-      - error
-    ForbiddenAccessError:
-      type: object
-      title: ForbiddenAccessError
-      description: User cannot access some resource.
-      properties:
-        message:
-          type: string
-          title: Message
-      required:
-      - message
     APIErrorResponse_UnknownError_:
       type: object
       title: APIErrorResponse[UnknownError]
       properties:
         error:
           $ref: '#/components/schemas/UnknownError'
+      required:
+      - error
+    UserMetadata:
+      type: object
+      title: UserMetadata
+      properties:
+        email:
+          type: string
+          title: Email
+          description: Email of the user.
+          examples:
+          - john.doe@cybelangel.com
+      required:
+      - email
+    APIErrorResponse_ForbiddenAccessError_:
+      type: object
+      title: APIErrorResponse[ForbiddenAccessError]
+      properties:
+        error:
+          $ref: '#/components/schemas/ForbiddenAccessError'
+      required:
+      - error
+    Action:
+      type: string
+      enum:
+      - create
+      - update
+      - delete
+      - view
+      - share_externally
+      - export
+      - add_comment
+      - request_takedown
+      - login
+      - logout
+      - change_password
+      title: Action
+    ObjectType:
+      type: string
+      enum:
+      - report
+      - keyword
+      - user
+      title: ObjectType
+    APIErrorResponse_ValidationError_:
+      type: object
+      title: APIErrorResponse[ValidationError]
+      properties:
+        error:
+          $ref: '#/components/schemas/ValidationError'
       required:
       - error
     UnknownError:
@@ -272,16 +364,26 @@ components:
           title: Message
       required:
       - message
-    NotFoundError:
+    Field:
       type: object
-      title: NotFoundError
-      description: Nothing matches the given URI
+      title: Field
+      description: Detail of an incorrect input field
       properties:
-        message:
+        name:
           type: string
-          title: Message
+          title: Name
+        msg:
+          type: string
+          title: Msg
+        input:
+          title: Input
+          default: null
+          anyOf:
+          - type: string
+          - type: 'null'
       required:
-      - message
+      - name
+      - msg
     PublicAuditLog:
       type: object
       title: PublicAuditLog
@@ -369,124 +471,22 @@ components:
       - object_type
       - event_id
       - organization_id
-    ObjectType:
-      type: string
-      enum:
-      - report
-      - keyword
-      - user
-      title: ObjectType
-    APIErrorResponse_ForbiddenAccessError_:
+    ValidationError:
       type: object
-      title: APIErrorResponse[ForbiddenAccessError]
+      title: ValidationError
+      description: Error on incorrect input fields
       properties:
-        error:
-          $ref: '#/components/schemas/ForbiddenAccessError'
-      required:
-      - error
-    Action:
-      type: string
-      enum:
-      - create
-      - update
-      - delete
-      - view
-      - share_externally
-      - export
-      - add_comment
-      - request_takedown
-      - login
-      - logout
-      - change_password
-      title: Action
-    APIErrorResponse_ValidationError_:
-      type: object
-      title: APIErrorResponse[ValidationError]
-      properties:
-        error:
-          $ref: '#/components/schemas/ValidationError'
-      required:
-      - error
-    AuditLogsList:
-      type: object
-      title: AuditLogsList
-      description: List of audit logs.
-      properties:
-        total:
-          type: integer
-          title: Total
-          description: Total number of audit logs matching the request.
-          examples:
-          - 153
-        events:
+        message:
+          type: string
+          title: Message
+        fields:
           type: array
-          title: Events
-          description: Events matching the request parameters. The number of returned events can be inferior to the total if there are more results than the requested limit.
+          title: Fields
           items:
-            $ref: '#/components/schemas/PublicAuditLog'
-        more:
-          type: boolean
-          title: More
-          description: Set to true when there are more audit logs to retrieve with the same search request parameters and a new 'cursor'.
-          default: false
-        cursor:
-          title: Cursor
-          description: Set when there are more audit logs to retrieve. It can be used in another search request, with the same parameters, to download the following audit logs.
-          default: null
-          examples:
-          - 646q4dzHTR6521grDs654gtr1hg3652eds2005496feHKrf
-          anyOf:
-          - type: string
-          - type: 'null'
+            $ref: '#/components/schemas/Field'
       required:
-      - total
-      - events
-    Field:
-      type: object
-      title: Field
-      description: Detail of an incorrect input field
-      properties:
-        name:
-          type: string
-          title: Name
-        msg:
-          type: string
-          title: Msg
-        input:
-          title: Input
-          default: null
-          anyOf:
-          - type: string
-          - type: 'null'
-      required:
-      - name
-      - msg
-    KeywordMetadata:
-      type: object
-      title: KeywordMetadata
-      properties:
-        name:
-          type: string
-          title: Name
-          description: Name of the keyword.
-          examples:
-          - Cybelangel
-        status:
-          type: string
-          title: Status
-          description: Status of the keyword.
-          examples:
-          - active
-        type:
-          type: string
-          title: Type
-          description: Type of the keyword.
-          examples:
-          - brand
-      required:
-      - name
-      - status
-      - type
+      - message
+      - fields
   securitySchemes:
     jwt:
       type: http
