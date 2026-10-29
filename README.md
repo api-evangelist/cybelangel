@@ -64,60 +64,147 @@
 > Full detail: **[Where this data comes from](https://apievangelist.com/about/where-our-data-comes-from)**
 <!-- API-EVANGELIST-PROVENANCE:END -->
 
-CybelAngel is a Paris- and Boston-based external risk protection company. Its platform scans the
-public internet, the deep and dark web, unsecured file servers and databases, cloud drives, code-
-and paste-sharing sites, DNS and social platforms for a customer's exposed data and unmanaged
-assets, across external attack surface (ADM) inventory, data-breach prevention, credential
-intelligence, brand protection and impersonation, cyber threat intelligence, and analyst-led
-remediation.
+CybelAngel is a Paris- and Boston-based external risk protection company that scans the public internet, the deep and dark web, connected devices, cloud storage, code-sharing and paste sites for a customer's exposed data and unmanaged assets. Its platform covers external attack surface (ADM) inventory, data-breach prevention, credential intelligence, brand protection and domain/social-media impersonation, cyber threat intelligence, and analyst-led remediation. For developers it publishes seven documented REST APIs on a Stoplight developer portal — Reports (incident reports, credential and domain watchlists, assets, remediation requests), Alerts in Feed (real-time alerts, also served in OASIS STIX format), ADM Inventory, Keywords, Threat Intelligence claimed-attacks, Audit Logs and a Partner API for MSSPs managing client organizations — all authenticated with OAuth 2.0 client-credentials bearer tokens minted by an Auth0 tenant, plus CybelAngel Connect, a no-code automation studio for ServiceNow, Jira, Splunk, Slack, Cortex XSOAR, IBM Security SOAR and Azure Sentinel.
 
-## What this profile covers
+**Areas:** Company · Cybersecurity · Threat Intelligence · external-attack-surface-management · data-breach-prevention · Credential Intelligence · Brand Protection · Dark Web Monitoring · Digital Risk Protection · STIX · security-alerts · Asset Inventory
 
-CybelAngel publishes **seven documented REST APIs** on a Stoplight developer portal at
-[developers.cybelangel.com](https://developers.cybelangel.com/) — **52 operations across seven
-OpenAPI 3.1.0 documents**, all harvested verbatim into [`openapi/`](openapi/):
+## CybelAngel on APIs.io
 
-| API | Ops | Base URL |
-|---|---|---|
-| [Reports](https://developers.cybelangel.com/docs/cybelangel-platform-api/39d4926befc14-what-can-i-do-with-this-api) | 21 | `https://platform.cybelangel.com/api` |
-| [Alerts (Alerts in Feed)](https://developers.cybelangel.com/docs/alerts-api/72b66de24898e-cybel-angel-alerts-api-real-time-threat-intelligence) | 9 | `https://api.cybelangel.com` |
-| [Partner](https://developers.cybelangel.com/docs/partner-api/72b66de24898e-cybel-angel-partners-api) | 10 | `https://api.cybelangel.com` |
-| [ADM Inventory](https://developers.cybelangel.com/docs/adm-inventory-api/7e88d945427a4-fetch-assets-details-from-adm-inventory) | 5 | `https://api.cybelangel.com` |
-| [Keywords](https://developers.cybelangel.com/docs/keywords-api/c812fc6b544b0-manipulate-your-keywords) | 5 | `https://api.cybelangel.com` |
-| [Threat Intelligence](https://developers.cybelangel.com/docs/threat-intelligence-api/38e63ab3d5c42-fetch-threat-intelligence-claimed-attacks) | 1 | `https://api.cybelangel.com` |
-| [Audit Logs](https://developers.cybelangel.com/docs/audit-logs-api/72b66de24898e-cybel-angel-audit-logs-api) | 1 | `https://api.cybelangel.com` |
+Everything profiled for CybelAngel is published on APIs.io rather than in this repository. Start at the provider page — **[apis.io/providers/cybelangel/](https://apis.io/providers/cybelangel/)** — or go straight to one of the APIs or properties below.
 
-Authentication is OAuth 2.0 client-credentials against an Auth0 tenant at
-`auth.cybelangel.com`, which serves real OIDC discovery, RFC 8414 metadata and JWKS
-(all three captured in [`well-known/`](well-known/)).
+### APIs (13)
 
-## Notable findings
+- [CybelAngel ADM Inventory API](https://apis.io/apis/cybelangel/cybelangel-adm-inventory-api/) — Manipulate ADM inventory assets and threats.
+- [CybelAngel Alerts API](https://apis.io/apis/cybelangel/cybelangel-alerts-api/) — Alerts
+- [CybelAngel Asset API](https://apis.io/apis/cybelangel/cybelangel-asset-api/) — Accessing the application assets
+- [CybelAngel audit logs API](https://apis.io/apis/cybelangel/cybelangel-audit-logs-api/) — Audit Logs Public API
+- [CybelAngel Credential watchlist API](https://apis.io/apis/cybelangel/cybelangel-credential-watchlist-api/) — Credentials incident reports and credentials
+- [CybelAngel Domain watchlist API](https://apis.io/apis/cybelangel/cybelangel-domain-watchlist-api/) — Domain Protection
+- [CybelAngel Incident reports API](https://apis.io/apis/cybelangel/cybelangel-incident-reports-api/) — Manipulate incident reports.
+- [CybelAngel Keywords API](https://apis.io/apis/cybelangel/cybelangel-keywords-api/) — Manipulate keywords.
+- [CybelAngel Reports API](https://apis.io/apis/cybelangel/cybelangel-reports-api/) — The Reports API from CybelAngel — 1 operation(s) for reports.
+- [CybelAngel Stats API](https://apis.io/apis/cybelangel/cybelangel-stats-api/) — Statistics on the reports, keywords, etc.
+- [CybelAngel Stix API](https://apis.io/apis/cybelangel/cybelangel-stix-api/) — Alerts - Stix
+- [CybelAngel Threat Intelligence API](https://apis.io/apis/cybelangel/cybelangel-threat-intelligence-api/) — Fetch threat intelligence data from the CybelAngel platform.
+- [CybelAngel Workspaces API](https://apis.io/apis/cybelangel/cybelangel-workspaces-api/) — List workspaces.
 
-- **Token minting is the real quota.** 2,000 tokens/month per `client_id` against a token the
-  docs variously describe as lasting 1 hour or 24 hours. Caching is mandatory, not an
-  optimization — see [`rate-limits/`](rate-limits/) and [`conventions/`](conventions/).
-- **Two pagination styles in one estate**: cursor on the newer `api.cybelangel.com` APIs,
-  `skip`/`limit` on the Reports watchlists and Threat Intelligence.
-- **No idempotency key anywhere**, and two genuinely non-idempotent POSTs (report comments,
-  remediation requests).
-- **Published limits, no runtime signal**: 15 req/s and 20 concurrent requests are documented,
-  but no `X-RateLimit-*`, `RateLimit-*` or `Retry-After` header exists and the exhaustion status
-  code is never named.
-- **The Reports API declares no error schemas** — its 4xx/5xx responses carry a description only,
-  unlike the six sibling specs.
-- **STIX is a real strength**: `GET /v1/stix/alerts` returns OASIS STIX bundles, with a published
-  schema mapping per alert category.
-- **The `/security.txt` is broken three ways** — wrong path, no `Expires`, and its only `Contact`
-  is the marketing site's WordPress agency rather than CybelAngel. Detail in
-  [`security/`](security/).
-- **No SDKs, no CLI, no MCP server, no agent card, no webhooks/AsyncAPI, no status page, no
-  published prices.** Every registry and well-known path probed is recorded with the status it
-  actually returned.
-- CybelAngel does hold **ISO/IEC 27001:2022** and **SOC 2 Type I** (both A-LIGN) — see
-  [`conformance/`](conformance/).
+### Published properties
 
-Six packaged [Agent Skills](skills/) ground the marquee flows in real `operationId`s, and each
-harvested spec has an [Overlay](overlays/) carrying API Evangelist's derived findings without
-mutating the provider's document.
+Each property below is a page on APIs.io carrying the machine-readable artifact and what it says.
 
-Source: portfolio company of [serena](https://github.com/api-evangelist/serena) — https://www.cybelangel.com/
+#### MCP servers (1)
+
+Model Context Protocol servers that expose the API to agents.
+
+- [cybelangel](https://apis.io/servers/cybelangel/cybelangel/)
+
+#### Overlays (7)
+
+OpenAPI overlays, including conversational phrasing for each operation.
+
+- [Cybelangel Adm Inventory Overlay](https://apis.io/overlays/cybelangel/cybelangel-adm-inventory-overlay/)
+- [Cybelangel Alerts Overlay](https://apis.io/overlays/cybelangel/cybelangel-alerts-overlay/)
+- [Cybelangel Audit Logs Overlay](https://apis.io/overlays/cybelangel/cybelangel-audit-logs-overlay/)
+- [Cybelangel Keywords Overlay](https://apis.io/overlays/cybelangel/cybelangel-keywords-overlay/)
+- [Cybelangel Partner Overlay](https://apis.io/overlays/cybelangel/cybelangel-partner-overlay/)
+- [Cybelangel Platform Reports Overlay](https://apis.io/overlays/cybelangel/cybelangel-platform-reports-overlay/)
+- [Cybelangel Threat Intelligence Overlay](https://apis.io/overlays/cybelangel/cybelangel-threat-intelligence-overlay/)
+
+#### Security (3)
+
+Authentication, trust centre, and vulnerability disclosure.
+
+- [Cybelangel Authentication](https://apis.io/security/cybelangel/cybelangel-authentication/)
+- [Cybelangel Domain Security](https://apis.io/security/cybelangel/cybelangel-domain-security/)
+- [Cybelangel Vulnerability Disclosure](https://apis.io/security/cybelangel/cybelangel-vulnerability-disclosure/)
+
+#### OAuth scopes (1)
+
+The permissions the API asks for.
+
+- [Cybelangel Scopes](https://apis.io/scopes/cybelangel/cybelangel-scopes/)
+
+#### Plans and pricing (1)
+
+Published plans, tiers and prices.
+
+- [Cybelangel Plans Pricing](https://apis.io/plans/cybelangel/cybelangel-plans-pricing/)
+
+#### Rate limits (1)
+
+Published request limits.
+
+- [Cybelangel Rate Limits](https://apis.io/rate-limits/cybelangel/cybelangel-rate-limits/)
+
+## Where to find this API
+
+Links to the company's own pages. This repository publishes no copy of their specifications — the canonical document is theirs and lives at the URLs below.
+
+- [Website](https://www.cybelangel.com/)
+- [Documentation](https://developers.cybelangel.com/docs/cybelangel-platform-api/39d4926befc14-what-can-i-do-with-this-api)
+- [Getting started](https://developers.cybelangel.com/docs/cybelangel-platform-api/05d245301ecc5-get-your-api-credentials)
+- [API reference](https://developers.cybelangel.com/docs/cybelangel-platform-api/68a341c676710-references)
+- [Sign up](https://cybelangel.com/request-a-demo/)
+- [Support](https://cybelangel.com/contact/)
+- [Changelog](https://cybelangel.com/changelog/)
+- [Blog](https://cybelangel.com/blog/)
+- [Security](https://cybelangel.com/security.txt)
+- [Compliance](https://cybelangel.com/solutions/compliance-cybelangel/)
+- [Terms of service](https://cybelangel.com/terms-conditions/)
+- [Privacy policy](https://cybelangel.com/privacy-policy/)
+- [GitHub](https://github.com/CybelAngel)
+
+## API Evangelist rating
+
+**Kin Score 59.5** — strong · rubric 0.25.0 · scored 2026-10-23
+
+| Facet | Score |
+|---|---|
+| Discoverability | 71.4 |
+| Contract quality | 54.9 |
+| Contract governance | 18.2 |
+| Operational transparency | 60.5 |
+| Developer ergonomics | 62.5 |
+| Access clarity | 42.1 |
+
+**Agent readiness 42.7** — agent-ready (gated down from agent-native)
+
+| Agent-readiness dimension | Result |
+|---|---|
+| Spec Presence | yes |
+| Agentic Access | — |
+| Reversibility Documented | — |
+| MCP Server | — |
+| Auth Clarity | served (partial credit) |
+| Idempotency | — |
+| Error Semantics | verified |
+| OpenAPI Examples | verified |
+| Rate Limit Signal | documented (partial credit) |
+| Event Surface Described | — |
+| Agent Skills | derived (partial credit) |
+| Well Known Catalog | — |
+| Consent Identity | — |
+| Agent Card | — |
+| Dry Run Mode | — |
+| Delegated Identity | served (partial credit) |
+| Protected Resource Metadata | — |
+| Dynamic Client Registration | yes |
+| Agentic Commerce | — |
+| Pagination Ratio | partial |
+| Operation Distinctiveness | mostly |
+
+**Regulatory alignment 45.1** — Horizontal (data, software, accessibility, platform)
+
+The rubric is published at [github.com/api-evangelist/kin-score](https://github.com/api-evangelist/kin-score). The per-check breakdown behind these numbers — which checks were earned, partial or missed — along with score history and how this provider compares to its peers, is available at [apis.io/providers/cybelangel/](https://apis.io/providers/cybelangel/).
+
+## How this profile is made
+
+API Evangelist profiles a company's public API surface the way a developer would find it: the website, developer portal and documentation, the specifications it publishes, its public repositories, and its pricing, status and changelog pages. From that it derives the properties above — contracts split per API, workflows, schemas, collections, governance rules, plans and rate limits — and scores them against the published [Kin Score rubric](https://github.com/api-evangelist/kin-score).
+
+The artifacts are published on [APIs.io](https://apis.io), not in this repository. This repository is the public record for CybelAngel: the place to say something is wrong, missing or out of date, and to ask for a re-score or a removal.
+
+## Open an issue
+
+- **Something about this listing** — a wrong description, a missing API, a stale artifact or a question about the rating: [open an issue on this repository](https://github.com/api-evangelist/cybelangel/issues/new).
+- **A new API, or one that is not in the catalog yet** — [submit it on APIs.io](https://apis.io/add/).
+- **Anything else** — [the APIs.io inbox](https://github.com/api-search/inbox/issues/new) or [info@apievangelist.com](mailto:info@apievangelist.com).
